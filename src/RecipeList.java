@@ -13,7 +13,7 @@ import java.util.Iterator;
 
 public class RecipeList {
     
-    private int highestIndex;
+    private int highestIndex;  //index of the most recently created recipe
     
     private HashMap<Integer, Recipe> recipeList;
 
@@ -26,12 +26,12 @@ public class RecipeList {
         try { 
             FileOutputStream myFileOutStream 
                 = new FileOutputStream( 
-                    "recipeList.txt"); 
+                    "recipe.list"); //create outputstream for file
   
             ObjectOutputStream myObjectOutStream 
-                = new ObjectOutputStream(myFileOutStream); 
+                = new ObjectOutputStream(myFileOutStream); //attaches the fileobject stream to object
   
-            myObjectOutStream.writeObject(recipeList); 
+            myObjectOutStream.writeObject(recipeList); //write the objecct to the output object stream
   
             // closing FileOutputStream and 
             // ObjectOutputStream 
@@ -48,12 +48,12 @@ public class RecipeList {
   
         try { 
             FileInputStream fileInput = new FileInputStream( 
-                "recipeList.txt"); 
+                "recipe.list"); //create pointer to file 
   
             ObjectInputStream objectInput 
-                = new ObjectInputStream(fileInput); 
+                = new ObjectInputStream(fileInput); //attach pointer to object input stream
   
-            newHashMap = (HashMap)objectInput.readObject(); 
+            newHashMap = (HashMap)objectInput.readObject(); //take object in from stream
   
             objectInput.close(); 
             fileInput.close(); 
@@ -70,32 +70,25 @@ public class RecipeList {
             return; 
         } 
   
-        System.out.println("Deserializing  HashMap.."); 
-  
-        // Displaying content in "newHashMap.txt" using 
-        // Iterator 
+        // Iterate through the hashmap and find largest entry to update highestIndex
         Set set = newHashMap.entrySet(); 
         Iterator iterator = set.iterator(); 
   
         while (iterator.hasNext()) { 
             Map.Entry entry = (Map.Entry)iterator.next(); 
-  
-            // System.out.print("key : " + entry.getKey() 
-            //                  + " & Value : "); 
-            // System.out.println(entry.getValue()); 
             if((Integer)entry.getKey() > highestIndex){
                 highestIndex = (Integer)entry.getKey();
             }
         }
 
-        recipeList = newHashMap;
+        recipeList = newHashMap; //update recipeList
     }
 
     public Recipe getRecipe(int recipeID){
         return recipeList.get(recipeID);
     }
     public void newRecipe(String title, String recipeText){
-        int index = ++highestIndex;
+        int index = ++highestIndex; //increment highestIndex with every new recipe creataed
         Recipe r = new Recipe(index,title, recipeText);
         recipeList.put(index,r);
     }

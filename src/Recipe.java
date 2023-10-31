@@ -2,12 +2,12 @@ import java.io.Serializable;
 
 public class Recipe implements Serializable{
 
-    private int recipeID;
-    private String title;
+    private int recipeID; //index of recipe to be used for ordering and adressing
+    private String title; 
     private String recipeText;
 
     public Recipe(int recipeID, String title, String recipeText){
-        this. recipeID = recipeID;
+        this.recipeID = recipeID;
         this.title = title;
         this.recipeText = recipeText;
     }
@@ -17,8 +17,6 @@ public class Recipe implements Serializable{
     }
 
     public String getTitle(){
-        
-    
         return title;
     }
 
