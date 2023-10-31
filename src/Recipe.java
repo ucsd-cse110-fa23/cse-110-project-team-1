@@ -1,25 +1,42 @@
-public class Recipe {
-    
+import java.io.Serializable;
 
-    int index;
-    String title;
-    String recipeText;
+public class Recipe implements Serializable{
 
-    Recipe(int index, String titie, String recipeText){
+    private int recipeID;
+    private String title;
+    private String recipeText;
 
+    public Recipe(int recipeID, String title, String recipeText){
+        this. recipeID = recipeID;
+        this.title = title;
+        this.recipeText = recipeText;
     }
 
-    int getIndex(){
+    public int getRecipeID(){
+        return recipeID;
+    }
+
+    public String getTitle(){
         
+    
+        return title;
     }
 
-    String getTitle(){}
+    public String getRecipeText(){
+        return recipeText;
+    }
 
-    String getRecipeText(){}
+    public void setTitle(String newTitle){
+        title = newTitle;
+    }
 
-    void setTitle(){}
+    public void setRecipeText(String newRecipe){
+        recipeText = newRecipe;
+    }
 
-    void setRecipeText(){}
+    public String toString(){
+        return title + ": "+ recipeText;
+    }
 
 }
 
