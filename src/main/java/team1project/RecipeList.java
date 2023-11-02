@@ -1,3 +1,4 @@
+package main.java.team1project;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -87,7 +88,7 @@ public class RecipeList {
     public Recipe getRecipe(int recipeID){
         return recipeList.get(recipeID);
     }
-    public void newRecipe(String recipeTitle, String recipeText){
+    public void addRecipe(String recipeTitle, String recipeText){
         int recipeID = ++highestIndex; //increment highestIndex with every new recipe creataed
         Recipe r = new Recipe(recipeID,recipeTitle, recipeText);
         recipeList.put(recipeID,r);

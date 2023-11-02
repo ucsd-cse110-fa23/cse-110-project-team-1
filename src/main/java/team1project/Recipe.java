@@ -1,3 +1,5 @@
+package main.java.team1project;
+
 import java.io.Serializable;
 
 public class Recipe implements Serializable{
@@ -24,7 +26,7 @@ public class Recipe implements Serializable{
         return recipeText;
     }
 
-    public void setTitle(String newTitle){
+    public void setRecipeTitle(String newTitle){
         recipeTitle = newTitle;
     }
 
