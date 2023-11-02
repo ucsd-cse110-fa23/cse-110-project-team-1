@@ -1,4 +1,10 @@
-build
+# Ignore system files
 .vscode
-bin
+
+# Ignore compile-time files
 .gradle
+build/
+bin/
+
+# Never include API key contents to public
+key.txt

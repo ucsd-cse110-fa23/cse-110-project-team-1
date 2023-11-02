@@ -14,11 +14,14 @@ repositories {
 
 dependencies {
     def junitVersion = '5.8.1'
+    def jsonVersion = '20230227'
 
     // This provides the JUnit API.
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     // This provides the TestEngine to actually run the tests.
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+    // This provides the JSON API.
+    implementation "org.json:json:$jsonVersion"
 }
 
 sourceSets {

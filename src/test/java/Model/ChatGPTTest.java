@@ -5,21 +5,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import Model.ChatGPT;
-
 public class ChatGPTTest {
-    private ChatGPT chatGPT;
+    private GPTModel chatGPT;
 
     @BeforeEach
     void setUp() {
-        chatGPT = new ChatGPT();
+        chatGPT = new MockGPT();
     }
 
     @Test
-    void testValidChatGPT() {
-        String expected = "this is wrong, write a mock ChatGPT class later so this is doable";
+    void testValidGPT() {
+        String expected = "Recipe for mashed potatoes...";
         String mealType = "Dinner";
-        String ingredients = "I have eggs, bacon, cheese.";
+        String ingredients = "I have potatoes, butter and cheese.";
 
         try {
             String response = chatGPT.getResponse(mealType, ingredients);
@@ -27,6 +25,33 @@ public class ChatGPTTest {
         } catch (Exception e) {
             System.err.println(e);
         }
-        
+    }
+
+    @Test
+    void testInvalidGPT_mealType() {
+        String expected = "No recipe.";
+        String mealType = "Lunch";
+        String ingredients = "I have potatoes, butter and cheese.";
+
+        try {
+            String response = chatGPT.getResponse(mealType, ingredients);
+            assertEquals(expected, response);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
+    }
+
+    @Test
+    void testInvalidGPT_ingredients() {
+        String expected = "No recipe.";
+        String mealType = "Dinner";
+        String ingredients = "I have potatoes, bacon and cheese.";
+
+        try {
+            String response = chatGPT.getResponse(mealType, ingredients);
+            assertEquals(expected, response);
+        } catch (Exception e) {
+            System.err.println(e);
+        }
     }
 }
