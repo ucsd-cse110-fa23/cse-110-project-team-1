@@ -70,11 +70,59 @@ public class ChatGPT implements GPTModel {
 }
 
 class MockGPT implements GPTModel {
+    private static final String API_ENDPOINT = "https://api.openai.com/v1/completions";
+    private static String API_KEY;
+    private static final String MODEL = "text-davinci-003";
+    private static final int MAXTOKENS = 400;
+
+    public MockGPT() {
+        try {
+            // For mocking purposes, this file does not exist
+            FileInputStream fs = new FileInputStream("wrongkey.txt");
+            API_KEY = new String(fs.readAllBytes());
+            fs.close();
+        } catch(Exception e) {
+            System.err.println(e);
+        }
+    }
+
     public String getResponse(String mealType, String ingredients) throws Exception {
+        // Create a request body which you will pass into request object
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("model", MODEL);
+        requestBody.put("prompt", "I'm looking to make " + mealType + ". Ingredients: " + ingredients);
+        requestBody.put("max_tokens", MAXTOKENS);
+        requestBody.put("temperature", 1.0);
+
+        // Create the HTTP Client
+        HttpClient client = HttpClient.newHttpClient();
+
+        // Create the request object
+        HttpRequest request = HttpRequest
+            .newBuilder()
+            .uri(new URI(API_ENDPOINT))
+            .header("Content-Type", "application/json")
+            .header("Authorization", String.format("Bearer %s", API_KEY))
+            .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+            .build();
+
+        // Send the request and receive an erroneous response
+        HttpResponse<String> postResponse = client.send(
+            request,
+            HttpResponse.BodyHandlers.ofString()
+        );
+
+        // Check if anything about HTTP request is strange
+        if(postResponse.statusCode() != 401 ||
+            postResponse.body() == null ||
+            API_KEY != null) {
+            return "Error";
+        }
+
         String response;
         String prompt = "{bla:\"foo\", choices:[{text:\"Recipe for mashed potatoes...\", test:\"foofoo\"}], blabla:\"bar\"}";
 
-        // Pull response string out of JSON prompt string
+        // Pull response string out of premade JSON prompt string
         String responseBody = prompt;
         JSONObject responseJson = new JSONObject(responseBody);
         JSONArray choices = responseJson.getJSONArray("choices");
