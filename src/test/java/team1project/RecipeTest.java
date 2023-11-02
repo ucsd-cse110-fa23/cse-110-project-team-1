@@ -1,7 +1,7 @@
-package tests;
+package test.java.team1project;
 import org.junit.jupiter.api.Test;
 
-import main.Recipe;
+import main.java.team1project.Recipe;
 
 import org.junit.jupiter.api.BeforeEach;
 

@@ -1,4 +1,5 @@
-package main;
+package main.java.team1project;
+
 import java.io.Serializable;
 
 public class Recipe implements Serializable{

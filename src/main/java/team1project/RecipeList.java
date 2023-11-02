@@ -1,4 +1,4 @@
-package main;
+package main.java.team1project;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
