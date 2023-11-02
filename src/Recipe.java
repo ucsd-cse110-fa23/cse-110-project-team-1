@@ -3,12 +3,12 @@ import java.io.Serializable;
 public class Recipe implements Serializable{
 
     private int recipeID; //index of recipe to be used for ordering and adressing
-    private String title; 
+    private String recipeTitle; 
     private String recipeText;
 
-    public Recipe(int recipeID, String title, String recipeText){
+    public Recipe(int recipeID, String recipeTitle, String recipeText){
         this.recipeID = recipeID;
-        this.title = title;
+        this.recipeTitle = recipeTitle;
         this.recipeText = recipeText;
     }
 
@@ -16,8 +16,8 @@ public class Recipe implements Serializable{
         return recipeID;
     }
 
-    public String getTitle(){
-        return title;
+    public String getRecipeTitle(){
+        return recipeTitle;
     }
 
     public String getRecipeText(){
@@ -25,7 +25,7 @@ public class Recipe implements Serializable{
     }
 
     public void setTitle(String newTitle){
-        title = newTitle;
+        recipeTitle = newTitle;
     }
 
     public void setRecipeText(String newRecipe){
@@ -33,7 +33,7 @@ public class Recipe implements Serializable{
     }
 
     public String toString(){
-        return title + ": "+ recipeText;
+        return recipeTitle + ": "+ recipeText;
     }
 
 }

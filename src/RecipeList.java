@@ -13,7 +13,7 @@ import java.util.Iterator;
 
 public class RecipeList {
     
-    private int highestIndex;  //index of the most recently created recipe
+    private int highestIndex;  //recipeID of the most recently created recipe
     
     private HashMap<Integer, Recipe> recipeList;
 
@@ -87,10 +87,10 @@ public class RecipeList {
     public Recipe getRecipe(int recipeID){
         return recipeList.get(recipeID);
     }
-    public void newRecipe(String title, String recipeText){
-        int index = ++highestIndex; //increment highestIndex with every new recipe creataed
-        Recipe r = new Recipe(index,title, recipeText);
-        recipeList.put(index,r);
+    public void newRecipe(String recipeTitle, String recipeText){
+        int recipeID = ++highestIndex; //increment highestIndex with every new recipe creataed
+        Recipe r = new Recipe(recipeID,recipeTitle, recipeText);
+        recipeList.put(recipeID,r);
     }
     
     public String toString(){
