@@ -1,4 +1,8 @@
+package tests;
 import org.junit.jupiter.api.Test;
+
+import main.Recipe;
+
 import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
