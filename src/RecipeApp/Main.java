@@ -63,6 +63,7 @@ public class Main extends Application {
 			if (newValue != null) {
 				int selectedIndex = listView.getSelectionModel().getSelectedIndex();
 				detailImage.setImage(new Image("file:./src/RecipeApp/images/" + (selectedIndex + 1) + ".jpg"));
+				recipeDescription.setText("Recipe description for recipe " + (selectedIndex + 1) + ": ...");
 			}
 		});
 
