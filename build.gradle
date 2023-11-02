@@ -30,5 +30,6 @@ sourceSets {
 }
 
 test {
+    include 'src/main/*'
     useJUnitPlatform()
 }
