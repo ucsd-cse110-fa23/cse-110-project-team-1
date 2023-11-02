@@ -24,7 +24,7 @@ public class Recipe implements Serializable{
         return recipeText;
     }
 
-    public void setTitle(String newTitle){
+    public void setRecipeTitle(String newTitle){
         recipeTitle = newTitle;
     }
 
