@@ -13,7 +13,7 @@ import java.beans.Transient;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class RecipeTests { //temporary tests until JUnit is in place\
+public class RecipeTest { //temporary tests until JUnit is in place\
     private Recipe recipe;
 
     @BeforeEach
