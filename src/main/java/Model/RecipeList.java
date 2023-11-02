@@ -1,4 +1,4 @@
-package main.java.team1project;
+package Model;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
