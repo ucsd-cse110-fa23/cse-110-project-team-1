@@ -1,4 +1,4 @@
-package main.java.team1project;
+package Model;
 
 import java.io.Serializable;
 
