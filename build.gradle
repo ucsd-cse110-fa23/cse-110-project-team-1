@@ -20,6 +20,14 @@ dependencies {
     // This provides the TestEngine to actually run the tests.
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 }
+sourceSets {
+    test {
+        java.srcDirs += [
+                'src/test'
+        ]
+        print(java.srcDirs)   // Clean
+    }
+}
 
 test {
     useJUnitPlatform()
