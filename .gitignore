@@ -1,4 +1,10 @@
-*.jar
-*.class
-/lib/*
-!/lib/.gitkeep
+# Ignore system files
+.vscode
+
+# Ignore compile-time files
+.gradle
+build/
+bin/
+
+# Never include API key contents to public
+key.txt
