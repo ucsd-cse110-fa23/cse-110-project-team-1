@@ -1,5 +1,5 @@
 # Ignore system files
-.vscode
+vscode/
 
 # Ignore compile-time files
 .gradle
@@ -8,3 +8,7 @@ bin/
 
 # Never include API key contents to public
 key.txt
+*.jar
+*.properties
+.vscode/*
+src/main/java/Model/Main.java
