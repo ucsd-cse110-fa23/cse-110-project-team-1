@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 
-public class Server {
+public class RecipeServer {
 
   // initialize server port and hostname
   private static final int SERVER_PORT = 8100;
@@ -19,7 +19,7 @@ public class Server {
 
     // create a recipelist to store data
    RecipeList list = new RecipeList();
-   list.addRecipe("test recipe", "temp recipe, please remove me");
+   list.loadFromDisk();
     // create a server
     HttpServer server = HttpServer.create(
         new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT),

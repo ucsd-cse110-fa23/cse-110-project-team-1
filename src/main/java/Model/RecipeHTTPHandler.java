@@ -69,6 +69,8 @@ public class RecipeHTTPHandler implements HttpHandler {
   }
 
   private String handlePost(HttpExchange httpExchange) throws IOException {
+    String response = "Invalid POST request";
+    /*
     InputStream inStream = httpExchange.getRequestBody();
     Scanner scanner = new Scanner(inStream);
     String postData = scanner.nextLine();
@@ -84,13 +86,14 @@ public class RecipeHTTPHandler implements HttpHandler {
  
     String response = "Posted entry {" + language + ", " + year + "}";
     System.out.println(response);
- 
+    */
  
     return response;
   }
 
   private String handlePut(HttpExchange httpExchange) throws IOException {
-    InputStream inStream = httpExchange.getRequestBody();
+    String response = "Invalid PUT request";
+    /*InputStream inStream = httpExchange.getRequestBody();
     Scanner scanner = new Scanner(inStream);
     String postData = scanner.nextLine();
     String language = postData.substring(
@@ -111,7 +114,7 @@ public class RecipeHTTPHandler implements HttpHandler {
  
     String response = "Posted entry {" + language + ", " + year + "}";
     System.out.println(response);
- 
+    */
  
     return response;
   }
@@ -119,7 +122,7 @@ public class RecipeHTTPHandler implements HttpHandler {
 
   private String handleDelete(HttpExchange httpExchange) throws IOException {
     String response = "Invalid DELETE request";
-    URI uri = httpExchange.getRequestURI();
+    /*URI uri = httpExchange.getRequestURI();
     String query = uri.getRawQuery();
     if (query != null) {
       String value = query.substring(query.indexOf("=") + 1);
@@ -131,7 +134,7 @@ public class RecipeHTTPHandler implements HttpHandler {
       } else {
         response = "No data found for " + value;
       }
-    }
+    }*/
      return response;
    
     //return "";
