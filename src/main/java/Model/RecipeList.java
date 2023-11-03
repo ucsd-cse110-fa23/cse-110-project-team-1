@@ -2,6 +2,9 @@ package Model;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.json.JSONObject;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream; 
 import java.io.IOException;
@@ -107,6 +110,22 @@ public class RecipeList {
             
         }
         return s;
+    }
+    public JSONObject toJSONObject(){
+        JSONObject allRecipes = new JSONObject();
+        Set set = recipeList.entrySet(); 
+        Iterator iterator = set.iterator(); 
+  
+        while (iterator.hasNext()) { 
+            Map.Entry entry = (Map.Entry)iterator.next(); 
+            Recipe r = ((Recipe) entry.getValue());
+            JSONObject recipe = new JSONObject();
+            recipe.put("recipeText", r.getRecipeText());
+            recipe.put("recipeTitle", r.getRecipeTitle());
+            recipe.put("recipeID", r.getRecipeID());
+            allRecipes.put(Integer.toString(r.getRecipeID()), recipe);  
+        }
+        return allRecipes;
     }
 }
 

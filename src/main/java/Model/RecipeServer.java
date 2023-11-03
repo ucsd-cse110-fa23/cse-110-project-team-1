@@ -36,7 +36,7 @@ public class RecipeServer {
     // Start the server
     server.start();
 
-    System.out.println("Server started on port " + SERVER_PORT);
+    System.out.println("Server started on port " + SERVER_PORT + "\n http://localhost:8100/?all");
 
   }
 }

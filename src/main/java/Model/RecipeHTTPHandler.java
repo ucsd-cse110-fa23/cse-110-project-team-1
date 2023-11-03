@@ -48,13 +48,19 @@ public class RecipeHTTPHandler implements HttpHandler {
     outStream.close();
 
  }
+ /*
+  * get requests are to pull recipes from server can either use 
+  * http://localhost:8100/?all to get all as a json object
+  * http://localhost:8100/?recipeID=123 to get specific recipe
+  */
  // Is expecting a get request with an ID of a recipe and returns with the recipe data
  private String handleGet(HttpExchange httpExchange) throws IOException {
     String response = "Invalid recipeID";
     URI uri = httpExchange.getRequestURI();
     String query = uri.getRawQuery();
     if (query != null) {
-      String idString = query.substring(query.indexOf("=") + 1);
+      if(query.contains("recipeID")){
+        String idString = query.substring(query.indexOf("=") + 1);
       int recipeID = Integer.valueOf(idString);
       Recipe r = list.getRecipe(recipeID);
       if(r != null){
@@ -64,7 +70,10 @@ public class RecipeHTTPHandler implements HttpHandler {
         requestBody.put("recipeID", r.getRecipeID());
         response = requestBody.toString();
       }
-    }
+    }else if(query.contains("all")){
+        response = list.toJSONObject().toString();      
+      }
+  }
     return response;
   }
 
