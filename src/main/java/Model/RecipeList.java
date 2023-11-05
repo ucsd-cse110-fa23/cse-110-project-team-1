@@ -2,6 +2,7 @@ package Model;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.json.JSONObject;
 
@@ -49,6 +50,8 @@ public class RecipeList {
         }
     }
 
+    // Suppress Type Safety for objectInput, since we are sure of <Int, Recipe> type
+    @SuppressWarnings("unchecked")
     public void loadFromDisk(){
         HashMap<Integer, Recipe> newHashMap = null; 
   
@@ -59,7 +62,7 @@ public class RecipeList {
             ObjectInputStream objectInput 
                 = new ObjectInputStream(fileInput); //attach pointer to object input stream
   
-            newHashMap = (HashMap)objectInput.readObject(); //take object in from stream
+            newHashMap = (HashMap<Integer, Recipe>)objectInput.readObject(); //take object in from stream
   
             objectInput.close(); 
             fileInput.close(); 
@@ -77,11 +80,11 @@ public class RecipeList {
         } 
   
         // Iterate through the hashmap and find largest entry to update highestIndex
-        Set set = newHashMap.entrySet(); 
-        Iterator iterator = set.iterator(); 
+        Set<Entry<Integer, Recipe>> set = newHashMap.entrySet(); 
+        Iterator<Entry<Integer, Recipe>> iterator = set.iterator(); 
   
         while (iterator.hasNext()) { 
-            Map.Entry entry = (Map.Entry)iterator.next(); 
+            Map.Entry<Integer, Recipe> entry = (Map.Entry<Integer, Recipe>)iterator.next(); 
             if((Integer)entry.getKey() > highestIndex){
                 highestIndex = (Integer)entry.getKey();
             }
@@ -102,11 +105,11 @@ public class RecipeList {
     
     public String toString(){
         String s = "";
-        Set set = recipeList.entrySet(); 
-        Iterator iterator = set.iterator(); 
+        Set<Entry<Integer, Recipe>> set = recipeList.entrySet(); 
+        Iterator<Entry<Integer, Recipe>> iterator = set.iterator(); 
   
         while (iterator.hasNext()) { 
-            Map.Entry entry = (Map.Entry)iterator.next(); 
+            Map.Entry<Integer, Recipe> entry = (Map.Entry<Integer, Recipe>)iterator.next(); 
   
             s += "key : " + entry.getKey() 
                              + " & Value : "+entry.getValue()+"\n";
@@ -116,11 +119,11 @@ public class RecipeList {
     }
     public JSONObject toJSONObject(){
         JSONObject allRecipes = new JSONObject();
-        Set set = recipeList.entrySet(); 
-        Iterator iterator = set.iterator(); 
+        Set<Entry<Integer, Recipe>> set = recipeList.entrySet(); 
+        Iterator<Entry<Integer, Recipe>> iterator = set.iterator(); 
   
         while (iterator.hasNext()) { 
-            Map.Entry entry = (Map.Entry)iterator.next(); 
+            Map.Entry<Integer, Recipe> entry = (Map.Entry<Integer, Recipe>)iterator.next(); 
             Recipe r = ((Recipe) entry.getValue());
             JSONObject recipe = new JSONObject();
             recipe.put("recipeText", r.getRecipeText());

@@ -1,22 +1,14 @@
 package Model;
 import org.junit.jupiter.api.Test;
 
-import Model.Recipe;
-import Model.RecipeList;
-
 import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.beans.Transient;
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 public class RecipeTest { //temporary tests until JUnit is in place\
-    private Recipe recipe;
+    //private Recipe recipe;
 
     @BeforeEach
     void setUp(){

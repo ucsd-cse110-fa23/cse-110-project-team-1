@@ -1,11 +1,19 @@
 plugins {
     id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion = JavaLanguageVersion.of(17)
     }
+}
+
+javafx {
+    version = '21.0.1'
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    platform = 'windows'
 }
 
 repositories {
@@ -27,13 +35,10 @@ dependencies {
 sourceSets {
     test {
         java.srcDirs += [
-                'src/main/java/*'
+                'src/main/java'
         ]
         java.srcDirs += [
-                'src/test/java/*'
-        ]
-        java.srcDirs += [
-                'cse-110-project-team-1/src/main/java/Model'
+                'src/test/java'
         ]
         print(java.srcDirs)   // Clean
     }
@@ -41,4 +46,8 @@ sourceSets {
 
 test {
     useJUnitPlatform()
+}
+
+application {
+    mainClassName = "View.Main"
 }

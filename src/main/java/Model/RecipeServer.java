@@ -8,8 +8,6 @@ import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -73,6 +71,7 @@ public class RecipeServer implements RecipeServerInterface{
   }
     public void stopServer(){
       server.stop(0);
+      System.out.println("Closed server");
     }
 
     public String getURLData(String url) throws IOException {
