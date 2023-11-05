@@ -18,19 +18,22 @@ import java.util.Iterator;
 public class RecipeList {
     
     private int highestIndex;  //recipeID of the most recently created recipe
+    private String listName;
     
     private HashMap<Integer, Recipe> recipeList;
 
-    public RecipeList(){
+    public RecipeList(String listName){
         highestIndex = 0;
         recipeList = new HashMap<Integer, Recipe>();
+        this.listName = listName; //default
+        loadFromDisk();
     }
     
     public void saveToDisk(){
         try { 
             FileOutputStream myFileOutStream 
                 = new FileOutputStream( 
-                    "recipe.list"); //create outputstream for file
+                    listName + ".list"); //create outputstream for file
   
             ObjectOutputStream myObjectOutStream 
                 = new ObjectOutputStream(myFileOutStream); //attaches the fileobject stream to object
@@ -52,7 +55,7 @@ public class RecipeList {
   
         try { 
             FileInputStream fileInput = new FileInputStream( 
-                "recipe.list"); //create pointer to file 
+                listName + ".list"); //create pointer to file 
   
             ObjectInputStream objectInput 
                 = new ObjectInputStream(fileInput); //attach pointer to object input stream
@@ -95,6 +98,7 @@ public class RecipeList {
         int recipeID = ++highestIndex; //increment highestIndex with every new recipe creataed
         Recipe r = new Recipe(recipeID,recipeTitle, recipeText);
         recipeList.put(recipeID,r);
+        saveToDisk();
     }
     
     public String toString(){
@@ -127,5 +131,9 @@ public class RecipeList {
         }
         return allRecipes;
     }
+    public void changeListName(String listName){
+        this.listName = listName;
+    }
+
 }
 
