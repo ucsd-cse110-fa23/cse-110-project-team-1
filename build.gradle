@@ -32,6 +32,9 @@ sourceSets {
         java.srcDirs += [
                 'src/test/java/*'
         ]
+        java.srcDirs += [
+                'cse-110-project-team-1/src/main/java/Model'
+        ]
         print(java.srcDirs)   // Clean
     }
 }
