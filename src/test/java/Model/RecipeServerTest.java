@@ -22,7 +22,7 @@ import java.net.URLConnection;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class RecipeServerTest {
+public class RecipeServerTest{
     /*
      * Gets json data from single line from url
      * buffered reader and url connection referenced from
@@ -58,6 +58,7 @@ public class RecipeServerTest {
                 "Cheese\\n" + //
                 "Dough\\n" + //
                 "Tomato Sauce\",\"recipeID\":1}}",content);
+        server.stopServer();
     }
     
     @Test
@@ -73,7 +74,7 @@ public class RecipeServerTest {
         String content = getURLData("http://localhost:8100/?all");
 
         assertEquals("{}",content);
-        //server.stopServer();
+        server.stopServer();
         
     }
 }

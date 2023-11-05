@@ -26,7 +26,6 @@ public class RecipeList {
         highestIndex = 0;
         recipeList = new HashMap<Integer, Recipe>();
         this.listName = listName; //default
-        loadFromDisk();
     }
     
     public void saveToDisk(){

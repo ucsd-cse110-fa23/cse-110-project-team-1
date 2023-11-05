@@ -1,8 +1,13 @@
 package Model;
 
 import com.sun.net.httpserver.*;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -15,6 +20,8 @@ interface RecipeServerInterface {
   public void loadServer();
   public void startServer() throws IOException;
   public void stopServer();
+  public String getURLData(String url) throws IOException;
+
 
 }
 public class RecipeServer implements RecipeServerInterface{
@@ -41,6 +48,7 @@ public class RecipeServer implements RecipeServerInterface{
 
     // create a recipelist to store data
    list = new RecipeList("recipe");
+   list.loadFromDisk();
    
 
     // create a server
@@ -64,6 +72,20 @@ public class RecipeServer implements RecipeServerInterface{
   }
     public void stopServer(){
       server.stop(0);
+    }
+
+    public String getURLData(String url) throws IOException {
+        URL urlObj = new URL(url); // creating a url object
+        System.out.println("Opened Mock Server");
+        URLConnection urlConnection = urlObj.openConnection(); // creating a urlconnection object
+
+        // wrapping the urlconnection in a bufferedreader
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        String content;
+        // reading from the urlconnection using the bufferedreader
+        content = bufferedReader.readLine();
+        bufferedReader.close();
+        return content;
     }
 
 }
@@ -94,7 +116,7 @@ class MockRecipeServer implements RecipeServerInterface{
    
 
     // create a server
-    HttpServer server = HttpServer.create(
+    server = HttpServer.create(
         new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT),
         0);
     
@@ -114,5 +136,19 @@ class MockRecipeServer implements RecipeServerInterface{
   }
    public void stopServer(){
       server.stop(0);
+    }
+
+    public String getURLData(String url) throws IOException {
+        URL urlObj = new URL(url); // creating a url object
+        System.out.println("Opened Mock Server");
+        URLConnection urlConnection = urlObj.openConnection(); // creating a urlconnection object
+
+        // wrapping the urlconnection in a bufferedreader
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+        String content;
+        // reading from the urlconnection using the bufferedreader
+        content = bufferedReader.readLine();
+        bufferedReader.close();
+        return content;
     }
 }
