@@ -38,7 +38,6 @@ public class RecipeServer implements RecipeServerInterface{
 
   public void loadServer(){
     list.loadFromDisk();
-    //list.addRecipe("Pizza", "Pizza\nIngredients:\nCheese\nDough\nTomato Sauce");
 
   }
 
@@ -49,6 +48,8 @@ public class RecipeServer implements RecipeServerInterface{
     // create a recipelist to store data
    list = new RecipeList("recipe");
    list.loadFromDisk();
+  //ist.addRecipe("Pasta", "Pasta\nIngredients:\nDry Noodles\nWater\nSalt\n");
+
    
 
     // create a server

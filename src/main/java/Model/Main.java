@@ -17,40 +17,6 @@ public class Main {
         } catch (Exception e) {
             // TODO: handle exception
         }
-        s.stopServer();
-
-        //Empty
-        RecipeServerInterface server = new MockRecipeServer();
-        try {
-            server.startServer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        server.renameServer("src/test/lists/empty");
-        server.loadServer();
-        try {
-            String content = server.getURLData("http://localhost:8100/?all");
-            System.out.println("Should be empty: " + content);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        server.stopServer();
-        //1 recipe
-        server = new MockRecipeServer();
-        try {
-            server.startServer();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        server.renameServer("src/test/lists/demo1");
-        server.loadServer();
-        try {
-            String content = server.getURLData("http://localhost:8100/?all");
-            System.out.println("Should be 1 entry: " + content);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        //s.stopServer();
     }
 }
