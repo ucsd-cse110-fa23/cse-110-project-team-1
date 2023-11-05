@@ -23,13 +23,13 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
         try {
             server.startServer();
+            primaryStage.setTitle(this.appName);
+            primaryStage.setScene(new Scene(new StackPane(), dimX, dimY));
+            primaryStage.show();
         } catch (Exception e) {
             System.err.println(e);
         }
 
-		primaryStage.setTitle(this.appName);
-		primaryStage.setScene(new Scene(new StackPane(), dimX, dimY));
-		primaryStage.show();
 	}
 
     @Override

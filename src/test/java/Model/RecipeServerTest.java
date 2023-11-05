@@ -33,18 +33,18 @@ public class RecipeServerTest{
         RecipeServerInterface server = new MockRecipeServer();
         try {
             server.startServer();
+            server.renameServer("src/test/lists/testServerReadsExistingList");
+            server.loadServer();
+            String content = getURLData("http://localhost:8100/?all");
+            assertEquals("{\"1\":{\"recipeTitle\":\"Pizza\",\"recipeText\":\"Pizza\\n" + //
+                    "Ingredients:\\n" + //
+                    "Cheese\\n" + //
+                    "Dough\\n" + //
+                    "Tomato Sauce\",\"recipeID\":1}}",content);
+            server.stopServer();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        server.renameServer("src/test/lists/testServerReadsExistingList");
-        server.loadServer();
-        String content = getURLData("http://localhost:8100/?all");
-        assertEquals("{\"1\":{\"recipeTitle\":\"Pizza\",\"recipeText\":\"Pizza\\n" + //
-                "Ingredients:\\n" + //
-                "Cheese\\n" + //
-                "Dough\\n" + //
-                "Tomato Sauce\",\"recipeID\":1}}",content);
-        server.stopServer();
     }
     
     @Test
@@ -52,15 +52,15 @@ public class RecipeServerTest{
         RecipeServerInterface server = new MockRecipeServer();
         try {
             server.startServer();
+            server.renameServer("src/test/lists/empty");
+            server.loadServer();
+            String content = getURLData("http://localhost:8100/?all");
+    
+            assertEquals("{}",content);
+            server.stopServer();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        server.renameServer("src/test/lists/empty");
-        server.loadServer();
-        String content = getURLData("http://localhost:8100/?all");
-
-        assertEquals("{}",content);
-        server.stopServer();
         
     }
 }

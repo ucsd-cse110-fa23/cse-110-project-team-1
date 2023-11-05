@@ -5,6 +5,7 @@
 .gradle/
 build/
 bin/
+lib/
 
 # Never include API key contents to public
 key.txt
