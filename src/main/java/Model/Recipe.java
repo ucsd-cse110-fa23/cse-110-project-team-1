@@ -2,11 +2,14 @@ package Model;
 
 import java.io.Serializable;
 
+import org.json.JSONObject;
+
 public class Recipe implements Serializable{
 
     private int recipeID; //index of recipe to be used for ordering and adressing
     private String recipeTitle; 
     private String recipeText;
+    private static final long serialVersionUID = 6529685098267757690L;
 
     public Recipe(int recipeID, String recipeTitle, String recipeText){
         this.recipeID = recipeID;
@@ -36,6 +39,14 @@ public class Recipe implements Serializable{
 
     public String toString(){
         return recipeTitle + ": "+ recipeText;
+    }
+
+    public JSONObject toJson(){
+        JSONObject recipe = new JSONObject();
+        recipe.put("recipeText", getRecipeText());
+        recipe.put("recipeTitle", getRecipeTitle());
+        recipe.put("recipeID", getRecipeID());
+        return recipe;
     }
 
 }

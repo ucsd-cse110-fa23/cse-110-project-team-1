@@ -117,7 +117,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
         //Make recipe and add to list
         String recipeTitle = recipeText.substring(0,recipeText.indexOf("\n"));
         list.addRecipe(recipeTitle, recipeText);
-        response = "Added " + recipeText;
+        response = list.getMostRecent().toJson().toString();
       } catch (Exception e) {
         // TODO: handle exception
       }
@@ -193,3 +193,4 @@ class MockRecipeHTTPHandler extends RecipeHTTPHandler{
   gpt = new MockGPT();
  }
 }
+

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import Controller.*;
 
 public class RecipeServerTest{
     /*
@@ -35,6 +36,7 @@ public class RecipeServerTest{
             server.startServer();
             server.renameServer("src/test/lists/testServerReadsExistingList");
             server.loadServer();
+            //RequestHandler req = new RequestHandler();
             String content = getURLData("http://localhost:8100/?all");
             assertEquals("{\"1\":{\"recipeTitle\":\"Pizza\",\"recipeText\":\"Pizza\\n" + //
                     "Ingredients:\\n" + //
