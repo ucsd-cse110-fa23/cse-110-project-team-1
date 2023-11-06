@@ -16,18 +16,15 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     }
     @Test
     void testRecipeConstruction(){
-       /* 
        int newRecipeID = 123;
         String newRecipeTitle = "Beans";
         String newRecipeText = "Beans Recipe\n Ingredients:\n1 Can of Beans\n\nInstructions:\nStep 1: Put beans on plate\n";
 
         Recipe newRecipe = new Recipe(newRecipeID,newRecipeTitle,newRecipeText);
 
-
-
         assertEquals(newRecipeID, newRecipe.getRecipeID());
         assertEquals(newRecipeText, newRecipe.getRecipeText());
-        assertEquals(newRecipeTitle, newRecipe.getRecipeTitle());*/
+        assertEquals(newRecipeTitle, newRecipe.getRecipeTitle());
 
     }
     @Test
@@ -36,7 +33,7 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         String newRecipeTitle = "Souffle";
         String newRecipeText = "Souffle Recipe\n Ingredients:\n2 Jars of eggs\n\nInstructions:\nStep 1: Put egg in ramen\n";
 
-        RecipeList newRecipeList = new RecipeList("test");
+        RecipeList newRecipeList = new RecipeList("src/test/test");
 
         newRecipeList.addRecipe(newRecipeTitle, newRecipeText);
 
