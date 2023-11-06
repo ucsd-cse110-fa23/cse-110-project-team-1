@@ -46,6 +46,49 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         
 
     }
+    @Test
+    void testAddingMultipleRecipes() {
+        RecipeList recipeList = new RecipeList("src/test/testAddingMultipleRecipes");
+        recipeList.addRecipe("Recipe1", "RecipeText1");
+        recipeList.addRecipe("Recipe2", "RecipeText2");
+        recipeList.addRecipe("Recipe3", "RecipeText3");
+
+        // Check if the most recent recipe is the last one added
+        Recipe mostRecent = recipeList.getMostRecent();
+        assertEquals("Recipe3", mostRecent.getRecipeTitle());
+        assertEquals("RecipeText3", mostRecent.getRecipeText());
+
+        File file = new File("src/test/testAddingMultipleRecipes.list");
+        file.delete(); // remove test list
+    }
+
+    @Test
+    void testSaveAndLoadRecipeList() {
+
+        RecipeList recipeList = new RecipeList("src/test/testSaveAndLoadRecipeList");
+    
+        recipeList.addRecipe("Recipe1", "RecipeText1");
+        recipeList.addRecipe("Recipe2", "RecipeText2");
+        recipeList.addRecipe("Recipe3", "RecipeText3");
+
+        recipeList.saveToDisk();
+
+        RecipeList loadedList = new RecipeList("src/test/testSaveAndLoadRecipeList");
+
+        loadedList.loadFromDisk();
+
+        assertEquals(recipeList.getRecipe(1).getRecipeTitle(), loadedList.getRecipe(1).getRecipeTitle());
+        assertEquals(recipeList.getRecipe(1).getRecipeText(), loadedList.getRecipe(1).getRecipeText());
+    
+        assertEquals(recipeList.getRecipe(2).getRecipeTitle(), loadedList.getRecipe(2).getRecipeTitle());
+        assertEquals(recipeList.getRecipe(2).getRecipeText(), loadedList.getRecipe(2).getRecipeText());
+    
+        assertEquals(recipeList.getRecipe(3).getRecipeTitle(), loadedList.getRecipe(3).getRecipeTitle());
+        assertEquals(recipeList.getRecipe(3).getRecipeText(), loadedList.getRecipe(3).getRecipeText());
+       
+        File file = new File("src/test/testSaveAndLoadRecipeList.list");
+        file.delete(); // remove test list
+    }
     /*public static void main(String[] args){
         Recipe L = new Recipe(0, "ball", "two eggs");
         Recipe G = new Recipe(1, "souffle", "three eggs");
