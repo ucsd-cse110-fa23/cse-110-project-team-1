@@ -9,7 +9,7 @@ public class Recipe implements Serializable{
     private int recipeID; //index of recipe to be used for ordering and adressing
     private String recipeTitle; 
     private String recipeText;
-    private static final long serialVersionUID = 6529685098267757690L;
+    private static final long serialVersionUID = -3203943774493510754L;
 
     public Recipe(int recipeID, String recipeTitle, String recipeText){
         this.recipeID = recipeID;
