@@ -125,6 +125,7 @@ public class RecipeList {
         JSONObject allRecipes = new JSONObject();
         Set<Entry<Integer, Recipe>> set = recipeList.entrySet(); 
         Iterator<Entry<Integer, Recipe>> iterator = set.iterator(); 
+        int recipeIndex = 0;
   
         while (iterator.hasNext()) { 
             Map.Entry<Integer, Recipe> entry = (Map.Entry<Integer, Recipe>)iterator.next(); 
@@ -133,7 +134,7 @@ public class RecipeList {
             recipe.put("recipeText", r.getRecipeText());
             recipe.put("recipeTitle", r.getRecipeTitle());
             recipe.put("recipeID", r.getRecipeID());
-            allRecipes.put(Integer.toString(r.getRecipeID()), recipe);  
+            allRecipes.put(Integer.toString(recipeIndex++), recipe);  
         }
         return allRecipes;
     }
