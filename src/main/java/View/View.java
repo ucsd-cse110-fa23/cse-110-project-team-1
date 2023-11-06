@@ -25,15 +25,15 @@ import javafx.scene.image.ImageView;
 
 public class View {
 
-    BorderPane root;
-
+    public BorderPane root;
+	public ListView<HBox> listView;
     public View(){
     root = new BorderPane();
 	root.setPadding(new Insets(10));
 		//Left ListView with placeholders and a + button
 
 		RequestHandler req = new RequestHandler();
-		//req.performPOST("D,ingredients=butter\npotato");
+		req.performPOST("D,ingredients=butter\npotato");
 		
 		ListView<HBox> listView = ViewModel.pullRecipes();
 		//int recipeNum = 5;
@@ -76,5 +76,8 @@ public class View {
     public BorderPane getRoot(){
         return root;
     }
+	public void updateRecipes(){
+		listView = ViewModel.pullRecipes();
+	}
 
 }
