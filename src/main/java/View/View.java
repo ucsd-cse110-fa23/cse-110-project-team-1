@@ -23,46 +23,19 @@ import javafx.scene.layout.HBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public class Main extends Application {
+public class View {
 
-	public final String appName = new String("Recipe App");
-	public final int dimX = 1000, dimY = 600;
-    public static RecipeServer server; 
+    BorderPane root;
 
-	public static void main(String[] args) {
-		launch(args);
-	}
-	public ListView<HBox> pullRecipes(){
-		RequestHandler req = new RequestHandler();
-		String allRecipes = req.performGET("http://localhost:8100/?all");
-		JSONObject allRec = new JSONObject(allRecipes);
-		Iterator<String> keys = allRec.keys();
-		ListView<HBox> listView = new ListView<>();
-            while(keys.hasNext()) {
-				String key = keys.next();
-				JSONObject r = allRec.getJSONObject(key);
-                //System.out.println(allRec.getJSONObject(key));
-                //System.out.println(r.getString("recipeTitle"));
-				
-				RecipeNode newRecipe = new RecipeNode(r.getInt("recipeID"),r.getString("recipeTitle"),r.getString("recipeText"));
-				newRecipe.getChildren().add(new Label(newRecipe.getRecipeTitle()));
-                System.out.println(newRecipe.toString());
-				listView.getItems().add(newRecipe);
-
-			}
-		return listView;
-		//System.out.println(allRec.toString());
-	}
-	@Override
-	public void start(Stage primaryStage) throws IOException {
-		BorderPane root = new BorderPane();
-		root.setPadding(new Insets(10));
+    public View(){
+    root = new BorderPane();
+	root.setPadding(new Insets(10));
 		//Left ListView with placeholders and a + button
-		server = new RecipeServer();
-		server.startServer();
-		pullRecipes();
+
+		RequestHandler req = new RequestHandler();
+		//req.performPOST("D,ingredients=butter\npotato");
 		
-		ListView<HBox> listView = pullRecipes();
+		ListView<HBox> listView = ViewModel.pullRecipes();
 		//int recipeNum = 5;
 		//for (int i = 0; i < recipeNum; i++) {
 			//Placeholder image
@@ -99,9 +72,9 @@ public class Main extends Application {
 			}
 		});
 
-		primaryStage.setTitle(this.appName);
-		primaryStage.setScene(new Scene(root, dimX, dimY));
-		primaryStage.show();
-	}
-    
+    }
+    public BorderPane getRoot(){
+        return root;
+    }
+
 }

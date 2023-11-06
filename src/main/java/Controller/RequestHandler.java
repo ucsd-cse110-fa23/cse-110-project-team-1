@@ -17,15 +17,21 @@ public class RequestHandler {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
-        
             OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
             out.write(body);
             out.flush();
             out.close(); 
+
+            
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String response = in.readLine();
+            in.close();
+            System.out.println(response);
         } catch (Exception e) {
             // TODO: handle exception
         }
     }
+
     /*
      * Gets json data from single line from url
      * buffered reader and url connection referenced from

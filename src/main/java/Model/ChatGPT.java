@@ -120,7 +120,7 @@ class MockGPT implements GPTModel {
         }
 
         String response;
-        String prompt = "{bla:\"foo\", choices:[{text:\"Recipe for mashed potatoes...\", test:\"foofoo\"}], blabla:\"bar\"}";
+        String prompt = "{bla:\"foo\", choices:[{text:\"Mashed Potatos\\n...\", test:\"foofoo\"}], blabla:\"bar\"}";
 
         // Pull response string out of premade JSON prompt string
         String responseBody = prompt;
@@ -128,7 +128,7 @@ class MockGPT implements GPTModel {
         JSONArray choices = responseJson.getJSONArray("choices");
         String generatedText = choices.getJSONObject(0).getString("text");
 
-        if((mealType.toLowerCase()).contains("dinner") &&
+        if((mealType).contains("Dinner") &&
             (ingredients.toLowerCase()).contains("potato") &&
             (ingredients.toLowerCase()).contains("butter")) {
             response = generatedText;
