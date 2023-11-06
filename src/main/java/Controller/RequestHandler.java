@@ -27,7 +27,9 @@ public class RequestHandler {
         }
     }
     /*
-     * Gets all recipes
+     * Gets json data from single line from url
+     * buffered reader and url connection referenced from
+     * https://www.javatpoint.com/java-get-data-from-url
      */
     public String performGET(String url){
         String content = "Invalid";
