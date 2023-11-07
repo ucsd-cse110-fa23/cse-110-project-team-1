@@ -15,7 +15,7 @@ public class ChatGPTTest {
 
     @Test
     void testValidGPT() {
-        String expected = "Recipe for mashed potatoes...";
+        String expected = "Mashed Potatos\n...";
         String mealType = "Dinner";
         String ingredients = "I have potatoes, butter and cheese.";
 

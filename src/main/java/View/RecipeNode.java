@@ -1,19 +1,19 @@
-package Model;
-
-import java.io.Serializable;
+package View;
 
 import org.json.JSONObject;
 
-public class Recipe implements Serializable{
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+
+public class RecipeNode extends HBox{
 
     private int recipeID; //index of recipe to be used for ordering and adressing
-    private String recipeTitle; 
+    private Label recipeTitle; 
     private String recipeText;
-    private static final long serialVersionUID = -3203943774493510754L;
-
-    public Recipe(int recipeID, String recipeTitle, String recipeText){
+   
+    public RecipeNode(int recipeID, String recipeTitle, String recipeText){
         this.recipeID = recipeID;
-        this.recipeTitle = recipeTitle;
+        this.recipeTitle = new Label(recipeTitle);
         this.recipeText = recipeText;
     }
 
@@ -22,7 +22,7 @@ public class Recipe implements Serializable{
     }
 
     public String getRecipeTitle(){
-        return recipeTitle;
+        return recipeTitle.getText();
     }
 
     public String getRecipeText(){
@@ -30,7 +30,7 @@ public class Recipe implements Serializable{
     }
 
     public void setRecipeTitle(String newTitle){
-        recipeTitle = newTitle;
+        recipeTitle.setText(newTitle);
     }
 
     public void setRecipeText(String newRecipe){
@@ -38,7 +38,7 @@ public class Recipe implements Serializable{
     }
 
     public String toString(){
-        return recipeTitle + ": "+ recipeText;
+        return recipeTitle.getText() + ": "+ recipeText;
     }
 
     public JSONObject toJson(){

@@ -3,7 +3,9 @@ package Model;
 import com.sun.net.httpserver.*;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 
@@ -44,6 +46,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
         System.out.println("An erroneous request");
         response = e.toString();
         e.printStackTrace();
+        System.out.println("test");
       }
 
     //Sending back response to the client
@@ -88,16 +91,18 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
    * two type of post request, mealType and ingredients
    * post data is currently just mealType=dinner, mealType=lunch, mealType=breakfast
    * or
-   * d,ingredients=....
-   * b,ingredients=....
-   * l,ingredients=....
+   * D,ingredients=....
+   * L,ingredients=....
+   * B,ingredients=....
    * eventually will be a proper audio file when whisper gets set up
    */
   private String handlePost(HttpExchange httpExchange) throws IOException {
     String response = "Invalid POST request";
     InputStream inStream = httpExchange.getRequestBody();
-    Scanner scanner = new Scanner(inStream);
-    String postData = scanner.nextLine();
+    //Scanner scanner = new Scanner(inStream);
+    String postData = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
+    System.out.println("Post Data:" + postData);
+    System.out.println("ing: "+ postData.substring(2,postData.indexOf("=")));
     //This should be encapsulated as a meal validator and recipe maker of sorts
     if(postData.substring(0,postData.indexOf("=")) == "mealType"){
       String meal = postData.substring(postData.indexOf("=") + 1,postData.length());
@@ -106,26 +111,35 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
       }else{
          response = "mealType=" + meal + "-> not ok";
       }
-    }else if(postData.substring(2,postData.indexOf("=")) == "ingredients"){
+    }else if(postData.substring(2,postData.indexOf("=")).equals("ingredients")){
       String ingredients = postData.substring(postData.indexOf("=") + 1,postData.length());
+      System.out.println(ingredients);
       try {
         String recipeText;
-        if(postData.substring(0, 1) == "D"){recipeText = gpt.getResponse("Dinner", ingredients);}
-        else if(postData.substring(0, 1) == "L"){recipeText = gpt.getResponse("Lunch", ingredients);}
-        else if(postData.substring(0, 1) == "B"){recipeText = gpt.getResponse("Breakfast", ingredients);}
-        else{recipeText = "invalid response from chatGPT";}
+        System.out.println(postData.substring(0, 1));
+        if (postData.substring(0, 1).equals("D")) {
+          recipeText = gpt.getResponse("Dinner", ingredients);
+        } else if (postData.substring(0, 1).equals("L")) {
+          recipeText = gpt.getResponse("Lunch", ingredients);
+        } else if (postData.substring(0, 1).equals("B")) {
+          recipeText = gpt.getResponse("Breakfast", ingredients);
+        } else {
+          recipeText = "invalid response from chatGPT";
+        }
+        System.out.println("Rec" + recipeText);
         //Make recipe and add to list
         String recipeTitle = recipeText.substring(0,recipeText.indexOf("\n"));
         list.addRecipe(recipeTitle, recipeText);
-        response = "Added " + recipeText;
+        response = list.getMostRecent().toJson().toString();
       } catch (Exception e) {
         // TODO: handle exception
+        System.out.println("error caught");
+        e.printStackTrace();
       }
       
     }
     
     System.out.println(response);
-    scanner.close();
     return response;
   }
   /*
@@ -193,3 +207,4 @@ class MockRecipeHTTPHandler extends RecipeHTTPHandler{
   gpt = new MockGPT();
  }
 }
+

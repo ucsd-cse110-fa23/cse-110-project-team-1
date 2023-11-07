@@ -10,7 +10,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.concurrent.*;
 
-public class RecipeServer implements RecipeServerInterface{
+public class MockRecipeServer implements RecipeServerInterface{
 
   // initialize server port and hostname
   private static final int SERVER_PORT = 8100;
@@ -24,20 +24,16 @@ public class RecipeServer implements RecipeServerInterface{
 
   public void loadServer(){
     list.loadFromDisk();
-    System.out.println("Server Load");
+    //list.addRecipe("Pizza", "Pizza\nIngredients:\nCheese\nDough\nTomato Sauce");
 
   }
 
   public void startServer() throws IOException {
-    System.out.println("Server Start");
     // create a thread pool to handle requests
     ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
 
     // create a recipelist to store data
-   list = new RecipeList("recipe");
-   list.loadFromDisk();
-  //ist.addRecipe("Pasta", "Pasta\nIngredients:\nDry Noodles\nWater\nSalt\n");
-
+   list = new RecipeList("mock");
    
 
     // create a server
@@ -45,7 +41,7 @@ public class RecipeServer implements RecipeServerInterface{
         new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT),
         0);
     
-    RecipeHTTPHandlerInterface requestHandler = new RecipeHTTPHandler(list);
+    RecipeHTTPHandlerInterface requestHandler = new MockRecipeHTTPHandler(list);
     //MyHandler myHandler = new MyHandler(data);
     // Create the context
     server.createContext("/", requestHandler);
@@ -56,12 +52,11 @@ public class RecipeServer implements RecipeServerInterface{
     // Start the server
     server.start();
 
-    System.out.println("Server started on port " + SERVER_PORT + "\n http://localhost:8100/?all");
+    System.out.println("Mock Server started on port " + SERVER_PORT + "\n http://localhost:8100/?all");
 
   }
-    public void stopServer(){
+   public void stopServer(){
       server.stop(0);
-      System.out.println("Closed server");
     }
 
     public String getURLData(String url) throws IOException {
@@ -77,5 +72,4 @@ public class RecipeServer implements RecipeServerInterface{
         bufferedReader.close();
         return content;
     }
-
 }

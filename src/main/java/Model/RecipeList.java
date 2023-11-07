@@ -96,6 +96,10 @@ public class RecipeList {
     public Recipe getRecipe(int recipeID){
         return recipeList.get(recipeID);
     }
+
+    public Recipe getMostRecent(){
+        return recipeList.get(highestIndex);
+    }
     public void addRecipe(String recipeTitle, String recipeText){
         int recipeID = ++highestIndex; //increment highestIndex with every new recipe creataed
         Recipe r = new Recipe(recipeID,recipeTitle, recipeText);
@@ -121,6 +125,7 @@ public class RecipeList {
         JSONObject allRecipes = new JSONObject();
         Set<Entry<Integer, Recipe>> set = recipeList.entrySet(); 
         Iterator<Entry<Integer, Recipe>> iterator = set.iterator(); 
+        int recipeIndex = 0;
   
         while (iterator.hasNext()) { 
             Map.Entry<Integer, Recipe> entry = (Map.Entry<Integer, Recipe>)iterator.next(); 
@@ -129,7 +134,7 @@ public class RecipeList {
             recipe.put("recipeText", r.getRecipeText());
             recipe.put("recipeTitle", r.getRecipeTitle());
             recipe.put("recipeID", r.getRecipeID());
-            allRecipes.put(Integer.toString(r.getRecipeID()), recipe);  
+            allRecipes.put(Integer.toString(recipeIndex++), recipe);  
         }
         return allRecipes;
     }
