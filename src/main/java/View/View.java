@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
@@ -20,64 +21,61 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.HBox;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 public class View {
 
-    public BorderPane root;
-	public ListView<HBox> listView;
-    public View(){
-    root = new BorderPane();
-	root.setPadding(new Insets(10));
+	public BorderPane root;
+	private TextField recipeQuery = new TextField();
+	private Button generateButton = new Button("Generate Recipe");
+	private VBox leftVBox;
+	private VBox rightVBox;
+
+	public View() {
+		this.root = new BorderPane();
+		this.root.setPadding(new Insets(10));
 		//Left ListView with placeholders and a + button
 
-		RequestHandler req = new RequestHandler();
-		req.performPOST("D,ingredients=butter\npotato");
-		
-		ListView<HBox> listView = ViewModel.pullRecipes();
-		//int recipeNum = 5;
-		//for (int i = 0; i < recipeNum; i++) {
-			//Placeholder image
-			//ImageView imageView = new ImageView(new Image("file:src/main/java/View/images/" + (i + 1) + ".jpg"));
-			//imageView.setFitHeight(50);
-			//imageView.setFitWidth(50);
-			//HBox hBox = new HBox(10, imageView, new Label("Recipe " + (i + 1)));
-			//listView.getItems().add(hBox);
-		//}
-		VBox leftVBox = new VBox(10, listView, new Button("+"));
-		VBox.setVgrow(listView, Priority.ALWAYS);
-		root.setLeft(leftVBox);
+		this.recipeQuery.setPromptText("Enter Recipe Query...");
+		this.generateButton.setOnAction(e -> this.onGenerateRequest());
 
-		//Right side
-		VBox rightVBox = new VBox(10);
-		ImageView detailImage = new ImageView(new Image("file:./src/RecipeApp/images/1.jpg"));
-		detailImage.setFitHeight(400);
-		detailImage.setFitWidth(300);
+		// left side
+		this.updateRecipes();
+
+	}
+
+	public BorderPane getRoot() {
+		return this.root;
+	}
+	
+	public void updateRecipes() {
+		System.out.println("printing the muhfuckin list viwew");
+
 		Label recipeDescription = new Label("Recipe Description: ...");
-		rightVBox.getChildren().addAll(detailImage, recipeDescription, new Button("Rectangle Button?"));
-		rightVBox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
-		root.setRight(rightVBox);
-
-
+		ListView<HBox> daStuff = ViewModel.pullRecipes();
+		this.leftVBox = new VBox(10, daStuff, new Button("+"), this.recipeQuery, this.generateButton);
+		VBox.setVgrow(daStuff, Priority.ALWAYS);
+		this.root.setLeft(this.leftVBox);
 		//Update detail view
-
-		listView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+		daStuff.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue != null) {
-				int selectedIndex = listView.getSelectionModel().getSelectedIndex();
-				detailImage.setImage(new Image("file:./src/RecipeApp/images/" + (selectedIndex + 1) + ".jpg"));
-
-				String recipeText = ((RecipeNode)listView.getSelectionModel().getSelectedItem()).getRecipeText();
+				String recipeText = ((RecipeNode)daStuff.getSelectionModel().getSelectedItem()).getRecipeText();
 				recipeDescription.setText(recipeText);
 			}
 		});
 
-    }
-    public BorderPane getRoot(){
-        return root;
-    }
-	public void updateRecipes(){
-		listView = ViewModel.pullRecipes();
+		//Right side
+		this.rightVBox = new VBox(10);
+		this.rightVBox.getChildren().addAll(recipeDescription, new Button("Rectangle Button?"));
+		this.rightVBox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
+		this.root.setRight(this.rightVBox);
 	}
 
+	private void onGenerateRequest() {
+		//System.out.println("onGenerateRequest Query: " + this.recipeQuery.getText());
+
+		RequestHandler req = new RequestHandler();
+		req.performPOST(this.recipeQuery.getText());
+		this.recipeQuery.clear();
+		this.updateRecipes();
+	}
 }
