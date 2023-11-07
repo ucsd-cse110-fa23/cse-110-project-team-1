@@ -133,7 +133,7 @@ class MockGPT implements GPTModel {
             (ingredients.toLowerCase()).contains("butter")) {
             response = generatedText;
         } else {
-            response = "No recipe.";
+            response = "No recipe.\n";
         }
 
         return response;
