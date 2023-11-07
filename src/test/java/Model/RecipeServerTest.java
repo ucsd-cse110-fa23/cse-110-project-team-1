@@ -21,7 +21,7 @@ public class RecipeServerTest{
             server.loadServer();
             RequestHandler req = new RequestHandler();
             String content = req.performGET("http://localhost:8100/?all");
-            assertEquals("{\"1\":{\"recipeTitle\":\"Pizza\",\"recipeText\":\"Pizza\\n" + //
+            assertEquals("{\"0\":{\"recipeTitle\":\"Pizza\",\"recipeText\":\"Pizza\\n" + //
                     "Ingredients:\\n" + //
                     "Cheese\\n" + //
                     "Dough\\n" + //
