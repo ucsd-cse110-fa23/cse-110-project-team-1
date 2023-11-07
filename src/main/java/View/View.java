@@ -25,9 +25,10 @@ import javafx.scene.layout.HBox;
 public class View {
 
 	public BorderPane root;
-	public ListView<HBox> listView;
 	private TextField recipeQuery = new TextField();
 	private Button generateButton = new Button("Generate Recipe");
+	private VBox leftVBox;
+	private VBox rightVBox;
 
 	public View() {
 		this.root = new BorderPane();
@@ -35,27 +36,25 @@ public class View {
 		//Left ListView with placeholders and a + button
 
 		this.recipeQuery.setPromptText("Enter Recipe Query...");
-		this.listView = ViewModel.pullRecipes();
+		ListView<HBox> listView = ViewModel.pullRecipes();
 
 		this.generateButton.setOnAction(e -> this.onGenerateRequest());
 
 		// left side
-		VBox leftVBox = new VBox(10, this.listView, new Button("+"), this.recipeQuery, this.generateButton);
-		VBox.setVgrow(this.listView, Priority.ALWAYS);
-		this.root.setLeft(leftVBox);
+		this.updateRecipes();
 
 		//Right side
-		VBox rightVBox = new VBox(10);
+		this.rightVBox = new VBox(10);
 		Label recipeDescription = new Label("Recipe Description: ...");
-		rightVBox.getChildren().addAll(recipeDescription, new Button("Rectangle Button?"));
-		rightVBox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
-		this.root.setRight(rightVBox);
+		this.rightVBox.getChildren().addAll(recipeDescription, new Button("Rectangle Button?"));
+		this.rightVBox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
+		this.root.setRight(this.rightVBox);
 
 
 		//Update detail view
-		this.listView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+		listView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue != null) {
-				String recipeText = ((RecipeNode)this.listView.getSelectionModel().getSelectedItem()).getRecipeText();
+				String recipeText = ((RecipeNode)listView.getSelectionModel().getSelectedItem()).getRecipeText();
 				recipeDescription.setText(recipeText);
 			}
 		});
@@ -67,7 +66,12 @@ public class View {
 	}
 	
 	public void updateRecipes() {
-		this.listView = ViewModel.pullRecipes();
+		System.out.println("printing the muhfuckin list viwew");
+
+		ListView<HBox> daStuff = ViewModel.pullRecipes();
+		this.leftVBox = new VBox(10, daStuff, new Button("+"), this.recipeQuery, this.generateButton);
+		VBox.setVgrow(daStuff, Priority.ALWAYS);
+		this.root.setLeft(this.leftVBox);
 	}
 
 	private void onGenerateRequest() {
