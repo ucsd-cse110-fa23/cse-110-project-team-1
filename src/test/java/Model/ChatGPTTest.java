@@ -29,7 +29,7 @@ public class ChatGPTTest {
 
     @Test
     void testInvalidGPT_mealType() {
-        String expected = "No recipe.";
+        String expected = "No recipe.\n";
         String mealType = "Lunch";
         String ingredients = "I have potatoes, butter and cheese.";
 
@@ -43,7 +43,7 @@ public class ChatGPTTest {
 
     @Test
     void testInvalidGPT_ingredients() {
-        String expected = "No recipe.";
+        String expected = "No recipe.\n";
         String mealType = "Dinner";
         String ingredients = "I have potatoes, bacon and cheese.";
 
