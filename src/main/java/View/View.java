@@ -71,6 +71,11 @@ public class View {
 	}
 
 	private void onGenerateRequest() {
-		System.out.println("onGenerateRequest");
+		//System.out.println("onGenerateRequest Query: " + this.recipeQuery.getText());
+
+		RequestHandler req = new RequestHandler();
+		req.performPOST(this.recipeQuery.getText());
+		this.recipeQuery.clear();
+		this.updateRecipes();
 	}
 }
