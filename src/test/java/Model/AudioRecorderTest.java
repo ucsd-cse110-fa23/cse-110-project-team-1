@@ -3,6 +3,8 @@ package Model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
 
+import java.util.concurrent.CountDownLatch;
+
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioSystem;
 
@@ -19,24 +21,30 @@ public class AudioRecorderTest {
 
     @Test
     void testBasicRecording() {
-        try {
-            Thread t = new Thread(
-                new Runnable() {
-                @Override
-                public void run() {
-                    audioRecorder.startRecording();
-                    try {
-                        Thread.sleep(2000);
-                    } catch (Exception e1) {
-                        System.out.println(1111);
-                    }
-                    audioRecorder.stopRecording();
-                    assertEquals(1, 1);
+        CountDownLatch latch = new CountDownLatch(1);
+
+        //Do your async job
+        Thread t = new Thread(
+            new Runnable() {
+            @Override
+            public void run() {
+                audioRecorder.startRecording();
+                try {
+                    Thread.sleep(5000);
+                } catch (Exception e1) {
+                    System.out.println(1111);
                 }
-                });
-            t.start();
-        } catch(Exception e) {
-            System.out.println(11);
+                audioRecorder.stopRecording();
+                latch.countDown();
+            }
+            });
+        t.start();
+
+        //Wait for api response async
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -11,3 +11,6 @@ lib/
 key.txt
 *.properties
 *.list
+
+# Ignore recording.wav if it persists from testing
+recording.wav
