@@ -27,8 +27,11 @@ public class View {
 	public BorderPane root;
 	private TextField recipeQuery = new TextField();
 	private Button generateButton = new Button("Generate Recipe");
+	private Button editButton = new Button("Test Edit Recipe");
+	private Button deleteButton = new Button("Delete Recipe");
 	private VBox leftVBox;
 	private VBox rightVBox;
+	private int currentSelectedRecipeID;
 
 	public View() {
 		this.root = new BorderPane();
@@ -37,9 +40,12 @@ public class View {
 
 		this.recipeQuery.setPromptText("Enter Recipe Query...");
 		this.generateButton.setOnAction(e -> this.onGenerateRequest());
+		this.editButton.setOnAction(e -> this.onEditRequest());
+		this.deleteButton.setOnAction(e -> this.onDeleteRequest());
 
 		// left side
 		this.updateRecipes();
+		currentSelectedRecipeID = -1;
 
 	}
 
@@ -48,7 +54,7 @@ public class View {
 	}
 	
 	public void updateRecipes() {
-		System.out.println("printing the muhfuckin list viwew");
+		System.out.println("printing the muhfuckin' list viwew");
 
 		Label recipeDescription = new Label("Recipe Description: ...");
 		recipeDescription.setWrapText(true);
@@ -61,12 +67,13 @@ public class View {
 			if (newValue != null) {
 				String recipeText = ((RecipeNode)daStuff.getSelectionModel().getSelectedItem()).getRecipeText();
 				recipeDescription.setText(recipeText);
+				currentSelectedRecipeID = ((RecipeNode)daStuff.getSelectionModel().getSelectedItem()).getRecipeID();
 			}
 		});
 
 		//Right side
 		this.rightVBox = new VBox(10);
-		this.rightVBox.getChildren().addAll(recipeDescription, new Button("Rectangle Button?"));
+		this.rightVBox.getChildren().addAll(recipeDescription, editButton, deleteButton);
 		this.rightVBox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
 		this.rightVBox.setPadding(new Insets(0,10,5,10));
 		this.root.setCenter(this.rightVBox);
@@ -76,9 +83,31 @@ public class View {
 		//System.out.println("onGenerateRequest Query: " + this.recipeQuery.getText());
 
 		RequestHandler req = new RequestHandler();
-		req.performPOST(this.recipeQuery.getText());
+		req.performPOST("http://localhost:8100/", this.recipeQuery.getText());
 		this.recipeQuery.clear();
 		this.updateRecipes();
 	}
+
+	private void onEditRequest() {
+		//System.out.println("onGenerateRequest Query: " + this.recipeQuery.getText());
+		System.out.println("edi curRecipe:"+currentSelectedRecipeID);
+		
+		RequestHandler req = new RequestHandler();
+		req.performPUT("http://localhost:8100/", currentSelectedRecipeID, "Test Edit Title\n", "Test Edit Text\n");
+		this.recipeQuery.clear();
+		this.updateRecipes();
+	}
+
+	private void onDeleteRequest() {
+		//System.out.println("onGenerateRequest Query: " + this.recipeQuery.getText());
+		System.out.println("del curRecipe:"+currentSelectedRecipeID);
+	
+		RequestHandler req = new RequestHandler();
+		req.performDELETE("http://localhost:8100/", currentSelectedRecipeID);
+		this.recipeQuery.clear();
+		this.updateRecipes();
+	}
+
+	//private void
 
 }
