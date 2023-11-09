@@ -18,13 +18,13 @@ public class ChatGPTTest {
         String expected = "Mashed Potatos\n...";
         String mealType = "Dinner";
         String ingredients = "I have potatoes, butter and cheese.";
-
+        String response = "";
         try {
-            String response = chatGPT.getResponse(mealType, ingredients);
-            assertEquals(expected, response);
+            response = chatGPT.getResponse(mealType, ingredients);
         } catch (Exception e) {
             System.err.println(e);
         }
+        assertEquals(expected, response);
     }
 
     @Test
@@ -32,13 +32,13 @@ public class ChatGPTTest {
         String expected = "No recipe.\n";
         String mealType = "Lunch";
         String ingredients = "I have potatoes, butter and cheese.";
-
+        String response = "";
         try {
-            String response = chatGPT.getResponse(mealType, ingredients);
-            assertEquals(expected, response);
+            response = chatGPT.getResponse(mealType, ingredients);
         } catch (Exception e) {
             System.err.println(e);
         }
+        assertEquals(expected, response);
     }
 
     @Test
@@ -46,12 +46,12 @@ public class ChatGPTTest {
         String expected = "No recipe.\n";
         String mealType = "Dinner";
         String ingredients = "I have potatoes, bacon and cheese.";
-
+        String response = "";
         try {
-            String response = chatGPT.getResponse(mealType, ingredients);
-            assertEquals(expected, response);
+            response = chatGPT.getResponse(mealType, ingredients);
         } catch (Exception e) {
             System.err.println(e);
         }
+        assertEquals(expected, response);
     }
 }
