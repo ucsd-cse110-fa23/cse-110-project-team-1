@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 
@@ -88,6 +90,57 @@ public class RecipeTest { //temporary tests until JUnit is in place\
        
         File file = new File("src/test/testSaveAndLoadRecipeList.list");
         file.delete(); // remove test list
+    }
+
+    @Test
+    void testDeleteExistingRecipe(){
+        RecipeList recipeList = new RecipeList("src/test/testDeleteExistingRecipe");
+        int addedRecipeID = recipeList.addRecipe("Recipe1", "RecipeText1");
+        assertFalse(recipeList.isEmpty());
+        recipeList.deleteRecipe(addedRecipeID);
+        assertTrue(recipeList.isEmpty());
+    }
+
+    @Test
+    void testDeleteNonExistingRecipe(){
+        RecipeList recipeList = new RecipeList("testDeleteNonExistingRecipe");
+        int addedRecipeID = recipeList.addRecipe("Recipe1", "RecipeText1");
+        assertFalse(recipeList.deleteRecipe(addedRecipeID+1));
+        assertFalse(recipeList.isEmpty());
+    }
+    
+    
+    
+    
+    @Test 
+    void testEditExistingRecipe(){
+        RecipeList recipeList = new RecipeList("src/test/testEditExistingRecipe");
+    
+        recipeList.addRecipe("Recipe1", "RecipeText1");
+        recipeList.addRecipe("Recipe2", "RecipeText2");
+
+        recipeList.editRecipe(1,"Newer Recipe1", "Newer RecipeText");
+
+        assertEquals("Newer Recipe1", recipeList.getRecipe(1).getRecipeTitle());
+        assertEquals("Newer RecipeText", recipeList.getRecipe(1).getRecipeText());
+    
+        assertEquals("Recipe2", recipeList.getRecipe(2).getRecipeTitle());
+        assertEquals("RecipeText2", recipeList.getRecipe(2).getRecipeText());
+    }
+    @Test 
+    void testEditNonExistingRecipe(){
+        RecipeList recipeList = new RecipeList("src/test/testEditNonExistingRecipe");
+    
+        recipeList.addRecipe("Recipe1", "RecipeText1");
+        recipeList.addRecipe("Recipe2", "RecipeText2");
+
+        assertFalse(recipeList.editRecipe(3,"Newer Recipe1","Newer RecipeText"));
+
+        assertEquals("Recipe1", recipeList.getRecipe(1).getRecipeTitle());
+        assertEquals("RecipeText1", recipeList.getRecipe(1).getRecipeText());
+    
+        assertEquals("Recipe2", recipeList.getRecipe(2).getRecipeTitle());
+        assertEquals("RecipeText2", recipeList.getRecipe(2).getRecipeText());
     }
     /*public static void main(String[] args){
         Recipe L = new Recipe(0, "ball", "two eggs");

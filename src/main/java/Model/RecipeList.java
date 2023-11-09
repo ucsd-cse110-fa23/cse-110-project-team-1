@@ -79,6 +79,12 @@ public class RecipeList {
             return; 
         } 
   
+        updateHighestIndex(newHashMap);
+
+        recipeList = newHashMap; //update recipeList
+    }
+
+    private void updateHighestIndex(HashMap<Integer,Recipe> newHashMap) {
         // Iterate through the hashmap and find largest entry to update highestIndex
         Set<Entry<Integer, Recipe>> set = newHashMap.entrySet(); 
         Iterator<Entry<Integer, Recipe>> iterator = set.iterator(); 
@@ -89,8 +95,6 @@ public class RecipeList {
                 highestIndex = (Integer)entry.getKey();
             }
         }
-
-        recipeList = newHashMap; //update recipeList
     }
 
     public Recipe getRecipe(int recipeID){
@@ -100,11 +104,30 @@ public class RecipeList {
     public Recipe getMostRecent(){
         return recipeList.get(highestIndex);
     }
-    public void addRecipe(String recipeTitle, String recipeText){
+    public int addRecipe(String recipeTitle, String recipeText){
         int recipeID = ++highestIndex; //increment highestIndex with every new recipe creataed
         Recipe r = new Recipe(recipeID,recipeTitle, recipeText);
         recipeList.put(recipeID,r);
         saveToDisk();
+        return recipeID;
+    }
+    public boolean deleteRecipe(int recipeID){
+        if(recipeList.get(recipeID) != null){
+            recipeList.remove(recipeID);
+            saveToDisk();
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean editRecipe(int recipeID, String newRecipeTitle, String newRecipeText){
+        if(recipeList.get(recipeID) != null){
+            recipeList.get(recipeID).setRecipeText(newRecipeText);
+            recipeList.get(recipeID).setRecipeTitle(newRecipeTitle);
+            saveToDisk();
+            return true;
+        }
+        return false;
     }
     
     public String toString(){
@@ -141,6 +164,8 @@ public class RecipeList {
     public void changeListName(String listName){
         this.listName = listName;
     }
-
+     public boolean isEmpty(){
+        return recipeList.isEmpty();
+     }
 }
 

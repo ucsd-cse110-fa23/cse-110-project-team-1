@@ -3,9 +3,8 @@ package Model;
 import com.sun.net.httpserver.*;
 import java.io.*;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 import java.util.stream.Collectors;
+
 
 import org.json.JSONObject;
 
@@ -126,6 +125,11 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
         } else {
           recipeText = "invalid response from chatGPT";
         }
+
+        //make sure ends with new line and trim leading \n
+        recipeText= recipeText.trim();
+        recipeText +="\n";
+
         System.out.println("Rec" + recipeText);
         //Make recipe and add to list
         String recipeTitle = recipeText.substring(0,recipeText.indexOf("\n"));
@@ -144,58 +148,78 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
   }
   /*
    * This will be to edit recipe
+   * it will get a json object to parse as the streamed in value
    * 
    */
   private String handlePut(HttpExchange httpExchange) throws IOException {
-    String response = "Invalid PUT request";
-    /*InputStream inStream = httpExchange.getRequestBody();
-    Scanner scanner = new Scanner(inStream);
-    String postData = scanner.nextLine();
-    String language = postData.substring(
-      0,
-      postData.indexOf(",")
-    ), year = postData.substring(postData.indexOf(",") + 1);
- 
-    if(data.get(language) != year){
-         data.put(language, year);
-         String response = "Updated entry {" + language + ", " + year + "}";
-         System.out.println(response);
-         return response;
-    }
 
-    // Store data in hashmap
-    data.put(language, year);
- 
- 
-    String response = "Posted entry {" + language + ", " + year + "}";
-    System.out.println(response);
-    */
- 
+    String response = "Invalid PUT request";
+    InputStream inStream = httpExchange.getRequestBody();
+    // Scanner scanner = new Scanner(inStream);
+    String postData = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
+    JSONObject allRec = new JSONObject(postData);
+    int recipeID = allRec.getInt("recipeID");
+
+    if (list.editRecipe(recipeID, allRec.getString("newRecipeTitle"), allRec.getString("newRecipeText"))) {
+      response = "Edited recipe " + recipeID;
+      System.out.println("Edited recipe " + recipeID);
+    } else {
+      recipeID = list.addRecipe(allRec.getString("newRecipeTitle"), allRec.getString("newRecipeText"));
+      response = "Added recipe " + recipeID;
+      System.out.println("Added recipe " + recipeID);
+    }
     return response;
+
+    // allRec.
+
+    // String language = postData.substring(
+    //   0,
+    //   postData.indexOf(",")
+    // ), year = postData.substring(postData.indexOf(",") + 1);
+ 
+    // if(data.get(language) != year){
+    //      data.put(language, year);
+    //      String response = "Updated entry {" + language + ", " + year + "}";
+    //      System.out.println(response);
+    //      return response;
+    // }
+
+    // // Store data in hashmap
+    // data.put(language, year);
+ 
+ 
+    // String response = "Posted entry {" + language + ", " + year + "}";
+    // System.out.println(response);
+    
+ 
+    // return response;
   }
 
   /*
    * This will be to delete recioe
-   * 
+   * this expects the raw querty to be recipeID=xxxx
    */
   private String handleDelete(HttpExchange httpExchange) throws IOException {
     String response = "Invalid DELETE request";
-    /*URI uri = httpExchange.getRequestURI();
-    String query = uri.getRawQuery();
-    if (query != null) {
-      String value = query.substring(query.indexOf("=") + 1);
-      String year = data.get(value); // Retrieve data from hashmap
-      if (year != null) {
-        response = "Deleted entry {" + value + "," + year + "}";
-        data.remove(value);
-        System.out.println(response);
+    URI uri = httpExchange.getRequestURI();
+    InputStream inStream = httpExchange.getRequestBody();
+    // Scanner scanner = new Scanner(inStream);
+    String postData = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
+    // System.out.println("testing with that post:"+ postData);
+    // String query = uri.getRawQuery();
+    if (postData != null) {
+      String recipeID_String = postData.substring(postData.indexOf("=") + 1);
+      int recipeID = Integer.parseInt(recipeID_String);
+      if (list.deleteRecipe(recipeID)) {
+        response = "Deleted recipe " + recipeID;
+        System.out.println("Deleted recipe " + recipeID);
       } else {
-        response = "No data found for " + value;
+        response = "Invalid recipe ID " + recipeID;
+         System.out.println("Invalid recipe ID " + recipeID);
       }
-    }*/
+    }
      return response;
-   
-    //return "";
+
   }
   
 }
