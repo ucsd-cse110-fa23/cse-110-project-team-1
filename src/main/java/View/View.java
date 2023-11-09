@@ -51,6 +51,7 @@ public class View {
 		System.out.println("printing the muhfuckin list viwew");
 
 		Label recipeDescription = new Label("Recipe Description: ...");
+		recipeDescription.setWrapText(true);
 		ListView<HBox> daStuff = ViewModel.pullRecipes();
 		this.leftVBox = new VBox(10, daStuff, new Button("+"), this.recipeQuery, this.generateButton);
 		VBox.setVgrow(daStuff, Priority.ALWAYS);
@@ -67,7 +68,8 @@ public class View {
 		this.rightVBox = new VBox(10);
 		this.rightVBox.getChildren().addAll(recipeDescription, new Button("Rectangle Button?"));
 		this.rightVBox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
-		this.root.setRight(this.rightVBox);
+		this.rightVBox.setPadding(new Insets(0,10,5,10));
+		this.root.setCenter(this.rightVBox);
 	}
 
 	private void onGenerateRequest() {
@@ -78,4 +80,5 @@ public class View {
 		this.recipeQuery.clear();
 		this.updateRecipes();
 	}
+
 }

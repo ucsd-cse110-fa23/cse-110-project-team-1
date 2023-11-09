@@ -3,9 +3,8 @@ package Model;
 import com.sun.net.httpserver.*;
 import java.io.*;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 import java.util.stream.Collectors;
+
 
 import org.json.JSONObject;
 
@@ -126,6 +125,11 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
         } else {
           recipeText = "invalid response from chatGPT";
         }
+
+        //make sure ends with new line and trim leading \n
+        recipeText= recipeText.trim();
+        recipeText +="\n";
+
         System.out.println("Rec" + recipeText);
         //Make recipe and add to list
         String recipeTitle = recipeText.substring(0,recipeText.indexOf("\n"));
