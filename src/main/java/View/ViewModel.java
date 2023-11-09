@@ -28,7 +28,7 @@ public class ViewModel {
 
 				newRecipe.getChildren().add(new Label(newRecipe.getRecipeTitle()));
                 //System.out.println(newRecipe.toString());
-				listView.getItems().add(newRecipe);
+				listView.getItems().add(0,newRecipe);
 
 			}
 		return listView;
