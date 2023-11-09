@@ -19,7 +19,7 @@ public class AudioRecorder {
         // the number of bits in each sample of a sound that has been digitized.
         int sampleSizeInBits = 16;
         // the number of audio channels in this format (1 for mono, 2 for stereo).
-        int channels = 2;
+        int channels = 1;
         // whether the data is signed or unsigned.
         boolean signed = true;
         // whether the audio data is stored in big-endian or little-endian order.
