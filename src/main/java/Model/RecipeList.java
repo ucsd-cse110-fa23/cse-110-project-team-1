@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream; 
 import java.io.IOException;
@@ -17,17 +16,6 @@ import java.util.Iterator;
 //Referenced this for serialization and deserialization code
 //https://www.geeksforgeeks.org/how-to-serialize-hashmap-in-java/
 
-/* 
- * Contains:
- * HashMap for Recipe objects
- * Integer highestIndex for tracking latest recipe
- * String listName for the name of the recipe list
- * 
- * Functions:
- * Manages recipes (add, delete, edit)
- * Saves and loads list from disk
- * Maintains unique IDs for recipes with highestIndex
- */
 public class RecipeList {
     
     private int highestIndex;  //recipeID of the most recently created recipe
@@ -41,13 +29,6 @@ public class RecipeList {
         this.listName = listName; //default
     }
     
-    /*
-     * Input: None
-     * Output: None
-     * Operation: Saves the current state of recipeList to a file on disk. 
-     * The file name is derived from listName. 
-     * If an error occurs during the process, it prints the stack trace of the exception.
-     */
     public void saveToDisk(){
         try { 
             FileOutputStream myFileOutStream 
@@ -69,28 +50,20 @@ public class RecipeList {
         }
     }
 
-    /* 
-     * Input: None 
-     * Output: None 
-     * Operation: Loads the recipeList from a file on disk. 
-     * The file name is derived from listName. If the file does not exist or 
-     * an error occurs during the process, it handles the exception accordingly. 
-     */
     // Suppress Type Safety for objectInput, since we are sure of <Int, Recipe> type
     @SuppressWarnings("unchecked")
     public void loadFromDisk(){
         HashMap<Integer, Recipe> newHashMap = null; 
-        String filePath = listName + ".list";
-        File file = new File(filePath);
-
-        if (!file.exists()) {
-            saveToDisk();
-            return;
-        }
+  
         try { 
-            FileInputStream fileInput = new FileInputStream(filePath); 
-            ObjectInputStream objectInput = new ObjectInputStream(fileInput); 
-            newHashMap = (HashMap<Integer, Recipe>)objectInput.readObject(); 
+            FileInputStream fileInput = new FileInputStream( 
+                listName + ".list"); //create pointer to file 
+  
+            ObjectInputStream objectInput 
+                = new ObjectInputStream(fileInput); //attach pointer to object input stream
+  
+            newHashMap = (HashMap<Integer, Recipe>)objectInput.readObject(); //take object in from stream
+  
             objectInput.close(); 
             fileInput.close(); 
         } 
@@ -110,11 +83,7 @@ public class RecipeList {
 
         recipeList = newHashMap; //update recipeList
     }
-    /*
-     * Input: newHashMap - A HashMap containing recipe IDs as keys and Recipe objects as values.
-     * Output: None
-     * Operation: Updates the highestIndex field with the highest key value from the input HashMap.
-     */
+
     private void updateHighestIndex(HashMap<Integer,Recipe> newHashMap) {
         // Iterate through the hashmap and find largest entry to update highestIndex
         Set<Entry<Integer, Recipe>> set = newHashMap.entrySet(); 
@@ -135,11 +104,6 @@ public class RecipeList {
     public Recipe getMostRecent(){
         return recipeList.get(highestIndex);
     }
-    /*
-     * Input: recipeTitle - The title of the new recipe, recipeText - The text of the new recipe.
-     * Operation: Adds a new recipe to the recipeList and saves the updated list to disk.
-     * Output: recipeID - The ID of the newly added recipe.
-     */
     public int addRecipe(String recipeTitle, String recipeText){
         int recipeID = ++highestIndex; //increment highestIndex with every new recipe creataed
         Recipe r = new Recipe(recipeID,recipeTitle, recipeText);
@@ -147,11 +111,6 @@ public class RecipeList {
         saveToDisk();
         return recipeID;
     }
-    /*
-     * Input: recipeID - The ID of the recipe to be deleted.
-     * Output: Boolean - Returns true if the recipe was successfully deleted, false otherwise.
-     * Operation: Deletes a recipe from the recipeList based on the input ID and saves the updated list to disk.
-     */
     public boolean deleteRecipe(int recipeID){
         if(recipeList.get(recipeID) != null){
             recipeList.remove(recipeID);
@@ -160,11 +119,7 @@ public class RecipeList {
         }
         return false;
     }
-    /*
-     * Input: recipeID - The ID of the recipe to be edited, newRecipeTitle - The new title for the recipe, newRecipeText - The new text for the recipe.
-     * Output: Boolean - Returns true if the recipe was successfully edited, false otherwise.
-     * Operation: Edits a recipe in the recipeList based on the input ID and saves the updated list to disk.
-     */
+    
     public boolean editRecipe(int recipeID, String newRecipeTitle, String newRecipeText){
         if(recipeList.get(recipeID) != null){
             recipeList.get(recipeID).setRecipeText(newRecipeText);

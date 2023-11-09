@@ -9,12 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 
-
 public class ViewModel {
-	/*
-	 * Pulls recipies from server http://localhost:8100/
-	 * Returns a Listview of Recipes in order from newest to oldest
-	 */
     public static ListView<HBox> pullRecipes(){
 		RequestHandler req = new RequestHandler();
 		String allRecipes = req.performGET("http://localhost:8100/?all");
