@@ -11,3 +11,6 @@ lib/
 key.txt
 *.properties
 *.list
+
+# Ignore temporary files
+recording.wav
