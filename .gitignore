@@ -11,3 +11,4 @@ lib/
 key.txt
 *.properties
 *.list
+src/main/RecievedMedia/mealType.mp3
