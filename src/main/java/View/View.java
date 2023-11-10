@@ -126,7 +126,7 @@ public class View {
         System.out.println("Stopped recording.");
 
         RequestHandler req = new RequestHandler();
-		req.performPOST("http://localhost:8100/", new File("recording.wav"), type);
+		//req.performPOST("http://localhost:8100/", new File("recording.wav"), type);
 		this.updateRecipes();
     }
 }
