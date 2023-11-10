@@ -1,13 +1,7 @@
 package Model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTimeout;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioSystem;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,15 +9,18 @@ import org.junit.jupiter.api.Timeout;
 
 public class AudioRecorderTest {
     private AudioRecorder audioRecorder;
+    private boolean supported;
 
     @BeforeEach
     void setUp() {
         audioRecorder = new AudioRecorder();
+        this.supported = audioRecorder.isSupported();
     }
 
     @Test
     @Timeout(value = 8 * 1000, unit = TimeUnit.MILLISECONDS)
     void testShortRecording() {
+        if (!supported) {return;}
         CountDownLatch latch = new CountDownLatch(1);
 
         //Async start and stop 1.5 sec recording
@@ -54,6 +51,7 @@ public class AudioRecorderTest {
     @Test
     @Timeout(value = 15 * 1000, unit = TimeUnit.MILLISECONDS)
     void testLongRecording() {
+        if (!supported) {return;}
         CountDownLatch latch = new CountDownLatch(1);
 
         //Async start and stop 10 sec recording

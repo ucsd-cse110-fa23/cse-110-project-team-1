@@ -1,22 +1,12 @@
 package View;
 
 import Controller.*;
-import Model.RecipeServer;
 
-import java.io.*;
-import java.util.Iterator;
-
-import org.json.JSONObject;
-
-import javafx.application.Application;
-import javafx.stage.Stage;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;

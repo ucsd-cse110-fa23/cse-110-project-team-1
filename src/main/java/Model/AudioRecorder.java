@@ -12,6 +12,8 @@ import javax.sound.sampled.TargetDataLine;
 public class AudioRecorder {
     private AudioFormat audioFormat;
     private TargetDataLine targetDataLine;
+    private DataLine.Info dataLineInfo;
+    private boolean supported;
 
     private AudioFormat getAudioFormat() {
         // the number of samples of audio per second.
@@ -19,7 +21,7 @@ public class AudioRecorder {
         // the number of bits in each sample of a sound that has been digitized.
         int sampleSizeInBits = 16;
         // the number of audio channels in this format (1 for mono, 2 for stereo).
-        int channels = 1;
+        int channels = 2;
         // whether the data is signed or unsigned.
         boolean signed = true;
         // whether the audio data is stored in big-endian or little-endian order.
@@ -35,14 +37,16 @@ public class AudioRecorder {
 
     public AudioRecorder() {
         this.audioFormat = this.getAudioFormat();
+        this.dataLineInfo = new DataLine.Info(
+                TargetDataLine.class,
+                audioFormat);
+        this.supported = AudioSystem.isLineSupported(new DataLine.Info(TargetDataLine.class, audioFormat));
     }
 
     public void startRecording() {
+        if (supported == false) {return;}
         try {
             // the format of the TargetDataLine
-            DataLine.Info dataLineInfo = new DataLine.Info(
-                    TargetDataLine.class,
-                    audioFormat);
             // the TargetDataLine used to capture audio data from the microphone
             targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
             targetDataLine.open(audioFormat);
@@ -75,7 +79,12 @@ public class AudioRecorder {
     }
 
     public void stopRecording() {
+        if (targetDataLine == null) {return;}
         targetDataLine.stop();
         targetDataLine.close();
+    }
+
+    public boolean isSupported() {
+        return supported;
     }
 }
