@@ -29,9 +29,13 @@ public class View {
 	private Button generateButton = new Button("Generate Recipe");
 	private Button editButton = new Button("Test Edit Recipe");
 	private Button deleteButton = new Button("Delete Recipe");
+    private Button startRecording = new Button("Start Recording");
+    private Button stopRecordingMealType = new Button("Stop Recording");
+    private Button stopRecordingIngredients = new Button("Stop Recording");
 	private VBox leftVBox;
 	private VBox rightVBox;
 	private int currentSelectedRecipeID;
+    private AudioRecorder audioRecorder;
 
 	public View() {
 		this.root = new BorderPane();
@@ -42,11 +46,15 @@ public class View {
 		this.generateButton.setOnAction(e -> this.onGenerateRequest());
 		this.editButton.setOnAction(e -> this.onEditRequest());
 		this.deleteButton.setOnAction(e -> this.onDeleteRequest());
+        this.startRecording.setOnAction(e -> this.onRecordRequest());
+        this.stopRecordingMealType.setOnAction(e -> this.onStopRecordRequest("mealType"));
+        this.stopRecordingIngredients.setOnAction(e -> this.onStopRecordRequest("ingredients"));
 
 		// left side
 		this.updateRecipes();
 		currentSelectedRecipeID = -1;
 
+        this.audioRecorder = new AudioRecorder();
 	}
 
 	public BorderPane getRoot() {
@@ -73,7 +81,7 @@ public class View {
 
 		//Right side
 		this.rightVBox = new VBox(10);
-		this.rightVBox.getChildren().addAll(recipeDescription, editButton, deleteButton);
+		this.rightVBox.getChildren().addAll(recipeDescription, startRecording, stopRecordingMealType, stopRecordingIngredients, editButton, deleteButton);
 		this.rightVBox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
 		this.rightVBox.setPadding(new Insets(0,10,5,10));
 		this.root.setCenter(this.rightVBox);
@@ -108,6 +116,17 @@ public class View {
 		this.updateRecipes();
 	}
 
-	//private void
+    private void onRecordRequest() {
+        System.out.println("Recording...");
+        this.audioRecorder.startRecording();
+    }
 
+	private void onStopRecordRequest(String type) {
+        this.audioRecorder.stopRecording();
+        System.out.println("Stopped recording.");
+
+        RequestHandler req = new RequestHandler();
+		req.performPOST("http://localhost:8100/", new File("recording.wav"), type);
+		this.updateRecipes();
+    }
 }

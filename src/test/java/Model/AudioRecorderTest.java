@@ -13,6 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
+import View.AudioRecorder;
+
 public class AudioRecorderTest {
     private AudioRecorder audioRecorder;
 
