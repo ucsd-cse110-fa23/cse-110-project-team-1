@@ -96,53 +96,84 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
    * eventually will be a proper audio file when whisper gets set up
    */
   private String handlePost(HttpExchange httpExchange) throws IOException {
+
+    Headers headers = httpExchange.getRequestHeaders();
+    String fileType = headers.getFirst("Audio-Type");
+    String saveDirectory = "src/main/RecievedMedia/";
     String response = "Invalid POST request";
-    InputStream inStream = httpExchange.getRequestBody();
-    //Scanner scanner = new Scanner(inStream);
-    String postData = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
-    System.out.println("Post Data:" + postData);
-    System.out.println("ing: "+ postData.substring(2,postData.indexOf("=")));
-    //This should be encapsulated as a meal validator and recipe maker of sorts
-    if(postData.substring(0,postData.indexOf("=")) == "mealType"){
-      String meal = postData.substring(postData.indexOf("=") + 1,postData.length());
-      if(meal == "Breakfast" || meal == "Lunch" || meal == "Dinner"){
-        response = "mealType=" + meal + "-> is valid";
-      }else{
-         response = "mealType=" + meal + "-> not ok";
-      }
-    }else if(postData.substring(2,postData.indexOf("=")).equals("ingredients")){
-      String ingredients = postData.substring(postData.indexOf("=") + 1,postData.length());
-      System.out.println(ingredients);
-      try {
-        String recipeText;
-        System.out.println(postData.substring(0, 1));
-        if (postData.substring(0, 1).equals("D")) {
-          recipeText = gpt.getResponse("Dinner", ingredients);
-        } else if (postData.substring(0, 1).equals("L")) {
-          recipeText = gpt.getResponse("Lunch", ingredients);
-        } else if (postData.substring(0, 1).equals("B")) {
-          recipeText = gpt.getResponse("Breakfast", ingredients);
-        } else {
-          recipeText = "invalid response from chatGPT";
+    if (fileType == null || !(fileType.equals("mealType") || fileType.equals("ingredients"))) {
+      // This is for once we get rid of the text sent via post
+      // httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
+      // return;
+
+      // this handles the text post requests untill its all audio files only
+      InputStream inStream = httpExchange.getRequestBody();
+      // Scanner scanner = new Scanner(inStream);
+      String postData = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
+      System.out.println("Post Data:" + postData);
+      System.out.println("ing: " + postData.substring(2, postData.indexOf("=")));
+      // This should be encapsulated as a meal validator and recipe maker of sorts
+      if (postData.substring(0, postData.indexOf("=")) == "mealType") {
+          String meal = postData.substring(postData.indexOf("=") + 1, postData.length());
+          if (meal == "Breakfast" || meal == "Lunch" || meal == "Dinner") {
+              response = "mealType=" + meal + "-> is valid";
+          } else {
+              response = "mealType=" + meal + "-> not ok";
+          }
+      } else if (postData.substring(2, postData.indexOf("=")).equals("ingredients")) {
+            String ingredients = postData.substring(postData.indexOf("=") + 1, postData.length());
+            System.out.println(ingredients);
+            try {
+                String recipeText;
+                System.out.println(postData.substring(0, 1));
+                if (postData.substring(0, 1).equals("D")) {
+                    recipeText = gpt.getResponse("Dinner", ingredients);
+                } else if (postData.substring(0, 1).equals("L")) {
+                    recipeText = gpt.getResponse("Lunch", ingredients);
+                } else if (postData.substring(0, 1).equals("B")) {
+                    recipeText = gpt.getResponse("Breakfast", ingredients);
+                } else {
+                    recipeText = "invalid response from chatGPT";
+                }
+              
+                // make sure ends with new line and trim leading \n
+                recipeText = recipeText.trim();
+                recipeText += "\n";
+              
+                System.out.println("Rec" + recipeText);
+                // Make recipe and add to list
+                String recipeTitle = recipeText.substring(0, recipeText.indexOf("\n"));
+                list.addRecipe(recipeTitle, recipeText);
+                response = list.getMostRecent().toJson().toString();
+            } catch (Exception e) {
+          // TODO: handle exception
+          System.out.println("error caught");
+          e.printStackTrace();
         }
-
-        //make sure ends with new line and trim leading \n
-        recipeText= recipeText.trim();
-        recipeText +="\n";
-
-        System.out.println("Rec" + recipeText);
-        //Make recipe and add to list
-        String recipeTitle = recipeText.substring(0,recipeText.indexOf("\n"));
-        list.addRecipe(recipeTitle, recipeText);
-        response = list.getMostRecent().toJson().toString();
-      } catch (Exception e) {
-        // TODO: handle exception
-        System.out.println("error caught");
-        e.printStackTrace();
       }
-      
     }
-    
+    try (InputStream in = httpExchange.getRequestBody();
+        OutputStream out = new FileOutputStream(saveDirectory + fileType + ".mp3")) {
+      // this is a fix for reading single bytes at a time
+      // https://coderanch.com/t/676185/java/IO-byte-array-buffer
+      // this is what inspired it
+      byte[] buffer = new byte[1024];
+      int len;
+      while ((len = in.read(buffer)) != -1) {
+        out.write(buffer, 0, len);
+      }
+    } catch (IOException e) {
+      httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_INTERNAL_ERROR, 0);
+      System.out.println("Error saving file: " + e.getMessage());
+      return "IOException";
+    }
+
+    // This still needs to handle calling the speach to text and check it is
+    // one of the valid mealTypes and then sends the responseHeader
+    httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+    response = "Audio-Type:" + fileType + " recieved";
+
+
     System.out.println(response);
     return response;
   }

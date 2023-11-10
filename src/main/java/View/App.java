@@ -4,6 +4,7 @@ import Model.RecipeServer;
 
 import java.io.*;
 
+import Controller.RequestHandler;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -28,6 +29,11 @@ public class App extends Application {
 		server.startServer();
 
 		View view = new View();
+
+		//Just a test for sending files
+		//RequestHandler req = new RequestHandler();
+		//req.performPOST("http://localhost:8100/",new File("Test.mp3"),"mealType");
+
 
 		primaryStage.setTitle(this.appName);
 		primaryStage.setScene(new Scene(view.getRoot(), dimX, dimY));
