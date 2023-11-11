@@ -1,6 +1,6 @@
 package Model;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.util.concurrent.CountDownLatch;
@@ -13,15 +13,18 @@ import View.AudioRecorder;
 public class WhisperTest {
     private WhisperModel whisper;
     private AudioRecorder audioRecorder;
+    private boolean supported;
 
     @BeforeEach
     void setUp() {
-        this.whisper = new Whisper();
+        this.whisper = new MockWhisper();
         this.audioRecorder = new AudioRecorder();
+        this.supported = audioRecorder.isSupported();
     }
 
     @Test
     void testValidWhisperDinner() {
+        if (!supported) {return;}
         CountDownLatch latch = new CountDownLatch(1);
 
         //Async start and stop 1.5 sec recording
@@ -50,9 +53,13 @@ public class WhisperTest {
 
         try {
             String response = whisper.getResponse(new File("recording.wav"));
-            assertEquals(true, response.toLowerCase().contains("dinner"));
+            assertTrue(response.toLowerCase().contains("dinner"));
         } catch (Exception e) {
             System.err.println(e);
         }
+
+        File rec = new File("recording.wav");
+        assertTrue(rec.exists());
+        assertTrue(rec.delete());
     }
 }
