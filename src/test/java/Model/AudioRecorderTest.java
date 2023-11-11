@@ -1,5 +1,8 @@
 package Model;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.io.File;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -48,6 +51,9 @@ public class AudioRecorderTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        File rec = new File("recording.wav");
+        assertTrue(rec.exists());
+        assertTrue(rec.delete());
     }
 
     @Test
@@ -79,5 +85,8 @@ public class AudioRecorderTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        File rec = new File("recording.wav");
+        assertTrue(rec.exists());
+        assertTrue(rec.delete());
     }
 }
