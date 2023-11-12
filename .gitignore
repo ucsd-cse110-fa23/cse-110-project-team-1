@@ -11,4 +11,7 @@ lib/
 key.txt
 *.properties
 *.list
+
+# Ignore temporary files
+recording.wav
 src/main/RecievedMedia/mealType.mp3
