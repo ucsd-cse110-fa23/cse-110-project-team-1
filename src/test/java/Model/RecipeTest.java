@@ -99,14 +99,20 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         assertFalse(recipeList.isEmpty());
         recipeList.deleteRecipe(addedRecipeID);
         assertTrue(recipeList.isEmpty());
+
+        File file = new File("src/test/testDeleteExistingRecipe.list");
+        file.delete(); // remove test list
     }
 
     @Test
     void testDeleteNonExistingRecipe(){
-        RecipeList recipeList = new RecipeList("testDeleteNonExistingRecipe");
+        RecipeList recipeList = new RecipeList("src/test/testDeleteNonExistingRecipe");
         int addedRecipeID = recipeList.addRecipe("Recipe1", "RecipeText1");
         assertFalse(recipeList.deleteRecipe(addedRecipeID+1));
         assertFalse(recipeList.isEmpty());
+        
+        File file = new File("src/test/testDeleteNonExistingRecipe.list");
+        file.delete(); // remove test list
     }
     
     
@@ -126,6 +132,9 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     
         assertEquals("Recipe2", recipeList.getRecipe(2).getRecipeTitle());
         assertEquals("RecipeText2", recipeList.getRecipe(2).getRecipeText());
+
+        File file = new File("src/test/testEditExistingRecipe.list");
+        file.delete(); // remove test list
     }
     @Test 
     void testEditNonExistingRecipe(){
@@ -141,6 +150,9 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     
         assertEquals("Recipe2", recipeList.getRecipe(2).getRecipeTitle());
         assertEquals("RecipeText2", recipeList.getRecipe(2).getRecipeText());
+        
+        File file = new File("src/test/testEditNonExistingRecipe.list");
+        file.delete(); // remove test list
     }
     /*public static void main(String[] args){
         Recipe L = new Recipe(0, "ball", "two eggs");
