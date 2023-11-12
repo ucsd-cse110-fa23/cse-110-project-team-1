@@ -1,5 +1,8 @@
 package View;
 
+import java.io.File;
+import java.io.IOException;
+
 import Controller.*;
 
 import javafx.geometry.Insets;
@@ -63,10 +66,18 @@ public class View {
 		this.editSavedRecipeButton.setOnAction(e -> this.onEditRequest());
 		this.deleteSavedRecipeButton.setOnAction(e -> this.onDeleteRequest());
         this.startRecording.setOnAction(e -> this.onRecordRequest());
-        this.stopRecordingMealType.setOnAction(e -> this.onStopRecordRequest("mealType"));
-        this.stopRecordingIngredients.setOnAction(e -> this.onStopRecordRequest("ingredients"));
 		this.backToHome.setOnAction(e -> this.displayHomePage());
 		this.generateNewRecipe.setOnAction(e -> this.displayRecordMealType());
+        this.stopRecordingMealType.setOnAction(e -> {
+			
+			if (this.onStopRecordRequest("mealType")){
+				displayRecordIngredients();
+			}else{
+				recordMealTypeText.setText("Click start recording and then say breakfast, lunch, or dinner to select a meal type.\nClick stop when you are done \n Imvalid Meal Type. Please try again.");
+			}
+		});
+			
+        this.stopRecordingIngredients.setOnAction(e -> this.onStopRecordRequest("ingredients"));
 
 		// left side
 		this.updateRecipes();
@@ -142,7 +153,7 @@ public class View {
 		recordMealTypeText.setWrapText(true);
 		this.recordMealTypeVbox = new VBox(10);
 		//add buttons to record and stop recording
-		this.recordMealTypeVbox.getChildren().addAll(startRecording,stopRecordingMealType);
+		this.recordMealTypeVbox.getChildren().addAll(recordMealTypeText, startRecording,stopRecordingMealType);
 	}
 	private void displayRecordMealType(){
 		this.root.setCenter(this.recordMealTypeVbox);
@@ -196,12 +207,22 @@ public class View {
         this.audioRecorder.startRecording();
     }
 
-	private void onStopRecordRequest(String type) {
+	private boolean onStopRecordRequest(String requestType) {
         this.audioRecorder.stopRecording();
         System.out.println("Stopped recording.");
-
+		
         RequestHandler req = new RequestHandler();
-		//req.performPOST("http://localhost:8100/", new File("recording.wav"), type);
-		this.updateRecipes();
+		try {
+			String response = req.performPOST("http://localhost:8100/", new File("recording.wav"), requestType);
+			System.out.println("Response from server" + response);
+			if(requestType.equals("mealType")){
+				return ViewModel.validateMealType(response);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// this.updateRecipes();
+		return false;
     }
+	
 }

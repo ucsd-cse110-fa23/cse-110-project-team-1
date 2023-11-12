@@ -39,4 +39,17 @@ public class ViewModel {
 		return listView;
 		//System.out.println(allRec.toString());
 	}
+
+	/*
+	 * Returns if mealtype recorded is valid
+	 */
+	public static boolean validateMealType(String mealType){
+		System.out.println("Validate: " + mealType);
+		mealType= mealType.toLowerCase().trim();
+		if(mealType.contains("breakfast") || mealType.contains("lunch") || mealType.contains("dinner")){
+			return true;
+		}
+		return false;
+	}
+
 }

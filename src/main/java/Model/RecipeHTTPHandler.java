@@ -98,10 +98,10 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
   private String handlePost(HttpExchange httpExchange) throws IOException {
 
     Headers headers = httpExchange.getRequestHeaders();
-    String fileType = headers.getFirst("Audio-Type");
+    String audioType = headers.getFirst("Audio-Type");
     String saveDirectory = "src/main/RecievedMedia/";
     String response = "Invalid POST request";
-    if (fileType == null || !(fileType.equals("mealType") || fileType.equals("ingredients"))) {
+    if (audioType == null || !(audioType.equals("mealType") || audioType.equals("ingredients"))) {
       // This is for once we get rid of the text sent via post
       // httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
       // return;
@@ -153,7 +153,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
       }
     }
     try (InputStream in = httpExchange.getRequestBody();
-        OutputStream out = new FileOutputStream(saveDirectory + fileType + ".mp3")) {
+        OutputStream out = new FileOutputStream(saveDirectory + audioType + ".wav")) {
       // this is a fix for reading single bytes at a time
       // https://coderanch.com/t/676185/java/IO-byte-array-buffer
       // this is what inspired it
@@ -168,14 +168,24 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
       return "IOException";
     }
 
+    WhisperModel wisp = new MockWhisper();
+    String transcribedAudio = "";
+    try {
+      transcribedAudio = wisp.getResponse(new File(saveDirectory + audioType + ".wav"));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    System.out.println("Transcribed: " + transcribedAudio);
     // This still needs to handle calling the speach to text and check it is
     // one of the valid mealTypes and then sends the responseHeader
+    if(audioType.equals("mealType")){
+      response = transcribedAudio;
+      
+    }else if(audioType.equals("ingredients")){
+      //do gpt stuff
+    }
     httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-    response = "Audio-Type:" + fileType + " recieved";
-
-
-    System.out.println(response);
-    return response;
+    return response + "\n";
   }
   /*
    * This will be to edit recipe

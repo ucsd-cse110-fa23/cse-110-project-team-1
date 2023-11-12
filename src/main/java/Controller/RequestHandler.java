@@ -51,12 +51,14 @@ public class RequestHandler {
      * @param urlString The URL of the server to which the POST request will be sent.
      * @param file The file to be sent to the server.
      * @param audioType The type of audio in the file, which can be either 'mealType' or 'ingredients'.
+     * @return 
      *
      * @throws MalformedURLException If the provided urlString is not a valid URL.
      * @throws FileNotFoundException If the provided file does not exist.
      * @throws IOException If an I/O error occurs with the connection.
      */
-    public void performPOST(String urlString, File file, String audioType) throws MalformedURLException, FileNotFoundException, IOException {
+    public String performPOST(String urlString, File file, String audioType) throws MalformedURLException, FileNotFoundException, IOException {
+        String response = "";
         try {
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -71,13 +73,14 @@ public class RequestHandler {
     
             out.flush();
             out.close();
-    
+            
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String response = in.readLine();
+                response = in.readLine();
                 in.close();
-                System.out.println(response);
+                System.out.println("Sever Response: " + response);
+                
             } else {
                 System.out.println("Server returned non-OK code: " + responseCode);
             }
@@ -88,6 +91,7 @@ public class RequestHandler {
         } catch (IOException e) {
             System.out.println("Error communicating with server: " + e.getMessage());
         }
+        return response;
     }
 
 
