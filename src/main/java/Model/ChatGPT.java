@@ -32,31 +32,31 @@ public class ChatGPT implements GPTModel {
     }
 
     public String getResponse(String mealType, String ingredients) throws Exception {
-        String prompt = "\"Imagine you're a chef and you've been asked to create a unique '" +  mealType + "' recipe. The ingredients you have to work with are '" + ingredients + "'. Your task is to come up with a recipe that incorporates some of these ingredients but not neccisarily all. \r\n" + //
-                "\r\n" + //
-                "The format of the recipe should be as follows:\r\n" + //
-                "\r\n" + //
-                "1. Start with the name of the recipe. This should be a short catchy and descriptive title that gives a sense of what the final dish will be like. This should be the first line of your response.\r\n" + //
-                "\r\n" + //
-                "2. Next, list out all the ingredients required for the recipe. For each ingredient, specify the amount needed. Each ingredient should be on a new line.\r\n" + //
-                "\r\n" + //
-                "3. After listing the ingredients, provide a step-by-step guide on how to prepare and cook the meal. Each step should be numbered and start on a new line. Be as detailed as possible, explaining each process clearly.\r\n" + //
-                "\r\n" + //
-                "Here's an example of how your recipe should be formatted:\r\n" + //
-                "\r\n" + //
-                "Chicken Stir-Fry\r\n" + //
-                "\r\n" + //
-                "- 1 lb of chicken\r\n" + //
-                "- 2 bell peppers\r\n" + //
-                "- 1 onion\r\n" + //
-                "- 2 tomatoes\r\n" + //
-                "\r\n" + //
-                "1. Cut the chicken and vegetables into bite-sized pieces.\r\n" + //
-                "2. Heat oil in a pan and add the chicken. Cook until no longer pink.\r\n" + //
-                "3. Add the vegetables and stir-fry until tender.\r\n" + //
-                "4. Serve hot with rice.\r\n" + //
-                "\r\n" + //
-                "Remember, the response should contain only the recipe and it should strictly follow this format. it should not include any explanation after the last step.\r\n";
+        String prompt = "\"Imagine you're a chef and you've been asked to create a unique '" +  mealType + "' recipe. The ingredients you have to work with are '" + ingredients + "'. Your task is to come up with a recipe that incorporates some of these ingredients but not necessarily  all. \n" + //
+                "\n" + //
+                "The format of the recipe should be as follows:\n" + //
+                "\n" + //
+                "1. Start with the name of the recipe. This should be a short catchy and descriptive title that gives a sense of what the final dish will be like. This should be the first line of your response.\n" + //
+                "\n" + //
+                "2. Next, list out all the ingredients required for the recipe. For each ingredient, specify the amount needed. Each ingredient should be on a new line.\n" + //
+                "\n" + //
+                "3. After listing the ingredients, provide a step-by-step guide on how to prepare and cook the meal. Each step should be numbered and start on a new line. Be as detailed as possible, explaining each process clearly.\n" + //
+                "\n" + //
+                "Here's an example of how your recipe should be formatted:\n" + //
+                "\n" + //
+                "Chicken Stir-Fry\n" + //
+                "\n" + //
+                "- 1 lb of chicken\n" + //
+                "- 2 bell peppers\n" + //
+                "- 1 onion\n" + //
+                "- 2 tomatoes\n" + //
+                "\n" + //
+                "1. Cut the chicken and vegetables into bite-sized pieces.\n" + //
+                "2. Heat oil in a pan and add the chicken. Cook until no longer pink.\n" + //
+                "3. Add the vegetables and stir-fry until tender.\n" + //
+                "4. Serve hot with rice.\n" + //
+                "\n" + //
+                "Remember, the response should contain only the recipe and it should strictly follow this format. it should not include any explanation after the last step.\n";
 
         // Create a request body which you will pass into request object
         JSONObject requestBody = new JSONObject();
