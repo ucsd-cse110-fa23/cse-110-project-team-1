@@ -49,7 +49,8 @@ public class RecipeNode extends HBox{
         return recipe;
     }
     public static RecipeNode jsonToRecipeNode(JSONObject json){
-        RecipeNode newRecipe = new RecipeNode(json.getInt("recipeID"), json.getString("recipeTitle"), json.getString("recipeText"));
+        RecipeNode newRecipe = new RecipeNode(json.getInt("recipeID"), json.getString("recipeTitle").replaceAll("\\r?", "")
+        , json.getString("recipeText"));
         return newRecipe;
     }
 

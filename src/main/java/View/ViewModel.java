@@ -83,6 +83,8 @@ public class ViewModel {
 		try {
 			response = req.performPOST("http://localhost:8100/", new File("recording.wav"), "ingredients", newlyValidatedMealType);
 			//System.out.println("Response from server: " + response);
+			response = response.replaceAll("\\r\\n?", "\n");
+
 			return RecipeNode.jsonToRecipeNode(new JSONObject(response));
 		} catch (IOException e) {
 			e.printStackTrace();
