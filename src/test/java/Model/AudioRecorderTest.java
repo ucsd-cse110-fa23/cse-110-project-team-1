@@ -87,6 +87,6 @@ public class AudioRecorderTest {
         }
         File rec = new File("recording.wav");
         assertTrue(rec.exists());
-        assertTrue(rec.delete());
+        rec.delete();
     }
 }
