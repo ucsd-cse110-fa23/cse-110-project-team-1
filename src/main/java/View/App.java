@@ -9,6 +9,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 
 
 public class App extends Application {
@@ -28,7 +29,7 @@ public class App extends Application {
 		server = new RecipeServer();
 		server.startServer();
 
-		View view = new View(primaryStage);
+		View view = new View();
 
 		//Just a test for sending files
 		//RequestHandler req = new RequestHandler();
@@ -36,6 +37,7 @@ public class App extends Application {
 
 
 		primaryStage.setTitle(this.appName);
+		primaryStage.getIcons().add(new Image("file:./src/main/java/View/images/icon.png"));
 		primaryStage.setScene(new Scene(view.getRoot(), dimX, dimY));
 		primaryStage.show();
 	}

@@ -1,23 +1,11 @@
 package View;
 
 import Controller.*;
-import Model.RecipeServer;
-
-import java.io.*;
-import java.util.Iterator;
-
-import org.json.JSONObject;
-
-import javafx.application.Application;
-import javafx.stage.Stage;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;
@@ -34,9 +22,8 @@ public class View {
 	private VBox rightVBox;
 	private int currentSelectedRecipeID;
 
-	public View(Stage primaryStage) {
-		primaryStage.getIcons().add(new Image("file:./src/main/java/View/images/icon.png"));
-		
+	public View() {
+
 		this.root = new BorderPane();
 		this.root.setPadding(new Insets(10));
 		//Left ListView with placeholders and a + button
