@@ -23,8 +23,8 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
  
  public RecipeHTTPHandler(RecipeList list){
    this.list = list;
-   gpt = new MockGPT(); // TODO: change to real gpt
-   wisp = new MockWhisper(); // TODO: change to real whisper
+   gpt = new ChatGPT(); // TODO: change to real gpt
+   wisp = new Whisper(); // TODO: change to real whisper
 
  }
 
