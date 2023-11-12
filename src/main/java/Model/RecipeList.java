@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 //Referenced this for serialization and deserialization code
 //https://www.geeksforgeeks.org/how-to-serialize-hashmap-in-java/
@@ -29,7 +31,7 @@ public class RecipeList {
 
     private int highestIndex;
     private String listName;
-    private HashMap<Integer, Recipe> recipeList;
+    private LinkedHashMap<Integer, Recipe> recipeList;
 
     /**
      * This is the constructor for the RecipeList class. 
@@ -40,7 +42,7 @@ public class RecipeList {
      */
     public RecipeList(String listName) {
         highestIndex = 0;
-        recipeList = new HashMap<Integer, Recipe>();
+        recipeList = new LinkedHashMap<Integer, Recipe>();
         this.listName = listName; // default
     }
 
@@ -77,7 +79,7 @@ public class RecipeList {
     // Suppress Type Safety for objectInput, since we are sure of <Int, Recipe> type
     @SuppressWarnings("unchecked")
     public void loadFromDisk() {
-        HashMap<Integer, Recipe> newHashMap = null;
+        LinkedHashMap<Integer, Recipe> newHashMap = null;
         String filePath = listName + ".list";
         File file = new File(filePath);
 
@@ -88,7 +90,7 @@ public class RecipeList {
         try {
             FileInputStream fileInput = new FileInputStream(filePath);
             ObjectInputStream objectInput = new ObjectInputStream(fileInput);
-            newHashMap = (HashMap<Integer, Recipe>) objectInput.readObject();
+            newHashMap = (LinkedHashMap<Integer, Recipe>) objectInput.readObject();
             objectInput.close();
             fileInput.close();
         }
@@ -166,6 +168,7 @@ public class RecipeList {
         int recipeID = ++highestIndex; // increment highestIndex with every new recipe creataed
         Recipe r = new Recipe(recipeID, recipeTitle, recipeText);
         recipeList.put(recipeID, r);
+        //System.out.println("Added " + recipeID);
         saveToDisk();
         return recipeID;
     }
@@ -233,26 +236,27 @@ public class RecipeList {
 
     /**
      * This method converts the recipe list to a JSONObject.
-     * Each entry in the list is converted to a JSONObject, with the recipe ID,
+     * Each entry in the list is converted to a JSONArray, with the recipe ID,
      * title, and text as properties.
      *
-     * @return A JSONObject representing the recipe list.
+     * @return A JSONArray representing the recipe list.
      */
 
-    public JSONObject toJSONObject() {
-        JSONObject allRecipes = new JSONObject();
+    public JSONArray toJSONObject() {
+        JSONArray allRecipes = new JSONArray();
         Set<Entry<Integer, Recipe>> set = recipeList.entrySet();
         Iterator<Entry<Integer, Recipe>> iterator = set.iterator();
-        int recipeIndex = 0;
 
+        int recipeIndex = 0;
         while (iterator.hasNext()) {
-            Map.Entry<Integer, Recipe> entry = (Map.Entry<Integer, Recipe>) iterator.next();
+            Map.Entry<Integer, Recipe> entry = iterator.next();
             Recipe r = ((Recipe) entry.getValue());
+            //System.out.println(r.getRecipeID());
             JSONObject recipe = new JSONObject();
-            recipe.put("recipeText", r.getRecipeText());
-            recipe.put("recipeTitle", r.getRecipeTitle());
-            recipe.put("recipeID", r.getRecipeID());
-            allRecipes.put(Integer.toString(recipeIndex++), recipe);
+                recipe.put("recipeText", r.getRecipeText());
+                recipe.put("recipeTitle", r.getRecipeTitle());
+                recipe.put("recipeID", r.getRecipeID());
+            allRecipes.put(recipeIndex++, recipe);
         }
         return allRecipes;
     }

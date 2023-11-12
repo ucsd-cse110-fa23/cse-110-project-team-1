@@ -128,7 +128,7 @@ class MockGPT implements GPTModel {
         JSONArray choices = responseJson.getJSONArray("choices");
         String generatedText = choices.getJSONObject(0).getString("text");
 
-        if((mealType).contains("Dinner") &&
+        if((mealType).toLowerCase().contains("dinner") &&
             (ingredients.toLowerCase()).contains("potato") &&
             (ingredients.toLowerCase()).contains("butter")) {
             response = generatedText;

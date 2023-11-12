@@ -19,10 +19,13 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
 
  protected final RecipeList list;
  protected GPTModel gpt;
+ protected WhisperModel wisp;
  
  public RecipeHTTPHandler(RecipeList list){
    this.list = list;
    gpt = new MockGPT(); // TODO: change to real gpt
+   wisp = new MockWhisper(); // TODO: change to real whisper
+
  }
 
  public void handle(HttpExchange httpExchange) throws IOException {
@@ -45,7 +48,6 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
         System.out.println("An erroneous request");
         response = e.toString();
         e.printStackTrace();
-        System.out.println("test");
       }
 
     //Sending back response to the client
@@ -122,7 +124,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
           }
       } else if (postData.substring(2, postData.indexOf("=")).equals("ingredients")) {
             String ingredients = postData.substring(postData.indexOf("=") + 1, postData.length());
-            System.out.println(ingredients);
+            //System.out.println(ingredients);
             try {
                 String recipeText;
                 System.out.println(postData.substring(0, 1));
@@ -168,7 +170,6 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
       return "IOException";
     }
 
-    WhisperModel wisp = new MockWhisper();
     String transcribedAudio = "";
     try {
       transcribedAudio = wisp.getResponse(new File(saveDirectory + audioType + ".wav"));
@@ -183,9 +184,20 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
       
     }else if(audioType.equals("ingredients")){
       //do gpt stuff
+      String mealType = headers.getFirst("Meal-Type");
+      System.out.println("Meal Type: " + mealType);
+      try {
+        response = gpt.getResponse(mealType, transcribedAudio);
+        String recipeText = response.trim() + "\n";
+        Integer tempRecipeID = -1;
+        String recipeTitle = recipeText.substring(0, recipeText.indexOf("\n"));
+        Recipe newRecipe = new Recipe(tempRecipeID, recipeTitle, recipeText);
+        response = newRecipe.toJson().toString();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }
-    httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-    return response + "\n";
+    return response;
   }
   /*
    * This will be to edit recipe
@@ -202,11 +214,11 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
     int recipeID = allRec.getInt("recipeID");
 
     if (list.editRecipe(recipeID, allRec.getString("newRecipeTitle"), allRec.getString("newRecipeText"))) {
-      response = "Edited recipe " + recipeID;
+      response = Integer.toString(recipeID);
       System.out.println("Edited recipe " + recipeID);
     } else {
       recipeID = list.addRecipe(allRec.getString("newRecipeTitle"), allRec.getString("newRecipeText"));
-      response = "Added recipe " + recipeID;
+      response = Integer.toString(recipeID);
       System.out.println("Added recipe " + recipeID);
     }
     return response;

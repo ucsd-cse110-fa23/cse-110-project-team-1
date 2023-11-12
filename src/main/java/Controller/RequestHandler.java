@@ -38,7 +38,7 @@ public class RequestHandler {
             BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String response = in.readLine();
             in.close();
-            System.out.println(response);
+            System.out.println("POST response: " + response);
         } catch (Exception e) {
             // TODO: handle exception
         }
@@ -51,13 +51,14 @@ public class RequestHandler {
      * @param urlString The URL of the server to which the POST request will be sent.
      * @param file The file to be sent to the server.
      * @param audioType The type of audio in the file, which can be either 'mealType' or 'ingredients'.
+     * @param mealType The type of meal to generate, should be "breakfast" "lunch" or "dinner", only use when sending a generate request not a mealType check
      * @return 
      *
      * @throws MalformedURLException If the provided urlString is not a valid URL.
      * @throws FileNotFoundException If the provided file does not exist.
      * @throws IOException If an I/O error occurs with the connection.
      */
-    public String performPOST(String urlString, File file, String audioType) throws MalformedURLException, FileNotFoundException, IOException {
+    public String performPOST(String urlString, File file, String audioType, String mealType) throws MalformedURLException, FileNotFoundException, IOException {
         String response = "";
         try {
             URL url = new URL(urlString);
@@ -67,6 +68,7 @@ public class RequestHandler {
             conn.setRequestProperty("Content-Type", "application/octet-stream");
             conn.setRequestProperty("Content-Length", String.valueOf(file.length()));
             conn.setRequestProperty("Audio-Type", audioType);
+            conn.setRequestProperty("Meal-Type", mealType);
     
             OutputStream out = conn.getOutputStream();
             Files.copy(file.toPath(), out);
@@ -76,9 +78,15 @@ public class RequestHandler {
             
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
+                String inputLine;
                 BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                response = in.readLine();
+                StringBuffer res = new StringBuffer();
+                while ((inputLine = in.readLine()) != null) {
+				    res.append(inputLine);
+                    //System.out.println(inputLine);
+			    }
                 in.close();
+                response = res.toString();
                 System.out.println("Sever Response: " + response);
                 
             } else {
@@ -103,9 +111,12 @@ public class RequestHandler {
      * @param recipeID The ID of the recipe to be updated or created.
      * @param recipeTitle The title of the recipe to be updated or created.
      * @param recipeText The text of the recipe to be updated or created.
+     * 
+     * @return 
      *
      */
-    public void performPUT(String urlString, int recipeID, String recipeTitle, String recipeText) {
+    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText) {
+        Integer toReturn = -1;
         try {
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -127,7 +138,8 @@ public class RequestHandler {
                 BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 String response = in.readLine();
                 in.close();
-                System.out.println("Put response " + response);
+                //System.out.println("Put response " + response);
+                toReturn = Integer.parseInt(response);
             } else {
                 System.out.println("Server returned non-OK code: " + responseCode);
             }
@@ -136,6 +148,7 @@ public class RequestHandler {
         } catch (IOException e) {
             System.out.println("Error communicating with server: " + e.getMessage());
         }
+        return toReturn;
     }
 
 
