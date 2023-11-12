@@ -1,12 +1,6 @@
 package View;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.json.JSONObject;
-
 import Controller.*;
-import Model.Recipe;
 import javafx.geometry.Insets;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -56,7 +50,7 @@ public class View {
 	private Label recordIngredientsText;
 
 	//newly generated receipe labels
-	private Label newlyGeneratedRecipeLabel;
+	//private Label newlyGeneratedRecipeLabel;
 
 	private int currentSelectedRecipeID;
 	private RecipeNode newlyGeneratedRecipe;
@@ -217,10 +211,10 @@ public class View {
 	}
 
 	private void onSaveNewlyGeneratedRecipeRequest(){
-		RequestHandler req = new RequestHandler();
-		Integer newRecipeID = req.performPUT("http://localhost:8100/", newlyGeneratedRecipe.getRecipeID(), 
-														   newlyGeneratedRecipe.getRecipeTitle(), 
-														   newlyGeneratedRecipe.getRecipeText());
+		//RequestHandler req = new RequestHandler();
+		//Integer newRecipeID = req.performPUT("http://localhost:8100/", newlyGeneratedRecipe.getRecipeID(), 
+		//												   newlyGeneratedRecipe.getRecipeTitle(), 
+		//												   newlyGeneratedRecipe.getRecipeText());
 		displayHomePage();
 		this.updateRecipes();
 	}

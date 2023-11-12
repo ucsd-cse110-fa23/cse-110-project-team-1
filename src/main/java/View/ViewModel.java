@@ -2,7 +2,6 @@ package View;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
