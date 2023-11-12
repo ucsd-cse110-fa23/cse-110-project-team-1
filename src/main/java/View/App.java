@@ -28,7 +28,7 @@ public class App extends Application {
 		server = new RecipeServer();
 		server.startServer();
 
-		View view = new View();
+		View view = new View(primaryStage);
 
 		//Just a test for sending files
 		//RequestHandler req = new RequestHandler();

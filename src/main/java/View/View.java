@@ -14,6 +14,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
@@ -33,7 +34,9 @@ public class View {
 	private VBox rightVBox;
 	private int currentSelectedRecipeID;
 
-	public View() {
+	public View(Stage primaryStage) {
+		primaryStage.getIcons().add(new Image("file:./src/main/java/View/images/icon.png"));
+		
 		this.root = new BorderPane();
 		this.root.setPadding(new Insets(10));
 		//Left ListView with placeholders and a + button
