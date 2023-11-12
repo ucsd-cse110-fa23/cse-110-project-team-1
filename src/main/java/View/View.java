@@ -54,6 +54,7 @@ public class View {
 	private int currentSelectedRecipeID;
 	
 	public View() {
+
 		this.root = new BorderPane();
 		this.root.setPadding(new Insets(10));
 		//Left ListView with placeholders and a + button
