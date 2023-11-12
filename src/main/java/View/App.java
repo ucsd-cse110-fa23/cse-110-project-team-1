@@ -1,6 +1,7 @@
 package View;
 
 import Model.RecipeServer;
+import Model.GenerateDemoLists;
 
 import java.io.*;
 
@@ -29,7 +30,8 @@ public class App extends Application {
 		server = new RecipeServer();
 		server.startServer();
 
-		View view = new View();
+		ViewModel viewModel = new ViewModel();
+		View view = new View(viewModel);
 
 		//Just a test for sending files
 		//RequestHandler req = new RequestHandler();

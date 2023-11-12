@@ -191,7 +191,7 @@ class MockWhisper implements WhisperModel {
             response = handleSuccessResponse(connection);
         } else {                                                // if it actually errors out not in the intended way, return error
             response = handleErrorResponse(connection);
-            response = "dinner";
+            response = "dinner,potato,butter";
             return response;
         }
 

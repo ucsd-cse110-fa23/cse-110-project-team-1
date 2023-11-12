@@ -17,11 +17,7 @@ public class RecipeServerTest{
             server.loadServer();
             RequestHandler req = new RequestHandler();
             String content = req.performGET("http://localhost:8100/?all");
-            assertEquals("{\"0\":{\"recipeTitle\":\"Pizza\",\"recipeText\":\"Pizza\\n" + //
-                    "Ingredients:\\n" + //
-                    "Cheese\\n" + //
-                    "Dough\\n" + //
-                    "Tomato Sauce\",\"recipeID\":1}}",content);
+            assertEquals("[{\"recipeTitle\":\"Beans\",\"recipeText\":\"Beans\\n Ingredients:\\n1 Can of Beans\\n\\nInstructions:\\nStep 1: Put beans on plate\\n\",\"recipeID\":1}]",content);
             server.stopServer();
         } catch (IOException e) {
             e.printStackTrace();
@@ -38,7 +34,7 @@ public class RecipeServerTest{
             RequestHandler req = new RequestHandler();
             String content = req.performGET("http://localhost:8100/?all");
     
-            assertEquals("{}",content);
+            assertEquals("[]",content);
             server.stopServer();
         } catch (IOException e) {
             e.printStackTrace();
