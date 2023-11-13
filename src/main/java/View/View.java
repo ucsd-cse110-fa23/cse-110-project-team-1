@@ -4,6 +4,7 @@ import Controller.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
@@ -20,11 +21,13 @@ public class View {
 	private ViewModel viewModel;
 
 	private TextField recipeQuery = new TextField();
+	private TextArea recipeEditArea;
 
 	private Button addNewRecipeButton = new Button("Generate Recipe");
 	private Button editSavedRecipeButton = new Button("Test Edit Recipe");
 	private Button deleteSavedRecipeButton = new Button("Delete Recipe");
 	private Button newlyGeneratedRecipeSaveButton = new Button("Save Recipe");
+	private Button editedRecipeSaveButton = new Button("Save Recipe");
 
 	private Button startRecording = new Button("Start Recording");
 	private Button stopRecordingMealType = new Button("Stop Mealtype Recording");
@@ -40,6 +43,8 @@ public class View {
 	private VBox newlyGeneratedRecipeDisplayVbox;
 	private VBox recordMealTypeVbox;
 	private VBox recordIngredientsVbox;
+	private VBox editRecipesVbox;
+
 
 	//homepage labels
 	private Label homePageTextHeader;
@@ -57,6 +62,7 @@ public class View {
 
 	private int currentSelectedRecipeID;
 	private RecipeNode newlyGeneratedRecipe;
+	private RecipeNode currentlyEditingRecipe;
 
 	
 	public View(ViewModel viewModel) {
@@ -67,11 +73,11 @@ public class View {
 		//Left ListView with placeholders and a + button
 		this.recipeQuery.setPromptText("Enter Recipe Query...");
 		this.addNewRecipeButton.setOnAction(e -> this.onGenerateRequest());
-		this.editSavedRecipeButton.setOnAction(e -> this.onEditRequest());
 		this.deleteSavedRecipeButton.setOnAction(e -> this.onDeleteRequest());
         this.startRecording.setOnAction(e -> this.onRecordRequest());
 		this.backToHome.setOnAction(e -> this.displayHomePage());
 		this.generateNewRecipe.setOnAction(e -> this.buildRecordMealType());
+		this.editSavedRecipeButton.setOnAction(e -> this.buildEditPage(currentlyEditingRecipe));
         this.stopRecordingMealType.setOnAction(e -> {
 			
 			if (this.onStopRecordRequest("mealType")){
@@ -89,6 +95,13 @@ public class View {
 		this.newlyGeneratedRecipeSaveButton.setOnAction(e -> {
 			onSaveNewlyGeneratedRecipeRequest();
 		});
+		this.editedRecipeSaveButton.setOnAction(e -> {
+			String newRecipeTitle = recipeEditArea.getText().trim().substring(0, recipeEditArea.getText().trim().indexOf("\n"));
+			currentlyEditingRecipe.setRecipeText(recipeEditArea.getText());
+			currentlyEditingRecipe.setRecipeTitle(newRecipeTitle);
+			onSaveEditedRecipe(currentlyEditingRecipe);
+		});
+
 
 		// left side
 		currentSelectedRecipeID = -1;
@@ -111,15 +124,17 @@ public class View {
 	public void updateRecipes() {
 		System.out.println("Updating Recipes");
 		ListView<HBox> daStuff = viewModel.pullRecipes();
-		this.recipeTitleListleftVbox = new VBox(10, daStuff, this.recipeQuery, this.addNewRecipeButton);
+		this.recipeTitleListleftVbox = new VBox(10, daStuff);
 		VBox.setVgrow(daStuff, Priority.ALWAYS);
 		this.root.setLeft(this.recipeTitleListleftVbox);
 		//Update detail view
 		daStuff.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue != null) {
-				String recipeText = ((RecipeNode)daStuff.getSelectionModel().getSelectedItem()).getRecipeText();
-				updateSelectedRecipeDetails(recipeText,((RecipeNode)daStuff.getSelectionModel().getSelectedItem()).getRecipeID());
-				System.out.println("Selected: " + ((RecipeNode)daStuff.getSelectionModel().getSelectedItem()).getRecipeTitle());
+				RecipeNode selected = (RecipeNode)daStuff.getSelectionModel().getSelectedItem();
+				String recipeText = selected.getRecipeText();
+				updateSelectedRecipeDetails(recipeText,(selected.getRecipeID()));
+				currentlyEditingRecipe = selected;
+				System.out.println("Selected: " + selected.getRecipeTitle());
 			}
 			buildDetailPage();
 		});
@@ -127,11 +142,24 @@ public class View {
 	}
 
 
+	private void buildEditPage(RecipeNode selectedRecipe){
+		this.recipeEditArea = new TextArea(selectedRecipe.getRecipeText());
+		this.recipeEditArea.setMinHeight(400);
+		this.editRecipesVbox = new VBox(10);
+		this.editRecipesVbox.getChildren().addAll(recipeEditArea, new HBox(backToHome, editedRecipeSaveButton));
+		this.editRecipesVbox.setAlignment(Pos.TOP_LEFT);
+		this.editRecipesVbox.setPadding(new Insets(0,10,5,10));
+		displayEditPage();
+	}
+
+	private void displayEditPage(){
+		this.root.setCenter(this.editRecipesVbox);
+	}
 	private void buildDetailPage(){
 		savedRecipeDescription.setWrapText(true);
 		//Right side
 		this.savedRecipeDetailVbox = new VBox(10);
-		this.savedRecipeDetailVbox.getChildren().addAll(savedRecipeDescription, editSavedRecipeButton, deleteSavedRecipeButton, backToHome);
+		this.savedRecipeDetailVbox.getChildren().addAll(savedRecipeDescription, new HBox(backToHome, editSavedRecipeButton, deleteSavedRecipeButton));
 		this.savedRecipeDetailVbox.setAlignment(Pos.TOP_LEFT);
 		this.savedRecipeDetailVbox.setPadding(new Insets(0,10,5,10));
 		displayRecipeDetails();
@@ -225,7 +253,7 @@ public class View {
 		savedRecipeDescription.setWrapText(true);
 		//Right side
 		this.newlyGeneratedRecipeDisplayVbox = new VBox(10);
-		this.newlyGeneratedRecipeDisplayVbox.getChildren().addAll(savedRecipeDescription, newlyGeneratedRecipeSaveButton, backToHome);
+		this.newlyGeneratedRecipeDisplayVbox.getChildren().addAll(savedRecipeDescription, new HBox(backToHome, newlyGeneratedRecipeSaveButton));
 		this.newlyGeneratedRecipeDisplayVbox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
 		this.newlyGeneratedRecipeDisplayVbox.setPadding(new Insets(0,10,5,10));
 		displayNewlyGeneratedRecipeDisplay();
@@ -254,14 +282,14 @@ public class View {
 		this.updateRecipes();
 	}
 
-	private void onEditRequest() {
-		//System.out.println("onGenerateRequest Query: " + this.recipeQuery.getText());
-		System.out.println("Client Delete Recipe:"+currentSelectedRecipeID);
-		
+	private void onSaveEditedRecipe(RecipeNode editRecipeNode){
 		RequestHandler req = new RequestHandler();
-		req.performPUT("http://localhost:8100/", currentSelectedRecipeID, "Test Edit Title\n", "Test Edit Text\n");
-		this.recipeQuery.clear();
+		req.performPUT("http://localhost:8100/", editRecipeNode.getRecipeID(), 
+														   editRecipeNode.getRecipeTitle(), 
+														   editRecipeNode.getRecipeText());
+		
 		this.updateRecipes();
+		displayHomePage();
 	}
 
 	private void onDeleteRequest() {

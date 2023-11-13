@@ -56,7 +56,7 @@ public class ChatGPT implements GPTModel {
                 "3. Add the vegetables and stir-fry until tender.\n" + //
                 "4. Serve hot with rice.\n" + //
                 "\n" + //
-                "Remember, the response should contain only the recipe and it should strictly follow this format. it should not include any explanation after the last step.\n";
+                "Remember, you can only use the listed ingredients and the response should contain only the recipe and it should strictly follow this format. it should not include any explanation after the last step.\n";
 
         // Create a request body which you will pass into request object
         JSONObject requestBody = new JSONObject();
