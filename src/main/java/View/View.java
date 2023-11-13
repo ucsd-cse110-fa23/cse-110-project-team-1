@@ -177,7 +177,7 @@ public class View {
 		this.homePageTextHeader = new Label("Welcome to Pantry Pal");
 		this.homePageTextHeader.setWrapText(true);
 
-		this.homePageTextSubheader = new Label("To add a new recipe, click \"Record Meal Type\"");
+		this.homePageTextSubheader = new Label("To add a new recipe, click \"" + this.addNewRecipeButton.getText() + "\"");
 		this.homePageTextSubheader.setWrapText(true);
 
 		// we need this to center the content
