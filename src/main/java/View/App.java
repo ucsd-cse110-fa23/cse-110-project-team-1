@@ -1,11 +1,8 @@
 package View;
 
 import Model.RecipeServer;
-import Model.GenerateDemoLists;
 
 import java.io.*;
-
-import Controller.RequestHandler;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

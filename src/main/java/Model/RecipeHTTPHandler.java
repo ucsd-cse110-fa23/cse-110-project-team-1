@@ -14,7 +14,6 @@ import org.json.JSONObject;
  */
 interface RecipeHTTPHandlerInterface extends HttpHandler{}
 
-// TODO: Currently uses mockGPT for real handler
 public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
 
  protected final RecipeList list;
@@ -23,8 +22,8 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
  
  public RecipeHTTPHandler(RecipeList list){
    this.list = list;
-   gpt = new ChatGPT(); // TODO: change to real gpt
-   wisp = new Whisper(); // TODO: change to real whisper
+   gpt = new ChatGPT();
+   wisp = new Whisper();
 
  }
 
@@ -148,7 +147,6 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
                 list.addRecipe(recipeTitle, recipeText);
                 response = list.getMostRecent().toJson().toString();
             } catch (Exception e) {
-          // TODO: handle exception
           System.out.println("error caught");
           e.printStackTrace();
         }
@@ -222,30 +220,6 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
       System.out.println("Added recipe " + recipeID);
     }
     return response;
-
-    // allRec.
-
-    // String language = postData.substring(
-    //   0,
-    //   postData.indexOf(",")
-    // ), year = postData.substring(postData.indexOf(",") + 1);
- 
-    // if(data.get(language) != year){
-    //      data.put(language, year);
-    //      String response = "Updated entry {" + language + ", " + year + "}";
-    //      System.out.println(response);
-    //      return response;
-    // }
-
-    // // Store data in hashmap
-    // data.put(language, year);
- 
- 
-    // String response = "Posted entry {" + language + ", " + year + "}";
-    // System.out.println(response);
-    
- 
-    // return response;
   }
 
   /*
@@ -254,7 +228,6 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
    */
   private String handleDelete(HttpExchange httpExchange) throws IOException {
     String response = "Invalid DELETE request";
-    URI uri = httpExchange.getRequestURI();
     InputStream inStream = httpExchange.getRequestBody();
     // Scanner scanner = new Scanner(inStream);
     String postData = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
@@ -282,6 +255,7 @@ class MockRecipeHTTPHandler extends RecipeHTTPHandler{
  public MockRecipeHTTPHandler(RecipeList list){
   super(list);
   gpt = new MockGPT();
+  wisp = new MockWhisper();
  }
 }
 
