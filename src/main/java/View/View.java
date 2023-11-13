@@ -3,6 +3,7 @@ package View;
 import Controller.*;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
@@ -10,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
 
 public class View {
@@ -39,7 +41,8 @@ public class View {
 	private VBox recordIngredientsVbox;
 
 	//homepage labels
-	private Label homePageText;
+	private Label homePageTextHeader;
+	private Label homePageTextSubheader;
 	private Label savedRecipeDescription;
 
 	//record mealtype labels
@@ -105,7 +108,7 @@ public class View {
 
 
 	private void buidlDetailPage(){
-		System.out.println("printing the muhfuckin' list viwew");
+		System.out.println("printing the muhfuckin' list view");
 
 		savedRecipeDescription = new Label("Recipe Description: ...");
 		savedRecipeDescription.setWrapText(true);
@@ -122,17 +125,32 @@ public class View {
 
 
 
-	private void buildHomePage(){
+	private void buildHomePage() {
 		System.out.println("Displaying Home Page");
-		homePageText = new Label("Welcome to Pantry Pal\n To add a recipe click record meal type");
-		homePageText.setWrapText(true);
+		this.homePageTextHeader = new Label("Welcome to Pantry Pal");	
+		this.homePageTextHeader.setWrapText(true);
+
+		this.homePageTextSubheader = new Label("To add a new recipe, click \"Record Meal Type\"");
+		this.homePageTextSubheader.setWrapText(true);
+
+		// we need this to center the content
+		StackPane centeringPane = new StackPane();
+
 		//Right side
 		this.homePageVbox = new VBox(10);
-		this.homePageVbox.getChildren().addAll(homePageText, generateNewRecipe);
-		this.homePageVbox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
-		this.homePageVbox.setPadding(new Insets(0,10,5,10));
-		displayHomePage();
+		this.homePageVbox.getChildren().addAll(this.homePageTextHeader, this.homePageTextSubheader, this.generateNewRecipe);
+		this.homePageVbox.setAlignment(javafx.geometry.Pos.CENTER);
+
+		VBox.setVgrow(this.homePageVbox, Priority.ALWAYS);
+		centeringPane.getChildren().add(this.homePageVbox);
+		StackPane.setAlignment(this.homePageVbox, Pos.CENTER);
+		StackPane.setMargin(this.homePageVbox, new Insets(10));
+
+		this.root.setCenter(centeringPane);
+
+		this.displayHomePage();
 	}
+
 	private void displayHomePage(){
 		this.root.setCenter(this.homePageVbox);
 	}
