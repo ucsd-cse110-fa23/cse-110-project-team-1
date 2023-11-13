@@ -1,6 +1,6 @@
 package View;
 
-import Model.RecipeServer;
+import Model.*;
 
 import java.io.*;
 import javafx.application.Application;
