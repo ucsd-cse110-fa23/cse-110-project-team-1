@@ -99,6 +99,7 @@ public class View {
 		this.buildRecordMealType();
 		this.buildRecordIngredients();
 		this.displayHomePage();
+		this.updateRecipes();
 
 		this.audioRecorder = new AudioRecorder();
 	}
@@ -169,6 +170,7 @@ public class View {
 	}
 
 	private void displayHomePage(){
+		this.updateRecipes();
 		System.out.println("Displaying Home Page");
 		this.root.setCenter(this.homePageVbox);
 	}
@@ -244,10 +246,10 @@ public class View {
 	}
 
 	private void onSaveNewlyGeneratedRecipeRequest(){
-		//RequestHandler req = new RequestHandler();
-		//Integer newRecipeID = req.performPUT("http://localhost:8100/", newlyGeneratedRecipe.getRecipeID(), 
-		//												   newlyGeneratedRecipe.getRecipeTitle(), 
-		//												   newlyGeneratedRecipe.getRecipeText());
+		RequestHandler req = new RequestHandler();
+		Integer newRecipeID = req.performPUT("http://localhost:8100/", newlyGeneratedRecipe.getRecipeID(), 
+														   newlyGeneratedRecipe.getRecipeTitle(), 
+														   newlyGeneratedRecipe.getRecipeText());
 		displayHomePage();
 		this.updateRecipes();
 	}
