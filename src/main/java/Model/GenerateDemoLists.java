@@ -4,7 +4,7 @@ public class GenerateDemoLists {
 
     public static void generateAndSaveDemoList() {
         // Generate and save the first demo list
-        RecipeList recipeList = new RecipeList("recipe");
+        RecipeList recipeList = new RecipeList("demo1");
 
         // Add demo recipes to the list
         String recipe1Title = "Beans";

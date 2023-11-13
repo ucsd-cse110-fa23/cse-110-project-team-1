@@ -32,7 +32,31 @@ public class ChatGPT implements GPTModel {
     }
 
     public String getResponse(String mealType, String ingredients) throws Exception {
-        String prompt = "I'm looking to make " + mealType + ". Ingredients: " + ingredients;
+        String prompt = "\"Imagine you're a chef and you've been asked to create a unique '" +  mealType + "' recipe. The ingredients you have to work with are '" + ingredients + "'. Your task is to come up with a recipe that incorporates some of these ingredients but not necessarily  all. \n" + //
+                "\n" + //
+                "The format of the recipe should be as follows:\n" + //
+                "\n" + //
+                "1. Start with the name of the recipe. This should be a short catchy and descriptive title that gives a sense of what the final dish will be like. This should be the first line of your response.\n" + //
+                "\n" + //
+                "2. Next, list out all the ingredients required for the recipe. For each ingredient, specify the amount needed. Each ingredient should be on a new line.\n" + //
+                "\n" + //
+                "3. After listing the ingredients, provide a step-by-step guide on how to prepare and cook the meal. Each step should be numbered and start on a new line. Be as detailed as possible, explaining each process clearly.\n" + //
+                "\n" + //
+                "Here's an example of how your recipe should be formatted:\n" + //
+                "\n" + //
+                "Chicken Stir-Fry\n" + //
+                "\n" + //
+                "- 1 lb of chicken\n" + //
+                "- 2 bell peppers\n" + //
+                "- 1 onion\n" + //
+                "- 2 tomatoes\n" + //
+                "\n" + //
+                "1. Cut the chicken and vegetables into bite-sized pieces.\n" + //
+                "2. Heat oil in a pan and add the chicken. Cook until no longer pink.\n" + //
+                "3. Add the vegetables and stir-fry until tender.\n" + //
+                "4. Serve hot with rice.\n" + //
+                "\n" + //
+                "Remember, the response should contain only the recipe and it should strictly follow this format. it should not include any explanation after the last step.\n";
 
         // Create a request body which you will pass into request object
         JSONObject requestBody = new JSONObject();
@@ -128,7 +152,7 @@ class MockGPT implements GPTModel {
         JSONArray choices = responseJson.getJSONArray("choices");
         String generatedText = choices.getJSONObject(0).getString("text");
 
-        if((mealType).contains("Dinner") &&
+        if((mealType).toLowerCase().contains("dinner") &&
             (ingredients.toLowerCase()).contains("potato") &&
             (ingredients.toLowerCase()).contains("butter")) {
             response = generatedText;

@@ -14,15 +14,17 @@ import org.json.JSONObject;
  */
 interface RecipeHTTPHandlerInterface extends HttpHandler{}
 
-// TODO: Currently uses mockGPT for real handler
 public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
 
  protected final RecipeList list;
  protected GPTModel gpt;
+ protected WhisperModel wisp;
  
  public RecipeHTTPHandler(RecipeList list){
    this.list = list;
-   gpt = new MockGPT(); // TODO: change to real gpt
+   gpt = new ChatGPT();
+   wisp = new Whisper();
+
  }
 
  public void handle(HttpExchange httpExchange) throws IOException {
@@ -45,7 +47,6 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
         System.out.println("An erroneous request");
         response = e.toString();
         e.printStackTrace();
-        System.out.println("test");
       }
 
     //Sending back response to the client
@@ -98,10 +99,10 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
   private String handlePost(HttpExchange httpExchange) throws IOException {
 
     Headers headers = httpExchange.getRequestHeaders();
-    String fileType = headers.getFirst("Audio-Type");
+    String audioType = headers.getFirst("Audio-Type");
     String saveDirectory = "src/main/RecievedMedia/";
     String response = "Invalid POST request";
-    if (fileType == null || !(fileType.equals("mealType") || fileType.equals("ingredients"))) {
+    if (audioType == null || !(audioType.equals("mealType") || audioType.equals("ingredients"))) {
       // This is for once we get rid of the text sent via post
       // httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
       // return;
@@ -122,7 +123,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
           }
       } else if (postData.substring(2, postData.indexOf("=")).equals("ingredients")) {
             String ingredients = postData.substring(postData.indexOf("=") + 1, postData.length());
-            System.out.println(ingredients);
+            //System.out.println(ingredients);
             try {
                 String recipeText;
                 System.out.println(postData.substring(0, 1));
@@ -146,14 +147,13 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
                 list.addRecipe(recipeTitle, recipeText);
                 response = list.getMostRecent().toJson().toString();
             } catch (Exception e) {
-          // TODO: handle exception
           System.out.println("error caught");
           e.printStackTrace();
         }
       }
     }
     try (InputStream in = httpExchange.getRequestBody();
-        OutputStream out = new FileOutputStream(saveDirectory + fileType + ".mp3")) {
+        OutputStream out = new FileOutputStream(saveDirectory + audioType + ".wav")) {
       // this is a fix for reading single bytes at a time
       // https://coderanch.com/t/676185/java/IO-byte-array-buffer
       // this is what inspired it
@@ -168,13 +168,33 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
       return "IOException";
     }
 
+    String transcribedAudio = "";
+    try {
+      transcribedAudio = wisp.getResponse(new File(saveDirectory + audioType + ".wav"));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    System.out.println("Transcribed: " + transcribedAudio);
     // This still needs to handle calling the speach to text and check it is
     // one of the valid mealTypes and then sends the responseHeader
-    httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-    response = "Audio-Type:" + fileType + " recieved";
-
-
-    System.out.println(response);
+    if(audioType.equals("mealType")){
+      response = transcribedAudio;
+      
+    }else if(audioType.equals("ingredients")){
+      //do gpt stuff
+      String mealType = headers.getFirst("Meal-Type");
+      System.out.println("Meal Type: " + mealType);
+      try {
+        response = gpt.getResponse(mealType, transcribedAudio);
+        String recipeText = response.trim() + "\n";
+        Integer tempRecipeID = -1;
+        String recipeTitle = recipeText.substring(0, recipeText.indexOf("\n"));
+        Recipe newRecipe = new Recipe(tempRecipeID, recipeTitle, recipeText);
+        response = newRecipe.toJson().toString();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
     return response;
   }
   /*
@@ -192,38 +212,14 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
     int recipeID = allRec.getInt("recipeID");
 
     if (list.editRecipe(recipeID, allRec.getString("newRecipeTitle"), allRec.getString("newRecipeText"))) {
-      response = "Edited recipe " + recipeID;
+      response = Integer.toString(recipeID);
       System.out.println("Edited recipe " + recipeID);
     } else {
       recipeID = list.addRecipe(allRec.getString("newRecipeTitle"), allRec.getString("newRecipeText"));
-      response = "Added recipe " + recipeID;
+      response = Integer.toString(recipeID);
       System.out.println("Added recipe " + recipeID);
     }
     return response;
-
-    // allRec.
-
-    // String language = postData.substring(
-    //   0,
-    //   postData.indexOf(",")
-    // ), year = postData.substring(postData.indexOf(",") + 1);
- 
-    // if(data.get(language) != year){
-    //      data.put(language, year);
-    //      String response = "Updated entry {" + language + ", " + year + "}";
-    //      System.out.println(response);
-    //      return response;
-    // }
-
-    // // Store data in hashmap
-    // data.put(language, year);
- 
- 
-    // String response = "Posted entry {" + language + ", " + year + "}";
-    // System.out.println(response);
-    
- 
-    // return response;
   }
 
   /*
@@ -232,7 +228,6 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
    */
   private String handleDelete(HttpExchange httpExchange) throws IOException {
     String response = "Invalid DELETE request";
-    URI uri = httpExchange.getRequestURI();
     InputStream inStream = httpExchange.getRequestBody();
     // Scanner scanner = new Scanner(inStream);
     String postData = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
@@ -260,6 +255,7 @@ class MockRecipeHTTPHandler extends RecipeHTTPHandler{
  public MockRecipeHTTPHandler(RecipeList list){
   super(list);
   gpt = new MockGPT();
+  wisp = new MockWhisper();
  }
 }
 
