@@ -17,7 +17,7 @@ import javafx.scene.layout.HBox;
 public class View {
 
 	public BorderPane root;
-    private AudioRecorder audioRecorder;
+	private AudioRecorder audioRecorder;
 
 	private TextField recipeQuery = new TextField();
 
@@ -25,17 +25,17 @@ public class View {
 	private Button editSavedRecipeButton = new Button("Test Edit Recipe");
 	private Button deleteSavedRecipeButton = new Button("Delete Recipe");
 
-    private Button startRecording = new Button("Start Recording");
-    private Button stopRecordingMealType = new Button("Stop Mealtype Recording");
-    private Button stopRecordingIngredients = new Button("Stop Ingredient Recording");
-    private Button generateNewRecipe = new Button("Generate New Recipe");
+	private Button startRecording = new Button("Start Recording");
+	private Button stopRecordingMealType = new Button("Stop Mealtype Recording");
+	private Button stopRecordingIngredients = new Button("Stop Ingredient Recording");
+	private Button generateNewRecipe = new Button("Generate New Recipe");
 
 	private Button backToHome = new Button("Back to Home");
 
 	private VBox recipeTitleListleftVbox;
 
 	private VBox homePageVbox;
-	private VBox savedRecipeDetailVbox; 
+	private VBox savedRecipeDetailVbox;
 	private VBox newlyGeneratedRecipeVbox;
 	private VBox recordMealTypeVbox;
 	private VBox recordIngredientsVbox;
@@ -55,7 +55,7 @@ public class View {
 	private Label newlyGeneratedRecipeLabel;
 
 	private int currentSelectedRecipeID;
-	
+
 	public View() {
 
 		this.root = new BorderPane();
@@ -65,9 +65,9 @@ public class View {
 		this.addNewRecipeButton.setOnAction(e -> this.onGenerateRequest());
 		this.editSavedRecipeButton.setOnAction(e -> this.onEditRequest());
 		this.deleteSavedRecipeButton.setOnAction(e -> this.onDeleteRequest());
-        this.startRecording.setOnAction(e -> this.onRecordRequest());
-        this.stopRecordingMealType.setOnAction(e -> this.onStopRecordRequest("mealType"));
-        this.stopRecordingIngredients.setOnAction(e -> this.onStopRecordRequest("ingredients"));
+		this.startRecording.setOnAction(e -> this.onRecordRequest());
+		this.stopRecordingMealType.setOnAction(e -> this.onStopRecordRequest("mealType"));
+		this.stopRecordingIngredients.setOnAction(e -> this.onStopRecordRequest("ingredients"));
 		this.backToHome.setOnAction(e -> this.displayHomePage());
 		this.generateNewRecipe.setOnAction(e -> this.displayRecordMealType());
 
@@ -81,15 +81,15 @@ public class View {
 		this.buildRecordIngredients();
 		this.displayHomePage();
 
-        this.audioRecorder = new AudioRecorder();
+		this.audioRecorder = new AudioRecorder();
 	}
 
 	public BorderPane getRoot() {
 		return this.root;
 	}
-	
+
 	public void updateRecipes() {
-		
+
 		ListView<HBox> daStuff = ViewModel.pullRecipes();
 		this.recipeTitleListleftVbox = new VBox(10, daStuff, this.recipeQuery, this.addNewRecipeButton);
 		VBox.setVgrow(daStuff, Priority.ALWAYS);
@@ -103,7 +103,7 @@ public class View {
 				currentSelectedRecipeID = ((RecipeNode)daStuff.getSelectionModel().getSelectedItem()).getRecipeID();
 			}
 		});
-		
+
 	}
 
 
@@ -127,7 +127,7 @@ public class View {
 
 	private void buildHomePage() {
 		System.out.println("Displaying Home Page");
-		this.homePageTextHeader = new Label("Welcome to Pantry Pal");	
+		this.homePageTextHeader = new Label("Welcome to Pantry Pal");
 		this.homePageTextHeader.setWrapText(true);
 
 		this.homePageTextSubheader = new Label("To add a new recipe, click \"Record Meal Type\"");
@@ -166,23 +166,23 @@ public class View {
 	private void displayRecordMealType() {
 		BorderPane recordLayout = new BorderPane();
 
-    	recordLayout.setCenter(this.recordMealTypeVbox);
-    
-    	HBox topContainer = new HBox();
-    	topContainer.setAlignment(Pos.TOP_RIGHT);
-    	topContainer.getChildren().add(this.backToHome);
-    	topContainer.setPadding(new Insets(10));
-    
-    	recordLayout.setTop(topContainer);
+		recordLayout.setCenter(this.recordMealTypeVbox);
 
-    	this.root.setCenter(recordLayout);
+		HBox topContainer = new HBox();
+		topContainer.setAlignment(Pos.TOP_RIGHT);
+		topContainer.getChildren().add(this.backToHome);
+		topContainer.setPadding(new Insets(10));
+
+		recordLayout.setTop(topContainer);
+
+		this.root.setCenter(recordLayout);
 	}
 
 	private void buildRecordIngredients(){
 		System.out.println("Displaying Ingredients Page");
 		recordIngredientsText = new Label("Click start recording and speak your ingredients to generate a recipe.\nClick stop when you are done");
 		recordIngredientsText.setWrapText(true);
-		
+
 		this.recordIngredientsVbox = new VBox(10);
 		this.recordIngredientsVbox.getChildren().addAll(recordIngredientsText);
 		this.recordIngredientsVbox.setAlignment(Pos.TOP_LEFT);
@@ -204,7 +204,7 @@ public class View {
 	private void onEditRequest() {
 		//System.out.println("onGenerateRequest Query: " + this.recipeQuery.getText());
 		System.out.println("edi curRecipe:"+currentSelectedRecipeID);
-		
+
 		RequestHandler req = new RequestHandler();
 		req.performPUT("http://localhost:8100/", currentSelectedRecipeID, "Test Edit Title\n", "Test Edit Text\n");
 		this.recipeQuery.clear();
@@ -214,24 +214,24 @@ public class View {
 	private void onDeleteRequest() {
 		//System.out.println("onGenerateRequest Query: " + this.recipeQuery.getText());
 		System.out.println("del curRecipe:"+currentSelectedRecipeID);
-	
+
 		RequestHandler req = new RequestHandler();
 		req.performDELETE("http://localhost:8100/", currentSelectedRecipeID);
 		this.recipeQuery.clear();
 		this.updateRecipes();
 	}
 
-    private void onRecordRequest() {
-        System.out.println("Recording...");
-        this.audioRecorder.startRecording();
-    }
+	private void onRecordRequest() {
+		System.out.println("Recording...");
+		this.audioRecorder.startRecording();
+	}
 
 	private void onStopRecordRequest(String type) {
-        this.audioRecorder.stopRecording();
-        System.out.println("Stopped recording.");
+		this.audioRecorder.stopRecording();
+		System.out.println("Stopped recording.");
 
-        RequestHandler req = new RequestHandler();
+		RequestHandler req = new RequestHandler();
 		//req.performPOST("http://localhost:8100/", new File("recording.wav"), type);
 		this.updateRecipes();
-    }
+	}
 }
