@@ -30,7 +30,7 @@ public class View {
     private Button stopRecordingIngredients = new Button("Stop Ingredient Recording");
     private Button generateNewRecipe = new Button("Generate New Recipe");
 
-	private Button backToHome = new Button("Back");
+	private Button backToHome = new Button("Back to Home");
 
 	private VBox recipeTitleListleftVbox;
 
@@ -75,11 +75,11 @@ public class View {
 		this.updateRecipes();
 		currentSelectedRecipeID = -1;
 
-		buildHomePage();
-		buidlDetailPage();
-		buildRecordMealType();
-		buildRecordIngredients();
-		displayHomePage();
+		this.buildHomePage();
+		this.buildDetailPage();
+		this.buildRecordMealType();
+		this.buildRecordIngredients();
+		this.displayHomePage();
 
         this.audioRecorder = new AudioRecorder();
 	}
@@ -107,7 +107,7 @@ public class View {
 	}
 
 
-	private void buidlDetailPage(){
+	private void buildDetailPage(){
 		System.out.println("printing the muhfuckin' list view");
 
 		savedRecipeDescription = new Label("Recipe Description: ...");
