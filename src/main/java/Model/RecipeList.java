@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 
 //Referenced this for serialization and deserialization code
 //https://www.geeksforgeeks.org/how-to-serialize-hashmap-in-java/
@@ -31,7 +31,7 @@ public class RecipeList {
 
     private int highestIndex;
     private String listName;
-    private LinkedHashMap<Integer, Recipe> recipeList;
+    private HashMap<Integer, Recipe> recipeList;
 
     /**
      * This is the constructor for the RecipeList class. 
@@ -42,7 +42,7 @@ public class RecipeList {
      */
     public RecipeList(String listName) {
         highestIndex = 0;
-        recipeList = new LinkedHashMap<Integer, Recipe>();
+        recipeList = new HashMap<Integer, Recipe>();
         this.listName = listName; // default
     }
 
@@ -79,7 +79,7 @@ public class RecipeList {
     // Suppress Type Safety for objectInput, since we are sure of <Int, Recipe> type
     @SuppressWarnings("unchecked")
     public void loadFromDisk() {
-        LinkedHashMap<Integer, Recipe> newHashMap = null;
+        HashMap<Integer, Recipe> newHashMap = null;
         String filePath = listName + ".list";
         File file = new File(filePath);
 
@@ -90,7 +90,7 @@ public class RecipeList {
         try {
             FileInputStream fileInput = new FileInputStream(filePath);
             ObjectInputStream objectInput = new ObjectInputStream(fileInput);
-            newHashMap = (LinkedHashMap<Integer, Recipe>) objectInput.readObject();
+            newHashMap = (HashMap<Integer, Recipe>) objectInput.readObject();
             objectInput.close();
             fileInput.close();
         }
