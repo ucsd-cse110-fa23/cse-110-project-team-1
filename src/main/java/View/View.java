@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
@@ -17,7 +18,7 @@ import javafx.scene.layout.HBox;
 public class View {
 
 	public BorderPane root;
-    private AudioRecorder audioRecorder;
+	private AudioRecorder audioRecorder;
 	private ViewModel viewModel;
 
 	private TextField recipeQuery = new TextField();
@@ -30,7 +31,7 @@ public class View {
 	private Button editedRecipeSaveButton = new Button("Save Recipe");
 
 	private Button startRecording = new Button("Start Recording");
-	private Button stopRecordingMealType = new Button("Stop Mealtype Recording");
+	private Button stopRecordingMealType = new Button("Stop Recording");
 	private Button stopRecordingIngredients = new Button("Stop Ingredient Recording");
 	private Button generateNewRecipe = new Button("Generate New Recipe");
 
@@ -74,20 +75,20 @@ public class View {
 		this.recipeQuery.setPromptText("Enter Recipe Query...");
 		this.addNewRecipeButton.setOnAction(e -> this.onGenerateRequest());
 		this.deleteSavedRecipeButton.setOnAction(e -> this.onDeleteRequest());
-        this.startRecording.setOnAction(e -> this.onRecordRequest());
+		this.startRecording.setOnAction(e -> this.onRecordRequest());
 		this.backToHome.setOnAction(e -> this.displayHomePage());
 		this.generateNewRecipe.setOnAction(e -> this.buildRecordMealType());
 		this.editSavedRecipeButton.setOnAction(e -> this.buildEditPage(currentlyEditingRecipe));
-        this.stopRecordingMealType.setOnAction(e -> {
+		this.stopRecordingMealType.setOnAction(e -> {
 			
 			if (this.onStopRecordRequest("mealType")){
 				buildRecordIngredients();
 			}else{
-				recordMealTypeText.setText("Click start recording and then say breakfast, lunch, or dinner to select a meal type.\nClick stop when you are done \n Imvalid Meal Type. Please try again.");
+				this.recordMealTypeText.setText(this.recordMealTypeText.getText() + "\nInvalid meal type, please try again.");
 			}
 		});
 			
-        this.stopRecordingIngredients.setOnAction(e -> {
+		this.stopRecordingIngredients.setOnAction(e -> {
 			if(this.onStopRecordRequest("ingredients")){
 				buildNewlyGeneratedRecipeDisplay();
 			}
@@ -204,8 +205,10 @@ public class View {
 	}
 
 	private void buildRecordMealType(){
-		this.recordMealTypeText = new Label("Click start recording and then say breakfast, lunch, or dinner to select a meal type.\nClick stop when you are done");
-		this.recordMealTypeText.setWrapText(true);
+		this.recordMealTypeText = new Label("Click \"" +
+			this.startRecording.getText() +
+			"\" and then say \"breakfast\", \"lunch\", or \"dinner\" to select a meal type. Click \"" +
+			this.stopRecordingMealType.getText() + "\"when you are done.");
 
 		this.recordMealTypeVbox = new VBox(10);
 		this.recordMealTypeVbox.setAlignment(Pos.CENTER);
@@ -310,8 +313,8 @@ public class View {
 
 	private boolean onStopRecordRequest(String requestType) {
 		//Stop Recording
-        this.audioRecorder.stopRecording();
-        System.out.println("Stopped recording.");
+		this.audioRecorder.stopRecording();
+		System.out.println("Stopped recording.");
 		//Send Request
 		if(requestType.equals("mealType")){
 			return viewModel.requestMealTypeCheck();
@@ -321,7 +324,7 @@ public class View {
 		}
 		//If valid request, move on, else dont
 		return false;
-    }
+	}
 	private void updateSelectedRecipeDetails(String recipeText, Integer curID){
 		savedRecipeDescription.setText(recipeText);
 		currentSelectedRecipeID = curID;
