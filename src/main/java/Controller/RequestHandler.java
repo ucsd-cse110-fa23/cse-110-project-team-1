@@ -39,7 +39,7 @@ public class RequestHandler {
             in.close();
             System.out.println("POST response: " + response);
         } catch (Exception e) {
-            // TODO: handle exception
+            System.err.println(e);
         }
     }
 

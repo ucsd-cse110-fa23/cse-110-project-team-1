@@ -255,6 +255,7 @@ class MockRecipeHTTPHandler extends RecipeHTTPHandler{
  public MockRecipeHTTPHandler(RecipeList list){
   super(list);
   gpt = new MockGPT();
+  wisp = new MockWhisper();
  }
 }
 
