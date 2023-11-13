@@ -115,7 +115,7 @@ public class View {
 		//Right side
 		this.savedRecipeDetailVbox = new VBox(10);
 		this.savedRecipeDetailVbox.getChildren().addAll(savedRecipeDescription, editSavedRecipeButton, deleteSavedRecipeButton, backToHome);
-		this.savedRecipeDetailVbox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
+		this.savedRecipeDetailVbox.setAlignment(Pos.TOP_LEFT);
 		this.savedRecipeDetailVbox.setPadding(new Insets(0,10,5,10));
 		displayRecipeDetails();
 	}
@@ -139,7 +139,7 @@ public class View {
 		//Right side
 		this.homePageVbox = new VBox(10);
 		this.homePageVbox.getChildren().addAll(this.homePageTextHeader, this.homePageTextSubheader, this.generateNewRecipe);
-		this.homePageVbox.setAlignment(javafx.geometry.Pos.CENTER);
+		this.homePageVbox.setAlignment(Pos.CENTER);
 
 		VBox.setVgrow(this.homePageVbox, Priority.ALWAYS);
 		centeringPane.getChildren().add(this.homePageVbox);
@@ -162,8 +162,20 @@ public class View {
 		//add buttons to record and stop recording
 		this.recordMealTypeVbox.getChildren().addAll(startRecording,stopRecordingMealType);
 	}
-	private void displayRecordMealType(){
-		this.root.setCenter(this.recordMealTypeVbox);
+
+	private void displayRecordMealType() {
+		BorderPane recordLayout = new BorderPane();
+
+    	recordLayout.setCenter(this.recordMealTypeVbox);
+    
+    	HBox topContainer = new HBox();
+    	topContainer.setAlignment(Pos.TOP_RIGHT);
+    	topContainer.getChildren().add(this.backToHome);
+    	topContainer.setPadding(new Insets(10));
+    
+    	recordLayout.setTop(topContainer);
+
+    	this.root.setCenter(recordLayout);
 	}
 
 	private void buildRecordIngredients(){
@@ -173,7 +185,7 @@ public class View {
 		
 		this.recordIngredientsVbox = new VBox(10);
 		this.recordIngredientsVbox.getChildren().addAll(recordIngredientsText);
-		this.recordIngredientsVbox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
+		this.recordIngredientsVbox.setAlignment(Pos.TOP_LEFT);
 		this.recordIngredientsVbox.setPadding(new Insets(0,10,5,10));
 	}
 	private void displayRecordIngredients(){
