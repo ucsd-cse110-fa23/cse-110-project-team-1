@@ -156,11 +156,14 @@ public class View {
 	}
 
 	private void buildRecordMealType(){
-		recordMealTypeText = new Label("Click start recording and then say breakfast, lunch, or dinner to select a meal type.\nClick stop when you are done");
-		recordMealTypeText.setWrapText(true);
+		this.recordMealTypeText = new Label("Click start recording and then say breakfast, lunch, or dinner to select a meal type.\nClick stop when you are done");
+		this.recordMealTypeText.setWrapText(true);
+
 		this.recordMealTypeVbox = new VBox(10);
+		this.recordMealTypeVbox.setAlignment(Pos.CENTER);
+	
 		//add buttons to record and stop recording
-		this.recordMealTypeVbox.getChildren().addAll(startRecording,stopRecordingMealType);
+		this.recordMealTypeVbox.getChildren().addAll(this.startRecording, this.stopRecordingMealType);
 	}
 
 	private void displayRecordMealType() {
