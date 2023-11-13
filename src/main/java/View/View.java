@@ -31,7 +31,7 @@ public class View {
 	private Button editedRecipeSaveButton = new Button("Save Recipe");
 
 	private Button startRecording = new Button("Start Recording");
-	private Button stopRecordingMealType = new Button("Stop Recording");
+	private Button stopRecordingMealType = new Button("Stop Meal Type Recording");
 	private Button stopRecordingIngredients = new Button("Stop Ingredient Recording");
 	private Button generateNewRecipe = new Button("Generate New Recipe");
 
@@ -205,10 +205,15 @@ public class View {
 	}
 
 	private void buildRecordMealType(){
-		this.recordMealTypeText = new Label("Click \"" +
+		this.recordMealTypeText = new Label(
+			"Click \"" +
 			this.startRecording.getText() +
 			"\" and then say \"breakfast\", \"lunch\", or \"dinner\" to select a meal type. Click \"" +
-			this.stopRecordingMealType.getText() + "\"when you are done.");
+			this.stopRecordingMealType.getText() +
+			"\" when you are done.");
+
+		this.recordMealTypeText.setWrapText(true);
+		this.recordMealTypeText.setMaxWidth(480.0);
 
 		this.recordMealTypeVbox = new VBox(10);
 		this.recordMealTypeVbox.setAlignment(Pos.CENTER);
@@ -221,6 +226,8 @@ public class View {
 	}
 
 	private void displayRecordMealType() {
+		System.out.println("Displaying Record Meal Type Page");
+
 		BorderPane recordLayout = new BorderPane();
 
 		recordLayout.setCenter(this.recordMealTypeVbox);
@@ -237,18 +244,37 @@ public class View {
 
 
 	private void buildRecordIngredients(){
-		recordIngredientsText = new Label("Click start recording and speak your ingredients to generate a recipe.\nClick stop when you are done");
-		recordIngredientsText.setWrapText(true);
+		this.recordIngredientsText = new Label(
+			"Click \"" +
+			this.startRecording.getText() + 
+			"\" and speak your ingredients to generate a recipe. Click \"" +
+			this.stopRecordingIngredients.getText() +
+			"\" when you are done.");
+
+		this.recordIngredientsText.setWrapText(true);
+		this.recordIngredientsText.setMaxWidth(480.0);
+
 		//add buttons to record and stop recording
 		this.recordIngredientsVbox = new VBox(10);
+		this.recordIngredientsVbox.setAlignment(Pos.CENTER);
 		this.recordIngredientsVbox.getChildren().addAll(recordIngredientsText, startRecording, stopRecordingIngredients);
-		this.recordIngredientsVbox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
 		this.recordIngredientsVbox.setPadding(new Insets(0,10,5,10));
 		displayRecordIngredients();
 	}
 	private void displayRecordIngredients(){
 		System.out.println("Displaying Ingredients Page");
-		this.root.setCenter(this.recordIngredientsVbox);
+
+		BorderPane recordIngredientsLayout = new BorderPane();
+		recordIngredientsLayout.setCenter(this.recordIngredientsVbox);
+
+		HBox topContainer = new HBox();
+		topContainer.setAlignment(Pos.TOP_RIGHT);
+		topContainer.getChildren().add(this.backToHome);
+		topContainer.setPadding(new Insets(10));
+
+		recordIngredientsLayout.setTop(topContainer);
+
+		this.root.setCenter(recordIngredientsLayout);
 	}
 
 	private void buildNewlyGeneratedRecipeDisplay(){
