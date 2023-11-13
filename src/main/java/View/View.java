@@ -24,7 +24,7 @@ public class View {
 	private TextArea recipeEditArea;
 
 	private Button addNewRecipeButton = new Button("Generate Recipe");
-	private Button editSavedRecipeButton = new Button("Test Edit Recipe");
+	private Button editSavedRecipeButton = new Button("Edit Recipe");
 	private Button deleteSavedRecipeButton = new Button("Delete Recipe");
 	private Button newlyGeneratedRecipeSaveButton = new Button("Save Recipe");
 	private Button editedRecipeSaveButton = new Button("Save Recipe");
