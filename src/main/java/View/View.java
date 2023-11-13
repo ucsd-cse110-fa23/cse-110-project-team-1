@@ -2,6 +2,7 @@ package View;
 
 import Controller.*;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
@@ -9,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
 
 public class View {
@@ -24,12 +26,12 @@ public class View {
 	private Button deleteSavedRecipeButton = new Button("Delete Recipe");
 	private Button newlyGeneratedRecipeSaveButton = new Button("Save Recipe");
 
-    private Button startRecording = new Button("Start Recording");
-    private Button stopRecordingMealType = new Button("Stop Mealtype Recording");
-    private Button stopRecordingIngredients = new Button("Stop Ingredient Recording");
-    private Button generateNewRecipe = new Button("Generate New Recipe");
+	private Button startRecording = new Button("Start Recording");
+	private Button stopRecordingMealType = new Button("Stop Mealtype Recording");
+	private Button stopRecordingIngredients = new Button("Stop Ingredient Recording");
+	private Button generateNewRecipe = new Button("Generate New Recipe");
 
-	private Button backToHome = new Button("Back");
+	private Button backToHome = new Button("Back to Home");
 
 	private VBox recipeTitleListleftVbox;
 
@@ -40,7 +42,8 @@ public class View {
 	private VBox recordIngredientsVbox;
 
 	//homepage labels
-	private Label homePageText;
+	private Label homePageTextHeader;
+	private Label homePageTextSubheader;
 	private Label savedRecipeDescription;
 
 	//record mealtype labels
@@ -91,19 +94,20 @@ public class View {
 		currentSelectedRecipeID = -1;
 		savedRecipeDescription = new Label("Recipe Description: ...");
 
-		buildHomePage();
-		buidlDetailPage();
-		buildRecordMealType();
+		this.buildHomePage();
+		this.buildDetailPage();
+		this.buildRecordMealType();
+		this.buildRecordIngredients();
+		this.displayHomePage();
+		this.updateRecipes();
 
-		displayHomePage();
-
-        this.audioRecorder = new AudioRecorder();
+		this.audioRecorder = new AudioRecorder();
 	}
 
 	public BorderPane getRoot() {
 		return this.root;
 	}
-	
+
 	public void updateRecipes() {
 		System.out.println("Updating Recipes");
 		ListView<HBox> daStuff = viewModel.pullRecipes();
@@ -117,18 +121,18 @@ public class View {
 				updateSelectedRecipeDetails(recipeText,((RecipeNode)daStuff.getSelectionModel().getSelectedItem()).getRecipeID());
 				System.out.println("Selected: " + ((RecipeNode)daStuff.getSelectionModel().getSelectedItem()).getRecipeTitle());
 			}
-			buidlDetailPage();
+			buildDetailPage();
 		});
-		
+
 	}
 
 
-	private void buidlDetailPage(){
+	private void buildDetailPage(){
 		savedRecipeDescription.setWrapText(true);
 		//Right side
 		this.savedRecipeDetailVbox = new VBox(10);
 		this.savedRecipeDetailVbox.getChildren().addAll(savedRecipeDescription, editSavedRecipeButton, deleteSavedRecipeButton, backToHome);
-		this.savedRecipeDetailVbox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
+		this.savedRecipeDetailVbox.setAlignment(Pos.TOP_LEFT);
 		this.savedRecipeDetailVbox.setPadding(new Insets(0,10,5,10));
 		displayRecipeDetails();
 	}
@@ -139,36 +143,67 @@ public class View {
 
 
 
-	private void buildHomePage(){
-		updateRecipes();
-		homePageText = new Label("Welcome to Pantry Pal\n To add a recipe click record meal type");
-		homePageText.setWrapText(true);
+	private void buildHomePage() {
+		System.out.println("Displaying Home Page");
+		this.homePageTextHeader = new Label("Welcome to Pantry Pal");
+		this.homePageTextHeader.setWrapText(true);
+
+		this.homePageTextSubheader = new Label("To add a new recipe, click \"Record Meal Type\"");
+		this.homePageTextSubheader.setWrapText(true);
+
+		// we need this to center the content
+		StackPane centeringPane = new StackPane();
+
 		//Right side
 		this.homePageVbox = new VBox(10);
-		this.homePageVbox.getChildren().addAll(homePageText, generateNewRecipe);
-		this.homePageVbox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
-		this.homePageVbox.setPadding(new Insets(0,10,5,10));
-		displayHomePage();
+		this.homePageVbox.getChildren().addAll(this.homePageTextHeader, this.homePageTextSubheader, this.generateNewRecipe);
+		this.homePageVbox.setAlignment(Pos.CENTER);
+
+		VBox.setVgrow(this.homePageVbox, Priority.ALWAYS);
+		centeringPane.getChildren().add(this.homePageVbox);
+		StackPane.setAlignment(this.homePageVbox, Pos.CENTER);
+		StackPane.setMargin(this.homePageVbox, new Insets(10));
+
+		this.root.setCenter(centeringPane);
+
+		this.displayHomePage();
 	}
+
 	private void displayHomePage(){
+		this.updateRecipes();
 		System.out.println("Displaying Home Page");
 		this.root.setCenter(this.homePageVbox);
 	}
 
 	private void buildRecordMealType(){
-		recordMealTypeText = new Label("Click start recording and then say breakfast, lunch, or dinner to select a meal type.\nClick stop when you are done");
-		recordMealTypeText.setWrapText(true);
+		this.recordMealTypeText = new Label("Click start recording and then say breakfast, lunch, or dinner to select a meal type.\nClick stop when you are done");
+		this.recordMealTypeText.setWrapText(true);
+
 		this.recordMealTypeVbox = new VBox(10);
+		this.recordMealTypeVbox.setAlignment(Pos.CENTER);
+	
 		//add buttons to record and stop recording
-		this.recordMealTypeVbox.getChildren().addAll(recordMealTypeText, startRecording,stopRecordingMealType);
+		this.recordMealTypeVbox.getChildren().addAll(this.recordMealTypeText, this.startRecording, this.stopRecordingMealType);
 		//this.recordMealTypeVbox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
 		this.recordMealTypeVbox.setPadding(new Insets(0,10,5,10));
 		displayRecordMealType();
 	}
-	private void displayRecordMealType(){
-		System.out.println("Displaying Meal Type Page");
-		this.root.setCenter(this.recordMealTypeVbox);
+
+	private void displayRecordMealType() {
+		BorderPane recordLayout = new BorderPane();
+
+		recordLayout.setCenter(this.recordMealTypeVbox);
+
+		HBox topContainer = new HBox();
+		topContainer.setAlignment(Pos.TOP_RIGHT);
+		topContainer.getChildren().add(this.backToHome);
+		topContainer.setPadding(new Insets(10));
+
+		recordLayout.setTop(topContainer);
+
+		this.root.setCenter(recordLayout);
 	}
+
 
 	private void buildRecordIngredients(){
 		recordIngredientsText = new Label("Click start recording and speak your ingredients to generate a recipe.\nClick stop when you are done");
@@ -211,10 +246,10 @@ public class View {
 	}
 
 	private void onSaveNewlyGeneratedRecipeRequest(){
-		//RequestHandler req = new RequestHandler();
-		//Integer newRecipeID = req.performPUT("http://localhost:8100/", newlyGeneratedRecipe.getRecipeID(), 
-		//												   newlyGeneratedRecipe.getRecipeTitle(), 
-		//												   newlyGeneratedRecipe.getRecipeText());
+		RequestHandler req = new RequestHandler();
+		Integer newRecipeID = req.performPUT("http://localhost:8100/", newlyGeneratedRecipe.getRecipeID(), 
+														   newlyGeneratedRecipe.getRecipeTitle(), 
+														   newlyGeneratedRecipe.getRecipeText());
 		displayHomePage();
 		this.updateRecipes();
 	}
@@ -240,10 +275,10 @@ public class View {
 		displayHomePage();
 	}
 
-    private void onRecordRequest() {
-        System.out.println("Recording...");
-        this.audioRecorder.startRecording();
-    }
+	private void onRecordRequest() {
+		System.out.println("Recording...");
+		this.audioRecorder.startRecording();
+	}
 
 	private boolean onStopRecordRequest(String requestType) {
 		//Stop Recording
@@ -256,26 +291,6 @@ public class View {
 			newlyGeneratedRecipe = viewModel.requestNewRecipe();
 			return true;
 		}
-       /* RequestHandler req = new RequestHandler();
-		try {
-			if(requestType.equals("mealType")){
-				String response = req.performPOST("http://localhost:8100/", new File("recording.wav"), requestType, "none");
-				System.out.println("Response from server: " + response);
-				boolean validMealType = ViewModel.validateMealType(response);
-				if(validMealType){
-					newlyValidatedMealType = response;
-				}
-				return validMealType;
-			}else if(requestType.equals("ingredients")){
-				String response = req.performPOST("http://localhost:8100/", new File("recording.wav"), requestType, newlyValidatedMealType);
-				System.out.println("Response from server: " + response);
-				newlyGeneratedRecipe = RecipeNode.jsonToRecipeNode(new JSONObject(response));
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		*/
 		//If valid request, move on, else dont
 		return false;
     }
