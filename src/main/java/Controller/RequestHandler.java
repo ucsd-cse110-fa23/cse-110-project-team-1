@@ -11,93 +11,41 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
 
 import org.json.JSONObject;
 
 public class RequestHandler {
 
-    /*
-     * This is used to send the audio to the server
-     * 
-     */
-    public void performPOST(String urlString, String body){
-        try {
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
-            out.write(body);
-            out.flush();
-            out.close(); 
-
-            
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String response = in.readLine();
-            in.close();
-            System.out.println("POST response: " + response);
-        } catch (Exception e) {
-            System.err.println(e);
-        }
-    }
-
     /**
-     * This method sends a POST request to the server with a file and a specific audio type.
+     * Sends a POST request to the specified server with a file and specific audio type.
      * The file is sent as an octet-stream and the audio type is sent as a header.
      *
-     * @param urlString The URL of the server to which the POST request will be sent.
+     * @param urlString The URL of the server where the POST request will be sent.
      * @param file The file to be sent to the server.
      * @param audioType The type of audio in the file, which can be either 'mealType' or 'ingredients'.
      * @param mealType The type of meal to generate, should be "breakfast" "lunch" or "dinner", only use when sending a generate request not a mealType check
-     * @return 
+     * @return The server's response as a String.
      *
      * @throws MalformedURLException If the provided urlString is not a valid URL.
      * @throws FileNotFoundException If the provided file does not exist.
      * @throws IOException If an I/O error occurs with the connection.
      */
-    public String performPOST(String urlString, File file, String audioType, String mealType) throws MalformedURLException, FileNotFoundException, IOException {
-        String response = "";
-        try {
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-            conn.setRequestProperty("Content-Type", "application/octet-stream");
-            conn.setRequestProperty("Content-Length", String.valueOf(file.length()));
-            conn.setRequestProperty("Audio-Type", audioType);
-            conn.setRequestProperty("Meal-Type", mealType);
+    public String performPOST(String urlString, File file, String audioType, String mealType) throws IOException {
+        HttpURLConnection conn = setupConnection(urlString, "POST");
+        conn.setRequestProperty("Content-Type", "application/octet-stream");
+        conn.setRequestProperty("Content-Length", String.valueOf(file.length()));
+        conn.setRequestProperty("Audio-Type", audioType);
+        conn.setRequestProperty("Meal-Type", mealType);
     
-            OutputStream out = conn.getOutputStream();
-            Files.copy(file.toPath(), out);
+        OutputStream out = conn.getOutputStream();
+        Files.copy(file.toPath(), out);
     
-            out.flush();
-            out.close();
-            
-            int responseCode = conn.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                String inputLine;
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuffer res = new StringBuffer();
-                while ((inputLine = in.readLine()) != null) {
-				    res.append(inputLine);
-                    //System.out.println(inputLine);
-			    }
-                in.close();
-                response = res.toString();
-                System.out.println("Sever Response: " + response);
-                
-            } else {
-                System.out.println("Server returned non-OK code: " + responseCode);
-            }
-        } catch (MalformedURLException e) {
-            System.out.println("Malformed URL: " + urlString);
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found: " + file.getPath());
-        } catch (IOException e) {
-            System.out.println("Error communicating with server: " + e.getMessage());
-        }
+        out.flush();
+        out.close();
+    
+        String response = getResponse(conn);
+        System.out.println("Server Response: " + response);
         return response;
     }
 
@@ -114,38 +62,24 @@ public class RequestHandler {
      * @return 
      *
      */
-    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText) {
+    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText) throws IOException {
+        HttpURLConnection conn = setupConnection(urlString, "PUT");
+    
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("newRecipeText", recipeText);
+        requestBody.put("newRecipeTitle", recipeTitle);
+        requestBody.put("recipeID", recipeID);
+        String body = requestBody.toString();
+    
+        sendRequest(conn, body);
+    
+        int responseCode = conn.getResponseCode();
         Integer toReturn = -1;
-        try {
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("PUT");
-            conn.setDoOutput(true);
-            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
-    
-            JSONObject requestBody = new JSONObject();
-            requestBody.put("newRecipeText", recipeText);
-            requestBody.put("newRecipeTitle", recipeTitle);
-            requestBody.put("recipeID", recipeID);
-            String body = requestBody.toString();
-            out.write(body);
-            out.flush();
-            out.close(); 
-    
-            int responseCode = conn.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String response = in.readLine();
-                in.close();
-                //System.out.println("Put response " + response);
-                toReturn = Integer.parseInt(response);
-            } else {
-                System.out.println("Server returned non-OK code: " + responseCode);
-            }
-        } catch (MalformedURLException e) {
-            System.out.println("Malformed URL: " + urlString);
-        } catch (IOException e) {
-            System.out.println("Error communicating with server: " + e.getMessage());
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            String response = getResponse(conn);
+            toReturn = Integer.parseInt(response); // Get recipeID from server response
+        } else {
+            System.out.println("Server returned non-OK code: " + responseCode);
         }
         return toReturn;
     }
@@ -158,32 +92,18 @@ public class RequestHandler {
      * @param recipeID The ID of the recipe to be deleted.
      * 
      */
-    public void performDELETE(String urlString, int recipeID){
-        try {
-            URL url = new URL(urlString);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("DELETE");
-            conn.setDoOutput(true);
-            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+    public void performDELETE(String urlString, int recipeID) throws IOException {
+        HttpURLConnection conn = setupConnection(urlString, "DELETE");
     
-            String body = "recipeID="+recipeID;
-            out.write(body);
-            out.flush();
-            out.close(); 
+        String body = "recipeID=" + recipeID;
+        sendRequest(conn, body);
     
-            int responseCode = conn.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                String response = in.readLine();
-                in.close();
-                System.out.println("Delete response " + response);
-            } else {
-                System.out.println("Server returned non-OK code: " + responseCode);
-            }
-        } catch (MalformedURLException e) {
-            System.out.println("Malformed URL: " + urlString);
-        } catch (IOException e) {
-            System.out.println("Error communicating with server: " + e.getMessage());
+        int responseCode = conn.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            String response = getResponse(conn);
+            System.out.println("Delete response " + response);
+        } else {
+            System.out.println("Server returned non-OK code: " + responseCode);
         }
     }
 
@@ -198,24 +118,32 @@ public class RequestHandler {
      * @return A JSON string containing all recipes. If an error occurs, it returns the string "Invalid".
      *
      */
-    public String performGET(String url) {
-        String content = "Invalid";
-        try {
-            URL urlObj = new URL(url); // creating a url object
-            URLConnection urlConnection = urlObj.openConnection(); // creating a urlconnection object
-            
-            // wrapping the urlconnection in a bufferedreader
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-            // reading from the urlconnection using the bufferedreader
-            content = bufferedReader.readLine();
-            bufferedReader.close();
-        } catch (MalformedURLException e) {
-            System.out.println("Malformed URL: " + url);
-        } catch (IOException e) {
-            System.out.println("Error communicating with server: " + e.getMessage());
-        }
-        
+    public String performGET(String urlString) throws IOException {
+        HttpURLConnection conn = setupConnection(urlString, "GET");
+        String content = getResponse(conn);
         return content;
+    }
+
+    private HttpURLConnection setupConnection(String urlString, String method) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod(method);
+        conn.setDoOutput(true);
+        return conn;
+    }
+    
+    private void sendRequest(HttpURLConnection conn, String body) throws IOException {
+        OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+        out.write(body);
+        out.flush();
+        out.close();
+    }
+    
+    private String getResponse(HttpURLConnection conn) throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String response = in.readLine();
+        in.close();
+        return response;
     }
 
 }
