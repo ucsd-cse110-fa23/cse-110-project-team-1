@@ -3,6 +3,8 @@ package View;
 import Model.*;
 
 import java.io.*;
+
+import Controller.RequestHandler;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -27,7 +29,8 @@ public class App extends Application {
 		server = new RecipeServer();
 		server.startServer();
 
-		ViewModel viewModel = new ViewModel();
+		AudioRecorder audioRecorder = new AudioRecorder();
+		ViewModel viewModel = new ViewModel(new RequestHandler(), "http://localhost:8100/", audioRecorder);
 		View view = new View(viewModel);
 
 		//Just a test for sending files
