@@ -140,10 +140,21 @@ public class RequestHandler {
     }
     
     private String getResponse(HttpURLConnection conn) throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String response = in.readLine();
+        BufferedReader in;
+        System.out.println("Response Code: " + conn.getResponseCode());
+        System.out.println("Response Message: " + conn.getResponseMessage());
+        if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
+            in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        } else {
+            in = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+        }
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
         in.close();
-        return response;
-    }
+        return response.toString();
+     }
 
 }

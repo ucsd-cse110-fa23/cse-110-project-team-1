@@ -72,7 +72,7 @@ public class ViewModel {
 			response = response.replaceAll("\r\n?", "\n");
 			return RecipeNode.jsonToRecipeNode(new JSONObject(response));
 		} catch (JSONException e) {
-			ErrorAlert.showError("Invalid JSON response from server");
+			ErrorAlert.showError("Invalid JSON response from server, try again");
 			e.printStackTrace();
 			return null;
 		} catch (NullPointerException e){

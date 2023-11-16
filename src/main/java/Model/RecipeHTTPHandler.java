@@ -192,6 +192,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
         Recipe newRecipe = new Recipe(tempRecipeID, recipeTitle, recipeText);
         response = newRecipe.toJson().toString();
       } catch (Exception e) {
+        System.out.println("Response was" + response);
         e.printStackTrace();
       }
     }
