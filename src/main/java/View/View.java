@@ -1,6 +1,7 @@
 package View;
 
 import Controller.*;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListView;
@@ -8,9 +9,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
@@ -52,6 +53,10 @@ public class View {
 	private Label homePageTextSubheader;
 	private Label savedRecipeDescription;
 
+	private ComboBox<String> dropDown;
+	private String[] filters;
+	private Button debugButton;
+
 	//record mealtype labels
 	private Label recordMealTypeText;
 
@@ -67,6 +72,17 @@ public class View {
 
 	
 	public View(ViewModel viewModel) {
+		this.debugButton = new Button("For debug");
+		this.debugButton.setOnAction(e -> {
+			for (HBox r: viewModel.pullRecipes().getItems()){
+				if (r instanceof RecipeNode){
+					System.out.println(((RecipeNode) r).getRecipeTitle());
+					}
+			};
+		});
+		this.filters = new String[] {"All", "Breakfast", "Lunch", "Dinner"};
+		this.dropDown = new ComboBox<String>(FXCollections.observableArrayList(this.filters));
+		this.dropDown.setValue(this.filters[0]);
 
 		this.root = new BorderPane();
 		this.viewModel = viewModel;
@@ -152,10 +168,10 @@ public class View {
 		this.editRecipesVbox.setPadding(new Insets(0,10,5,10));
 		displayEditPage();
 	}
-
 	private void displayEditPage(){
 		this.root.setCenter(this.editRecipesVbox);
 	}
+
 	private void buildDetailPage(){
 		savedRecipeDescription.setWrapText(true);
 		//Right side
@@ -170,8 +186,6 @@ public class View {
 		this.root.setCenter(this.savedRecipeDetailVbox);
 	}
 
-
-
 	private void buildHomePage() {
 		System.out.println("Displaying Home Page");
 		this.homePageTextHeader = new Label("Welcome to Pantry Pal");
@@ -185,7 +199,7 @@ public class View {
 
 		//Right side
 		this.homePageVbox = new VBox(10);
-		this.homePageVbox.getChildren().addAll(this.homePageTextHeader, this.homePageTextSubheader, this.generateNewRecipe);
+		this.homePageVbox.getChildren().addAll(this.homePageTextHeader, this.homePageTextSubheader, this.generateNewRecipe, this.dropDown, this.debugButton);
 		this.homePageVbox.setAlignment(Pos.CENTER);
 
 		VBox.setVgrow(this.homePageVbox, Priority.ALWAYS);
@@ -197,7 +211,6 @@ public class View {
 
 		this.displayHomePage();
 	}
-
 	private void displayHomePage(){
 		this.updateRecipes();
 		System.out.println("Displaying Home Page");
@@ -224,7 +237,6 @@ public class View {
 		this.recordMealTypeVbox.setPadding(new Insets(0,10,5,10));
 		displayRecordMealType();
 	}
-
 	private void displayRecordMealType() {
 		System.out.println("Displaying Record Meal Type Page");
 
@@ -241,7 +253,6 @@ public class View {
 
 		this.root.setCenter(recordLayout);
 	}
-
 
 	private void buildRecordIngredients(){
 		this.recordIngredientsText = new Label(
@@ -351,9 +362,13 @@ public class View {
 		//If valid request, move on, else dont
 		return false;
 	}
+
 	private void updateSelectedRecipeDetails(String recipeText, Integer curID){
 		savedRecipeDescription.setText(recipeText);
 		currentSelectedRecipeID = curID;
 	}
 	
+	public String getCurrentFilter() {
+		return this.dropDown.getValue();
+	}
 }
