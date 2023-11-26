@@ -58,17 +58,19 @@ public class RequestHandler {
      * @param recipeID The ID of the recipe to be updated or created.
      * @param recipeTitle The title of the recipe to be updated or created.
      * @param recipeText The text of the recipe to be updated or created.
+     * @param mealType The meal type of the recipe to be updated or created.
      * 
      * @return 
      *
      */
-    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText) throws IOException {
+    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText, String mealType) throws IOException {
         HttpURLConnection conn = setupConnection(urlString, "PUT");
     
         JSONObject requestBody = new JSONObject();
         requestBody.put("newRecipeText", recipeText);
         requestBody.put("newRecipeTitle", recipeTitle);
         requestBody.put("recipeID", recipeID);
+        requestBody.put("mealType", mealType);
         String body = requestBody.toString();
     
         sendRequest(conn, body);

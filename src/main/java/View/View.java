@@ -1,5 +1,6 @@
 package View;
 
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListView;
@@ -8,6 +9,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.Label;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;
@@ -35,6 +37,8 @@ public class View {
 
 	private Button backToHome = new Button("Back to Home");
 
+    private ComboBox<String> filterDropdown;
+
 	private VBox recipeTitleListleftVbox;
 
 	private VBox homePageVbox;
@@ -44,6 +48,7 @@ public class View {
 	private VBox recordIngredientsVbox;
 	private VBox editRecipesVbox;
 
+    private HBox filterHBox;
 
 	//homepage labels
 	private Label homePageTextHeader;
@@ -55,6 +60,10 @@ public class View {
 
 	//record ingredient labels
 	private Label recordIngredientsText;
+
+    //filter labels
+	private String[] filters;
+    private Label filterLabel;
 
 	//newly generated receipe labels
 	//private Label newlyGeneratedRecipeLabel;
@@ -83,7 +92,9 @@ public class View {
         currentSelectedRecipeID = -1;
         savedRecipeDescription = new Label("Recipe Description: ...");
 		savedRecipeDescription.setWrapText(true);
-		
+
+        filterHBox = createFilters();
+
         this.updateRecipes();
 	}
 
@@ -93,17 +104,36 @@ public class View {
 
 	public void updateRecipes() {
 		System.out.println("Updating Recipes");
-		ListView<HBox> recipeListView = viewModel.pullRecipes();
-		this.recipeTitleListleftVbox = createRecipeTitleList(recipeListView);
+        ListView<HBox> sidebar = new ListView<HBox>();
+        ListView<HBox> allRecipes = viewModel.pullRecipes();
+        String filter = filterDropdown.getValue();
+        for(HBox h : allRecipes.getItems()) {
+            // If recipe's meal type is the same as the filter,
+            // or filter is "all", show the recipe on the sidebar.
+            if(filter.equalsIgnoreCase("all") || ((RecipeNode)h).toJson().getString("mealType").equalsIgnoreCase(filter)) {
+                sidebar.getItems().add(h);
+            }
+        }
+
+		this.recipeTitleListleftVbox = createRecipeTitleList(sidebar);
 		this.root.setLeft(this.recipeTitleListleftVbox);
-		setupSelectionListener(recipeListView);
+		setupSelectionListener(sidebar);
 	}
 
 	private VBox createRecipeTitleList(ListView<HBox> recipeListView) {
-		VBox recipeTitleList = new VBox(SPACING, recipeListView);
+		VBox recipeTitleList = new VBox(SPACING, filterHBox, recipeListView);
 		VBox.setVgrow(recipeListView, Priority.ALWAYS);
 		return recipeTitleList;
 	}
+
+    private HBox createFilters() {
+        filters = new String[] {"All", "Breakfast", "Lunch", "Dinner"};
+        filterDropdown = new ComboBox<String>(FXCollections.observableArrayList(this.filters));
+        filterDropdown.setValue(filters[0]);
+        filterLabel = new Label("Filter: ");
+
+        return new HBox(SPACING, filterLabel, filterDropdown);
+    }
 
 	// Variable arguments for a function 
 	// 
@@ -346,6 +376,9 @@ public class View {
 			}
 			buildDetailPage();
 		});
+        this.filterDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            this.updateRecipes();
+        });
 	}
 
 	public BorderPane getRoot() {
