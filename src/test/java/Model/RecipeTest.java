@@ -22,7 +22,7 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         String newRecipeTitle = "Beans";
         String newRecipeText = "Beans Recipe\n Ingredients:\n1 Can of Beans\n\nInstructions:\nStep 1: Put beans on plate\n";
 
-        Recipe newRecipe = new Recipe(newRecipeID,newRecipeTitle,newRecipeText, "lunch");
+        Recipe newRecipe = new Recipe(newRecipeID,newRecipeTitle,newRecipeText, "lunch",1);
 
         assertEquals(newRecipeID, newRecipe.getRecipeID());
         assertEquals(newRecipeText, newRecipe.getRecipeText());
@@ -37,7 +37,7 @@ public class RecipeTest { //temporary tests until JUnit is in place\
 
         RecipeList newRecipeList = new RecipeList("src/test/test");
 
-        newRecipeList.addRecipe(newRecipeTitle, newRecipeText, "lunch");
+        newRecipeList.addRecipe(newRecipeTitle, newRecipeText, "lunch",1);
 
         assertEquals(1, newRecipeList.getRecipe(1).getRecipeID());
         assertEquals(newRecipeText, newRecipeList.getRecipe(1).getRecipeText());
@@ -51,9 +51,9 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     @Test
     void testAddingMultipleRecipes() {
         RecipeList recipeList = new RecipeList("src/test/testAddingMultipleRecipes");
-        recipeList.addRecipe("Recipe1", "RecipeText1", "lunch");
-        recipeList.addRecipe("Recipe2", "RecipeText2", "lunch");
-        recipeList.addRecipe("Recipe3", "RecipeText3", "lunch");
+        recipeList.addRecipe("Recipe1", "RecipeText1", "lunch", 1);
+        recipeList.addRecipe("Recipe2", "RecipeText2", "lunch", 1);
+        recipeList.addRecipe("Recipe3", "RecipeText3", "lunch", 1);
 
         // Check if the most recent recipe is the last one added
         Recipe mostRecent = recipeList.getMostRecent();
@@ -69,9 +69,9 @@ public class RecipeTest { //temporary tests until JUnit is in place\
 
         RecipeList recipeList = new RecipeList("src/test/testSaveAndLoadRecipeList");
     
-        recipeList.addRecipe("Recipe1", "RecipeText1", "lunch");
-        recipeList.addRecipe("Recipe2", "RecipeText2", "lunch");
-        recipeList.addRecipe("Recipe3", "RecipeText3", "lunch");
+        recipeList.addRecipe("Recipe1", "RecipeText1", "lunch", 1);
+        recipeList.addRecipe("Recipe2", "RecipeText2", "lunch", 1);
+        recipeList.addRecipe("Recipe3", "RecipeText3", "lunch", 1);
 
         recipeList.saveToDisk();
 
@@ -95,9 +95,9 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     @Test
     void testDeleteExistingRecipe(){
         RecipeList recipeList = new RecipeList("src/test/testDeleteExistingRecipe");
-        int addedRecipeID = recipeList.addRecipe("Recipe1", "RecipeText1", "lunch");
+        int addedRecipeID = recipeList.addRecipe("Recipe1", "RecipeText1", "lunch", 1);
         assertFalse(recipeList.isEmpty());
-        recipeList.deleteRecipe(addedRecipeID);
+        recipeList.deleteRecipe(addedRecipeID, 1);
         assertTrue(recipeList.isEmpty());
 
         File file = new File("src/test/testDeleteExistingRecipe.list");
@@ -107,8 +107,8 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     @Test
     void testDeleteNonExistingRecipe(){
         RecipeList recipeList = new RecipeList("src/test/testDeleteNonExistingRecipe");
-        int addedRecipeID = recipeList.addRecipe("Recipe1", "RecipeText1", "lunch");
-        assertFalse(recipeList.deleteRecipe(addedRecipeID+1));
+        int addedRecipeID = recipeList.addRecipe("Recipe1", "RecipeText1", "lunch", 1);
+        assertFalse(recipeList.deleteRecipe(addedRecipeID+1, 1));
         assertFalse(recipeList.isEmpty());
         
         File file = new File("src/test/testDeleteNonExistingRecipe.list");
@@ -122,10 +122,10 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     void testEditExistingRecipe(){
         RecipeList recipeList = new RecipeList("src/test/testEditExistingRecipe");
     
-        recipeList.addRecipe("Recipe1", "RecipeText1", "lunch");
-        recipeList.addRecipe("Recipe2", "RecipeText2", "lunch");
+        recipeList.addRecipe("Recipe1", "RecipeText1", "lunch", 1);
+        recipeList.addRecipe("Recipe2", "RecipeText2", "lunch", 1);
 
-        recipeList.editRecipe(1,"Newer Recipe1", "Newer RecipeText");
+        recipeList.editRecipe(1,"Newer Recipe1", "Newer RecipeText", 1);
 
         assertEquals("Newer Recipe1", recipeList.getRecipe(1).getRecipeTitle());
         assertEquals("Newer RecipeText", recipeList.getRecipe(1).getRecipeText());
@@ -140,10 +140,10 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     void testEditNonExistingRecipe(){
         RecipeList recipeList = new RecipeList("src/test/testEditNonExistingRecipe");
     
-        recipeList.addRecipe("Recipe1", "RecipeText1", "lunch");
-        recipeList.addRecipe("Recipe2", "RecipeText2", "lunch");
+        recipeList.addRecipe("Recipe1", "RecipeText1", "lunch", 1);
+        recipeList.addRecipe("Recipe2", "RecipeText2", "lunch", 1);
 
-        assertFalse(recipeList.editRecipe(3,"Newer Recipe1","Newer RecipeText"));
+        assertFalse(recipeList.editRecipe(3,"Newer Recipe1","Newer RecipeText", 1));
 
         assertEquals("Recipe1", recipeList.getRecipe(1).getRecipeTitle());
         assertEquals("RecipeText1", recipeList.getRecipe(1).getRecipeText());

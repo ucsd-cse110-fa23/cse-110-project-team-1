@@ -12,7 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
-
+import View.*;
 import org.json.JSONObject;
 
 public class RequestHandler {
@@ -31,8 +31,8 @@ public class RequestHandler {
      * @throws FileNotFoundException If the provided file does not exist.
      * @throws IOException If an I/O error occurs with the connection.
      */
-    public String performPOST(String urlString, File file, String audioType, String mealType) throws IOException {
-        HttpURLConnection conn = setupConnection(urlString, "POST");
+    public String performPOST(String urlString, File file, String audioType, String mealType, User user) throws IOException {
+        HttpURLConnection conn = setupConnection(urlString, "POST", user);
         conn.setRequestProperty("Content-Type", "application/octet-stream");
         conn.setRequestProperty("Content-Length", String.valueOf(file.length()));
         conn.setRequestProperty("Audio-Type", audioType);
@@ -63,8 +63,8 @@ public class RequestHandler {
      * @return 
      *
      */
-    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText, String mealType) throws IOException {
-        HttpURLConnection conn = setupConnection(urlString, "PUT");
+    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText, String mealType, User user) throws IOException {
+        HttpURLConnection conn = setupConnection(urlString, "PUT", user);
     
         JSONObject requestBody = new JSONObject();
         requestBody.put("newRecipeText", recipeText);
@@ -94,8 +94,8 @@ public class RequestHandler {
      * @param recipeID The ID of the recipe to be deleted.
      * 
      */
-    public void performDELETE(String urlString, int recipeID) throws IOException {
-        HttpURLConnection conn = setupConnection(urlString, "DELETE");
+    public void performDELETE(String urlString, int recipeID, User user) throws IOException {
+        HttpURLConnection conn = setupConnection(urlString, "DELETE", user);
     
         String body = "recipeID=" + recipeID;
         sendRequest(conn, body);
@@ -120,17 +120,19 @@ public class RequestHandler {
      * @return A JSON string containing all recipes. If an error occurs, it returns the string "Invalid".
      *
      */
-    public String performGET(String urlString) throws IOException {
-        HttpURLConnection conn = setupConnection(urlString, "GET");
+    public String performGET(String urlString, User user) throws IOException {
+        HttpURLConnection conn = setupConnection(urlString, "GET", user);
         String content = getResponse(conn);
         return content;
     }
 
-    private HttpURLConnection setupConnection(String urlString, String method) throws IOException {
+    private HttpURLConnection setupConnection(String urlString, String method, User user) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(method);
         conn.setDoOutput(true);
+        conn.setRequestProperty("Username", user.getUsername());
+        conn.setRequestProperty("Password", user.getPassword());
         return conn;
     }
     

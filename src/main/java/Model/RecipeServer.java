@@ -45,7 +45,7 @@ public class RecipeServer implements RecipeServerInterface{
         new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT),
         0);
     
-    RecipeHTTPHandlerInterface requestHandler = new RecipeHTTPHandler(list);
+    RecipeHTTPHandlerInterface requestHandler = new RecipeHTTPHandler(list, new AccountManager("accounts.csv"));
     //MyHandler myHandler = new MyHandler(data);
     // Create the context
     server.createContext("/", requestHandler);
