@@ -36,8 +36,6 @@ public class View {
 	private Button stopRecordingIngredients = new Button("Stop Ingredient Recording");
 	private Button generateNewRecipe = new Button("Generate New Recipe");
 
-    private Button filterButton = new Button("Filter");
-
 	private Button backToHome = new Button("Back to Home");
 
 	private VBox recipeTitleListleftVbox;
@@ -55,8 +53,10 @@ public class View {
 	private Label homePageTextSubheader;
 	private Label savedRecipeDescription;
 
+    //filter labels and combobox
 	private ComboBox<String> filterDropdown;
 	private String[] filters;
+    private Label filterLabel;
 
 	//record mealtype labels
 	private Label recordMealTypeText;
@@ -76,6 +76,7 @@ public class View {
 		this.filters = new String[] {"All", "Breakfast", "Lunch", "Dinner"};
 		this.filterDropdown = new ComboBox<String>(FXCollections.observableArrayList(this.filters));
 		this.filterDropdown.setValue(this.filters[0]);
+        this.filterLabel = new Label("Filter: ");
 
 		this.root = new BorderPane();
 		this.viewModel = viewModel;
@@ -111,7 +112,10 @@ public class View {
 			currentlyEditingRecipe.setRecipeTitle(newRecipeTitle);
 			onSaveEditedRecipe(currentlyEditingRecipe);
 		});
-        this.filterButton.setOnAction(e -> {
+        // this.filterButton.setOnAction(e -> {
+        //     this.updateRecipes();
+        // });
+        this.filterDropdown.getSelectionModel().selectedItemProperty().addListener((op, ol, n) -> {
             this.updateRecipes();
         });
 
@@ -136,26 +140,25 @@ public class View {
 
 	public void updateRecipes() {
 		System.out.println("Updating Recipes");
-		ListView<HBox> daStuff = viewModel.pullRecipes();
-        
-        // Implement filtering here. Should simply remove filtered Recipes from list.
-
-        // for(HBox h : daStuff.getItems()) {
-        //     // If recipe's meal type is not what the filter is set as,
-        //     // do not show it / remove it from the sidebar.
-        //     if(!((RecipeNode)h).toJson().getString("mealType").equalsIgnoreCase(this.getCurrentFilter())) {
-        //         daStuff.getItems().remove(h);
-        //     }
-        // }
-		this.recipeTitleListleftVbox = new VBox(10, daStuff);
-        HBox filterContainer = new HBox(10, this.filterDropdown, this.filterButton);
+		ListView<HBox> sidebar = new ListView<HBox>();
+        ListView<HBox> allRecipes = viewModel.pullRecipes();
+        String filter = this.getCurrentFilter();
+        for(HBox h : allRecipes.getItems()) {
+            // If recipe's meal type is the same as the filter,
+            // or filter is "all", show the recipe on the sidebar.
+            if(filter.equalsIgnoreCase("all") || ((RecipeNode)h).toJson().getString("mealType").equalsIgnoreCase(this.getCurrentFilter())) {
+                sidebar.getItems().add(h);
+            }
+        }
+		this.recipeTitleListleftVbox = new VBox(10, sidebar);
+        HBox filterContainer = new HBox(10, this.filterLabel, this.filterDropdown);
         this.recipeTitleListleftVbox.getChildren().add(0, filterContainer);
-		VBox.setVgrow(daStuff, Priority.ALWAYS);
+		VBox.setVgrow(sidebar, Priority.ALWAYS);
 		this.root.setLeft(this.recipeTitleListleftVbox);
 		//Update detail view
-		daStuff.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+		sidebar.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue != null) {
-				RecipeNode selected = (RecipeNode)daStuff.getSelectionModel().getSelectedItem();
+				RecipeNode selected = (RecipeNode)sidebar.getSelectionModel().getSelectedItem();
 				String recipeText = selected.getRecipeText();
 				updateSelectedRecipeDetails(recipeText,(selected.getRecipeID()));
 				currentlyEditingRecipe = selected;
