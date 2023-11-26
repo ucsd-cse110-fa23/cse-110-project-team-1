@@ -163,9 +163,9 @@ public class RecipeList {
      *
      * @return The ID of the newly added recipe.
      */
-    public int addRecipe(String recipeTitle, String recipeText) {
+    public int addRecipe(String recipeTitle, String recipeText, String mealType) {
         int recipeID = ++highestIndex; // increment highestIndex with every new recipe creataed
-        Recipe r = new Recipe(recipeID, recipeTitle, recipeText);
+        Recipe r = new Recipe(recipeID, recipeTitle, recipeText, mealType);
         recipeList.put(recipeID, r);
         //System.out.println("Added " + recipeID);
         saveToDisk();
@@ -255,6 +255,7 @@ public class RecipeList {
                 recipe.put("recipeText", r.getRecipeText());
                 recipe.put("recipeTitle", r.getRecipeTitle());
                 recipe.put("recipeID", r.getRecipeID());
+                recipe.put("mealType", r.getMealType());
             allRecipes.put(recipeIndex++, recipe);
         }
         return allRecipes;

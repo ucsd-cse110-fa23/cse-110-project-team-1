@@ -36,6 +36,8 @@ public class View {
 	private Button stopRecordingIngredients = new Button("Stop Ingredient Recording");
 	private Button generateNewRecipe = new Button("Generate New Recipe");
 
+    private Button filterButton = new Button("Filter");
+
 	private Button backToHome = new Button("Back to Home");
 
 	private VBox recipeTitleListleftVbox;
@@ -53,9 +55,8 @@ public class View {
 	private Label homePageTextSubheader;
 	private Label savedRecipeDescription;
 
-	private ComboBox<String> dropDown;
+	private ComboBox<String> filterDropdown;
 	private String[] filters;
-	private Button debugButton;
 
 	//record mealtype labels
 	private Label recordMealTypeText;
@@ -72,17 +73,9 @@ public class View {
 
 	
 	public View(ViewModel viewModel) {
-		this.debugButton = new Button("For debug");
-		this.debugButton.setOnAction(e -> {
-			for (HBox r: viewModel.pullRecipes().getItems()){
-				if (r instanceof RecipeNode){
-					System.out.println(((RecipeNode) r).getRecipeTitle());
-					}
-			};
-		});
 		this.filters = new String[] {"All", "Breakfast", "Lunch", "Dinner"};
-		this.dropDown = new ComboBox<String>(FXCollections.observableArrayList(this.filters));
-		this.dropDown.setValue(this.filters[0]);
+		this.filterDropdown = new ComboBox<String>(FXCollections.observableArrayList(this.filters));
+		this.filterDropdown.setValue(this.filters[0]);
 
 		this.root = new BorderPane();
 		this.viewModel = viewModel;
@@ -118,6 +111,9 @@ public class View {
 			currentlyEditingRecipe.setRecipeTitle(newRecipeTitle);
 			onSaveEditedRecipe(currentlyEditingRecipe);
 		});
+        this.filterButton.setOnAction(e -> {
+            this.updateRecipes();
+        });
 
 
 		// left side
@@ -141,6 +137,13 @@ public class View {
 	public void updateRecipes() {
 		System.out.println("Updating Recipes");
 		ListView<HBox> daStuff = viewModel.pullRecipes();
+        // for(HBox h : daStuff.getItems()) {
+        //     // If recipe's meal type is not what the filter is set as,
+        //     // do not show it / remove it from the sidebar.
+        //     if(!((RecipeNode)h).toJson().getString("mealType").equalsIgnoreCase(this.getCurrentFilter())) {
+        //         daStuff.getItems().remove(h);
+        //     }
+        // }
 		this.recipeTitleListleftVbox = new VBox(10, daStuff);
 		VBox.setVgrow(daStuff, Priority.ALWAYS);
 		this.root.setLeft(this.recipeTitleListleftVbox);
@@ -199,7 +202,7 @@ public class View {
 
 		//Right side
 		this.homePageVbox = new VBox(10);
-		this.homePageVbox.getChildren().addAll(this.homePageTextHeader, this.homePageTextSubheader, this.generateNewRecipe, this.dropDown, this.debugButton);
+		this.homePageVbox.getChildren().addAll(this.homePageTextHeader, this.homePageTextSubheader, this.generateNewRecipe);
 		this.homePageVbox.setAlignment(Pos.CENTER);
 
 		VBox.setVgrow(this.homePageVbox, Priority.ALWAYS);
@@ -315,9 +318,10 @@ public class View {
 
 	private void onSaveNewlyGeneratedRecipeRequest(){
 		RequestHandler req = new RequestHandler();
-		Integer newRecipeID = req.performPUT("http://localhost:8100/", newlyGeneratedRecipe.getRecipeID(), 
+		req.performPUT("http://localhost:8100/", newlyGeneratedRecipe.getRecipeID(), 
 														   newlyGeneratedRecipe.getRecipeTitle(), 
-														   newlyGeneratedRecipe.getRecipeText());
+														   newlyGeneratedRecipe.getRecipeText(),
+                                                           newlyGeneratedRecipe.getMealType());
 		displayHomePage();
 		this.updateRecipes();
 	}
@@ -326,7 +330,8 @@ public class View {
 		RequestHandler req = new RequestHandler();
 		req.performPUT("http://localhost:8100/", editRecipeNode.getRecipeID(), 
 														   editRecipeNode.getRecipeTitle(), 
-														   editRecipeNode.getRecipeText());
+														   editRecipeNode.getRecipeText(),
+                                                           editRecipeNode.getMealType());
 		
 		this.updateRecipes();
 		displayHomePage();
@@ -369,6 +374,6 @@ public class View {
 	}
 	
 	public String getCurrentFilter() {
-		return this.dropDown.getValue();
+		return this.filterDropdown.getValue();
 	}
 }

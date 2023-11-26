@@ -114,7 +114,7 @@ public class RequestHandler {
      * @return 
      *
      */
-    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText) {
+    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText, String mealType) {
         Integer toReturn = -1;
         try {
             URL url = new URL(urlString);
@@ -127,6 +127,7 @@ public class RequestHandler {
             requestBody.put("newRecipeText", recipeText);
             requestBody.put("newRecipeTitle", recipeTitle);
             requestBody.put("recipeID", recipeID);
+            requestBody.put("mealType", mealType);
             String body = requestBody.toString();
             out.write(body);
             out.flush();

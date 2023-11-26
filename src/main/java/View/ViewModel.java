@@ -34,7 +34,8 @@ public class ViewModel {
 			
 			RecipeNode newRecipe = new RecipeNode(r.getInt("recipeID"),
 												  r.getString("recipeTitle"),
-												  r.getString("recipeText"));
+												  r.getString("recipeText"),
+                                                  r.getString("mealType"));
 												  
 			newRecipe.getChildren().add(new Label(newRecipe.getRecipeTitle()));
             //System.out.println(newRecipe.toString());
