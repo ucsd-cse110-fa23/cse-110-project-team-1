@@ -85,7 +85,9 @@ public class ChatGPT implements GPTModel {
 
         // Pull response string out of JSON response body
         String responseBody = response.body();
+        System.out.println("Response Body: \n" + responseBody);
         JSONObject responseJson = new JSONObject(responseBody);
+        //System.out.println("Parsed Json : \n" + responseJson.toString());
         JSONArray choices = responseJson.getJSONArray("choices");
         String generatedText = choices.getJSONObject(0).getString("text");
 

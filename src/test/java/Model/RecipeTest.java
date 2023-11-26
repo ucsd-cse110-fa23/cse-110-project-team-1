@@ -22,7 +22,7 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         String newRecipeTitle = "Beans";
         String newRecipeText = "Beans Recipe\n Ingredients:\n1 Can of Beans\n\nInstructions:\nStep 1: Put beans on plate\n";
 
-        Recipe newRecipe = new Recipe(newRecipeID,newRecipeTitle,newRecipeText);
+        Recipe newRecipe = new Recipe(newRecipeID,newRecipeTitle,newRecipeText, "lunch");
 
         assertEquals(newRecipeID, newRecipe.getRecipeID());
         assertEquals(newRecipeText, newRecipe.getRecipeText());
@@ -37,7 +37,7 @@ public class RecipeTest { //temporary tests until JUnit is in place\
 
         RecipeList newRecipeList = new RecipeList("src/test/test");
 
-        newRecipeList.addRecipe(newRecipeTitle, newRecipeText);
+        newRecipeList.addRecipe(newRecipeTitle, newRecipeText, "lunch");
 
         assertEquals(1, newRecipeList.getRecipe(1).getRecipeID());
         assertEquals(newRecipeText, newRecipeList.getRecipe(1).getRecipeText());
@@ -51,9 +51,9 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     @Test
     void testAddingMultipleRecipes() {
         RecipeList recipeList = new RecipeList("src/test/testAddingMultipleRecipes");
-        recipeList.addRecipe("Recipe1", "RecipeText1");
-        recipeList.addRecipe("Recipe2", "RecipeText2");
-        recipeList.addRecipe("Recipe3", "RecipeText3");
+        recipeList.addRecipe("Recipe1", "RecipeText1", "lunch");
+        recipeList.addRecipe("Recipe2", "RecipeText2", "lunch");
+        recipeList.addRecipe("Recipe3", "RecipeText3", "lunch");
 
         // Check if the most recent recipe is the last one added
         Recipe mostRecent = recipeList.getMostRecent();
@@ -69,9 +69,9 @@ public class RecipeTest { //temporary tests until JUnit is in place\
 
         RecipeList recipeList = new RecipeList("src/test/testSaveAndLoadRecipeList");
     
-        recipeList.addRecipe("Recipe1", "RecipeText1");
-        recipeList.addRecipe("Recipe2", "RecipeText2");
-        recipeList.addRecipe("Recipe3", "RecipeText3");
+        recipeList.addRecipe("Recipe1", "RecipeText1", "lunch");
+        recipeList.addRecipe("Recipe2", "RecipeText2", "lunch");
+        recipeList.addRecipe("Recipe3", "RecipeText3", "lunch");
 
         recipeList.saveToDisk();
 
@@ -95,7 +95,7 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     @Test
     void testDeleteExistingRecipe(){
         RecipeList recipeList = new RecipeList("src/test/testDeleteExistingRecipe");
-        int addedRecipeID = recipeList.addRecipe("Recipe1", "RecipeText1");
+        int addedRecipeID = recipeList.addRecipe("Recipe1", "RecipeText1", "lunch");
         assertFalse(recipeList.isEmpty());
         recipeList.deleteRecipe(addedRecipeID);
         assertTrue(recipeList.isEmpty());
@@ -107,7 +107,7 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     @Test
     void testDeleteNonExistingRecipe(){
         RecipeList recipeList = new RecipeList("src/test/testDeleteNonExistingRecipe");
-        int addedRecipeID = recipeList.addRecipe("Recipe1", "RecipeText1");
+        int addedRecipeID = recipeList.addRecipe("Recipe1", "RecipeText1", "lunch");
         assertFalse(recipeList.deleteRecipe(addedRecipeID+1));
         assertFalse(recipeList.isEmpty());
         
@@ -122,8 +122,8 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     void testEditExistingRecipe(){
         RecipeList recipeList = new RecipeList("src/test/testEditExistingRecipe");
     
-        recipeList.addRecipe("Recipe1", "RecipeText1");
-        recipeList.addRecipe("Recipe2", "RecipeText2");
+        recipeList.addRecipe("Recipe1", "RecipeText1", "lunch");
+        recipeList.addRecipe("Recipe2", "RecipeText2", "lunch");
 
         recipeList.editRecipe(1,"Newer Recipe1", "Newer RecipeText");
 
@@ -140,8 +140,8 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     void testEditNonExistingRecipe(){
         RecipeList recipeList = new RecipeList("src/test/testEditNonExistingRecipe");
     
-        recipeList.addRecipe("Recipe1", "RecipeText1");
-        recipeList.addRecipe("Recipe2", "RecipeText2");
+        recipeList.addRecipe("Recipe1", "RecipeText1", "lunch");
+        recipeList.addRecipe("Recipe2", "RecipeText2", "lunch");
 
         assertFalse(recipeList.editRecipe(3,"Newer Recipe1","Newer RecipeText"));
 

@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
-import java.util.HashMap;
 
 //Referenced this for serialization and deserialization code
 //https://www.geeksforgeeks.org/how-to-serialize-hashmap-in-java/
@@ -161,12 +160,13 @@ public class RecipeList {
      *
      * @param recipeTitle The title of the new recipe.
      * @param recipeText  The text of the new recipe.
+     * @param mealType    The meal type of the new recipe.
      *
      * @return The ID of the newly added recipe.
      */
-    public int addRecipe(String recipeTitle, String recipeText) {
+    public int addRecipe(String recipeTitle, String recipeText, String mealType) {
         int recipeID = ++highestIndex; // increment highestIndex with every new recipe creataed
-        Recipe r = new Recipe(recipeID, recipeTitle, recipeText);
+        Recipe r = new Recipe(recipeID, recipeTitle, recipeText, mealType);
         recipeList.put(recipeID, r);
         //System.out.println("Added " + recipeID);
         saveToDisk();
@@ -256,6 +256,7 @@ public class RecipeList {
                 recipe.put("recipeText", r.getRecipeText());
                 recipe.put("recipeTitle", r.getRecipeTitle());
                 recipe.put("recipeID", r.getRecipeID());
+                recipe.put("mealType", r.getMealType());
             allRecipes.put(recipeIndex++, recipe);
         }
         return allRecipes;

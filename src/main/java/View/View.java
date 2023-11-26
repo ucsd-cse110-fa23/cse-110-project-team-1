@@ -1,27 +1,27 @@
 package View;
 
-import Controller.*;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
 
 public class View {
 
 	public BorderPane root;
-	private AudioRecorder audioRecorder;
 	private ViewModel viewModel;
 
-	private TextField recipeQuery = new TextField();
 	private TextArea recipeEditArea;
 
 	private Button addNewRecipeButton = new Button("Generate Recipe");
@@ -37,6 +37,8 @@ public class View {
 
 	private Button backToHome = new Button("Back to Home");
 
+    private ComboBox<String> filterDropdown;
+
 	private VBox recipeTitleListleftVbox;
 
 	private VBox homePageVbox;
@@ -46,6 +48,7 @@ public class View {
 	private VBox recordIngredientsVbox;
 	private VBox editRecipesVbox;
 
+    private HBox filterHBox;
 
 	//homepage labels
 	private Label homePageTextHeader;
@@ -58,6 +61,10 @@ public class View {
 	//record ingredient labels
 	private Label recordIngredientsText;
 
+    //filter labels
+	private String[] filters;
+    private Label filterLabel;
+
 	//newly generated receipe labels
 	//private Label newlyGeneratedRecipeLabel;
 
@@ -65,183 +72,152 @@ public class View {
 	private RecipeNode newlyGeneratedRecipe;
 	private RecipeNode currentlyEditingRecipe;
 
+	private static final boolean ADD_BACK_BUTTON = true;
+	private static final boolean DONT_ADD_BACK_BUTTON = false;
+	private static final int SPACING = 10;
+	private static final Boolean TEXT = true;
+	private static final Boolean NO_TEXT = false;
+	private static final Boolean MIN_HEIGHT = true;
+	private static final Boolean NO_MIN_HEIGHT = false;
 	
 	public View(ViewModel viewModel) {
+        this.viewModel = viewModel;
 
 		this.root = new BorderPane();
-		this.viewModel = viewModel;
-		this.root.setPadding(new Insets(10));
-		//Left ListView with placeholders and a + button
-		this.recipeQuery.setPromptText("Enter Recipe Query...");
-		this.addNewRecipeButton.setOnAction(e -> this.onGenerateRequest());
-		this.deleteSavedRecipeButton.setOnAction(e -> this.onDeleteRequest());
-		this.startRecording.setOnAction(e -> this.onRecordRequest());
-		this.backToHome.setOnAction(e -> this.displayHomePage());
-		this.generateNewRecipe.setOnAction(e -> this.buildRecordMealType());
-		this.editSavedRecipeButton.setOnAction(e -> this.buildEditPage(currentlyEditingRecipe));
-		this.stopRecordingMealType.setOnAction(e -> {
-			
-			if (this.onStopRecordRequest("mealType")){
-				buildRecordIngredients();
-			}else{
-				this.recordMealTypeText.setText(this.recordMealTypeText.getText() + "\nInvalid meal type, please try again.");
-			}
-		});
-			
-		this.stopRecordingIngredients.setOnAction(e -> {
-			if(this.onStopRecordRequest("ingredients")){
-				buildNewlyGeneratedRecipeDisplay();
-			}
-		});
-		this.newlyGeneratedRecipeSaveButton.setOnAction(e -> {
-			onSaveNewlyGeneratedRecipeRequest();
-		});
-		this.editedRecipeSaveButton.setOnAction(e -> {
-			String newRecipeTitle = recipeEditArea.getText().trim().substring(0, recipeEditArea.getText().trim().indexOf("\n"));
-			currentlyEditingRecipe.setRecipeText(recipeEditArea.getText());
-			currentlyEditingRecipe.setRecipeTitle(newRecipeTitle);
-			onSaveEditedRecipe(currentlyEditingRecipe);
-		});
+        this.root.setPadding(new Insets(SPACING));
+		
+        filterHBox = createFilters();
+        setupEventHandlers();
+        setupUI();
+		
+        currentSelectedRecipeID = -1;
+        savedRecipeDescription = new Label("Recipe Description: ...");
+		savedRecipeDescription.setWrapText(true);
 
-
-		// left side
-		currentSelectedRecipeID = -1;
-		savedRecipeDescription = new Label("Recipe Description: ...");
-
-		this.buildHomePage();
-		this.buildDetailPage();
-		this.buildRecordMealType();
-		this.buildRecordIngredients();
-		this.displayHomePage();
-		this.updateRecipes();
-
-		this.audioRecorder = new AudioRecorder();
+        this.updateRecipes();
 	}
 
-	public BorderPane getRoot() {
-		return this.root;
-	}
+	private void setupUI() {
+        this.buildHomePage();
+    }
 
 	public void updateRecipes() {
 		System.out.println("Updating Recipes");
-		ListView<HBox> daStuff = viewModel.pullRecipes();
-		this.recipeTitleListleftVbox = new VBox(10, daStuff);
-		VBox.setVgrow(daStuff, Priority.ALWAYS);
-		this.root.setLeft(this.recipeTitleListleftVbox);
-		//Update detail view
-		daStuff.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue != null) {
-				RecipeNode selected = (RecipeNode)daStuff.getSelectionModel().getSelectedItem();
-				String recipeText = selected.getRecipeText();
-				updateSelectedRecipeDetails(recipeText,(selected.getRecipeID()));
-				currentlyEditingRecipe = selected;
-				System.out.println("Selected: " + selected.getRecipeTitle());
-			}
-			buildDetailPage();
-		});
+        ListView<HBox> sidebar = new ListView<HBox>();
+        ListView<HBox> allRecipes = viewModel.pullRecipes();
+        String filter = filterDropdown.getValue();
+        for(HBox h : allRecipes.getItems()) {
+            // If recipe's meal type is the same as the filter,
+            // or filter is "all", show the recipe on the sidebar.
+            if(filter.equalsIgnoreCase("all") || ((RecipeNode)h).toJson().getString("mealType").equalsIgnoreCase(filter)) {
+                sidebar.getItems().add(h);
+            }
+        }
 
+		this.recipeTitleListleftVbox = createRecipeTitleList(sidebar);
+		this.root.setLeft(this.recipeTitleListleftVbox);
+		setupSelectionListener(sidebar);
 	}
 
+	private VBox createRecipeTitleList(ListView<HBox> recipeListView) {
+		VBox recipeTitleList = new VBox(SPACING, filterHBox, recipeListView);
+		VBox.setVgrow(recipeListView, Priority.ALWAYS);
+		return recipeTitleList;
+	}
+
+    private HBox createFilters() {
+        filters = new String[] {"All", "Breakfast", "Lunch", "Dinner"};
+        filterDropdown = new ComboBox<String>(FXCollections.observableArrayList(this.filters));
+        filterDropdown.setValue(filters[0]);
+        filterLabel = new Label("Filter: ");
+
+        return new HBox(SPACING, filterLabel, filterDropdown);
+    }
+
+	// Variable arguments for a function 
+	// 
+	/**
+	 * This method is a general page building function that creates a VBox layout for a page in the application.
+	 * This takes a variable number of nodes to add as children.
+	 * Source: https://stackoverflow.com/questions/2330942/java-variable-number-of-arguments-for-a-method
+	 * 
+	 * @param textRegion The region where the text will be displayed on the page, can be null if addText is NO_TEXT
+	 * @param minHeight The minimum height for the text region. If null, no minimum height is set.
+	 * @param addText A boolean flag indicating whether to add text to the VBox. If true, textRegion is added to the VBox.
+	 * @param setMinHeight A boolean flag indicating whether to set a minimum height for the text region. If true, the minHeight parameter is used.
+	 * @param position The alignment position for the VBox.
+	 * @param nodes The nodes to be added to the VBox. 
+	 * 
+	 * @return A VBox with the specified configuration.
+	 */
+	private VBox buildPage(Region textRegion, Integer minHeight, Boolean addText, Boolean setMinHeight, Pos position, Node... nodes) {
+		VBox vbox = new VBox(SPACING);
+		vbox.setAlignment(position);
+
+		if(setMinHeight && minHeight != null){
+			textRegion.setMinHeight(minHeight);
+		}
+		if(addText && textRegion != null){
+			vbox.getChildren().add(textRegion);
+		}
+		vbox.getChildren().addAll(nodes);
+		vbox.setPadding(new Insets(0, SPACING, 0, SPACING));
+	
+		return vbox;
+	}
 
 	private void buildEditPage(RecipeNode selectedRecipe){
 		this.recipeEditArea = new TextArea(selectedRecipe.getRecipeText());
-		this.recipeEditArea.setMinHeight(400);
-		this.editRecipesVbox = new VBox(10);
-		this.editRecipesVbox.getChildren().addAll(recipeEditArea, new HBox(backToHome, editedRecipeSaveButton));
-		this.editRecipesVbox.setAlignment(Pos.TOP_LEFT);
-		this.editRecipesVbox.setPadding(new Insets(0,10,5,10));
-		displayEditPage();
+		HBox buttons = new HBox(backToHome, editedRecipeSaveButton);
+		this.editRecipesVbox = buildPage(recipeEditArea, 400, TEXT, MIN_HEIGHT, Pos.TOP_LEFT, buttons);
+		displaySelector("editPage");
 	}
 
-	private void displayEditPage(){
-		this.root.setCenter(this.editRecipesVbox);
-	}
 	private void buildDetailPage(){
-		savedRecipeDescription.setWrapText(true);
-		//Right side
-		this.savedRecipeDetailVbox = new VBox(10);
-		this.savedRecipeDetailVbox.getChildren().addAll(savedRecipeDescription, new HBox(backToHome, editSavedRecipeButton, deleteSavedRecipeButton));
-		this.savedRecipeDetailVbox.setAlignment(Pos.TOP_LEFT);
-		this.savedRecipeDetailVbox.setPadding(new Insets(0,10,5,10));
-		displayRecipeDetails();
-	}
-	private void displayRecipeDetails(){
-		System.out.println("Display Detail Page");
-		this.root.setCenter(this.savedRecipeDetailVbox);
+		HBox buttons = new HBox(backToHome, editSavedRecipeButton, deleteSavedRecipeButton);
+		ScrollPane descriptionScrollBox = new ScrollPane(savedRecipeDescription);
+		descriptionScrollBox.setStyle("-fx-background-color:transparent;");
+		this.savedRecipeDetailVbox = buildPage(descriptionScrollBox, 0, TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, buttons);
+		displaySelector("recipeDetails");
 	}
 
-
+	private void buildNewlyGeneratedRecipeDisplay(){
+		savedRecipeDescription.setText(newlyGeneratedRecipe.getRecipeText());
+		HBox buttons = new HBox(backToHome, newlyGeneratedRecipeSaveButton);
+		this.newlyGeneratedRecipeDisplayVbox = buildPage(savedRecipeDescription, 0, TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, buttons);
+		displaySelector("newlyGeneratedRecipeDisplay");
+		
+	}
 
 	private void buildHomePage() {
-		System.out.println("Displaying Home Page");
 		this.homePageTextHeader = new Label("Welcome to Pantry Pal");
 		this.homePageTextHeader.setWrapText(true);
 
 		this.homePageTextSubheader = new Label("To add a new recipe, click \"" + this.addNewRecipeButton.getText() + "\"");
 		this.homePageTextSubheader.setWrapText(true);
 
-		// we need this to center the content
 		StackPane centeringPane = new StackPane();
-
-		//Right side
-		this.homePageVbox = new VBox(10);
-		this.homePageVbox.getChildren().addAll(this.homePageTextHeader, this.homePageTextSubheader, this.generateNewRecipe);
-		this.homePageVbox.setAlignment(Pos.CENTER);
+		this.homePageVbox = buildPage(null, 0, NO_TEXT, NO_MIN_HEIGHT, Pos.CENTER, this.homePageTextHeader, this.homePageTextSubheader, this.generateNewRecipe);
 
 		VBox.setVgrow(this.homePageVbox, Priority.ALWAYS);
 		centeringPane.getChildren().add(this.homePageVbox);
 		StackPane.setAlignment(this.homePageVbox, Pos.CENTER);
-		StackPane.setMargin(this.homePageVbox, new Insets(10));
-
-		this.root.setCenter(centeringPane);
-
-		this.displayHomePage();
-	}
-
-	private void displayHomePage(){
-		this.updateRecipes();
-		System.out.println("Displaying Home Page");
-		this.root.setCenter(this.homePageVbox);
+		StackPane.setMargin(this.homePageVbox, new Insets(SPACING));
+		displaySelector("home");
 	}
 
 	private void buildRecordMealType(){
 		this.recordMealTypeText = new Label(
 			"Click \"" +
 			this.startRecording.getText() +
-			"\" and then say \"breakfast\", \"lunch\", or \"dinner\" to select a meal type. Click \"" +
+			"\" and then say \"breakfast\", \"lunch\", or \"dinner\" to select a meal type.\nClick \"" +
 			this.stopRecordingMealType.getText() +
 			"\" when you are done.");
-
 		this.recordMealTypeText.setWrapText(true);
 		this.recordMealTypeText.setMaxWidth(480.0);
-
-		this.recordMealTypeVbox = new VBox(10);
-		this.recordMealTypeVbox.setAlignment(Pos.CENTER);
-	
-		//add buttons to record and stop recording
-		this.recordMealTypeVbox.getChildren().addAll(this.recordMealTypeText, this.startRecording, this.stopRecordingMealType);
-		//this.recordMealTypeVbox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
-		this.recordMealTypeVbox.setPadding(new Insets(0,10,5,10));
-		displayRecordMealType();
+		this.recordMealTypeVbox = buildPage(recordMealTypeText, 0, TEXT, NO_MIN_HEIGHT, Pos.CENTER, this.startRecording, this.stopRecordingMealType);
+		displaySelector("recordMealType");
 	}
-
-	private void displayRecordMealType() {
-		System.out.println("Displaying Record Meal Type Page");
-
-		BorderPane recordLayout = new BorderPane();
-
-		recordLayout.setCenter(this.recordMealTypeVbox);
-
-		HBox topContainer = new HBox();
-		topContainer.setAlignment(Pos.TOP_RIGHT);
-		topContainer.getChildren().add(this.backToHome);
-		topContainer.setPadding(new Insets(10));
-
-		recordLayout.setTop(topContainer);
-
-		this.root.setCenter(recordLayout);
-	}
-
 
 	private void buildRecordIngredients(){
 		this.recordIngredientsText = new Label(
@@ -250,110 +226,162 @@ public class View {
 			"\" and speak your ingredients to generate a recipe. Click \"" +
 			this.stopRecordingIngredients.getText() +
 			"\" when you are done.");
-
 		this.recordIngredientsText.setWrapText(true);
 		this.recordIngredientsText.setMaxWidth(480.0);
-
-		//add buttons to record and stop recording
-		this.recordIngredientsVbox = new VBox(10);
-		this.recordIngredientsVbox.setAlignment(Pos.CENTER);
-		this.recordIngredientsVbox.getChildren().addAll(recordIngredientsText, startRecording, stopRecordingIngredients);
-		this.recordIngredientsVbox.setPadding(new Insets(0,10,5,10));
-		displayRecordIngredients();
+		this.recordIngredientsVbox = buildPage(recordIngredientsText, 0, TEXT, NO_MIN_HEIGHT, Pos.CENTER, this.startRecording, this.stopRecordingIngredients);
+		displaySelector("recordIngredients");
 	}
-	private void displayRecordIngredients(){
-		System.out.println("Displaying Ingredients Page");
+	
 
-		BorderPane recordIngredientsLayout = new BorderPane();
-		recordIngredientsLayout.setCenter(this.recordIngredientsVbox);
-
-		HBox topContainer = new HBox();
-		topContainer.setAlignment(Pos.TOP_RIGHT);
-		topContainer.getChildren().add(this.backToHome);
-		topContainer.setPadding(new Insets(10));
-
-		recordIngredientsLayout.setTop(topContainer);
-
-		this.root.setCenter(recordIngredientsLayout);
-	}
-
-	private void buildNewlyGeneratedRecipeDisplay(){
-		savedRecipeDescription = new Label(newlyGeneratedRecipe.getRecipeText());
-		savedRecipeDescription.setWrapText(true);
-		//Right side
-		this.newlyGeneratedRecipeDisplayVbox = new VBox(10);
-		this.newlyGeneratedRecipeDisplayVbox.getChildren().addAll(savedRecipeDescription, new HBox(backToHome, newlyGeneratedRecipeSaveButton));
-		this.newlyGeneratedRecipeDisplayVbox.setAlignment(javafx.geometry.Pos.TOP_LEFT);
-		this.newlyGeneratedRecipeDisplayVbox.setPadding(new Insets(0,10,5,10));
-		displayNewlyGeneratedRecipeDisplay();
-		
-	}
-	private void displayNewlyGeneratedRecipeDisplay(){
-		System.out.println("Displaying Newly Generated Recipe Page");
-		this.root.setCenter(this.newlyGeneratedRecipeDisplayVbox);
+	/**
+	 * This method is responsible for displaying a page in the application.
+	 * 
+	 * @param vbox The VBox layout that represents the page to be displayed.
+	 * @param message The message to be printed to the console for debugging purposes.
+	 * @param addBackButton A boolean flag indicating whether to add a back button to the page. If true, a back button is added to the top right corner of the page.
+	 * 
+	 * If useBackButton is true, the method creates a new BorderPane layout, sets the provided VBox as the center, and adds a back button to the top right corner. 
+	 * If useBackButton is false, the method simply sets the provided VBox as the center of the root layout.
+	 */
+	private void displayPage(VBox vbox, String message, boolean addBackButton) {
+		System.out.println(message);
+	
+		if (addBackButton) {
+			BorderPane layout = new BorderPane();
+			layout.setCenter(vbox);
+	
+			HBox topContainer = new HBox();
+			topContainer.setAlignment(Pos.TOP_RIGHT);
+			topContainer.getChildren().add(this.backToHome);
+			topContainer.setPadding(new Insets(SPACING));
+	
+			layout.setTop(topContainer);
+	
+			this.root.setCenter(layout);
+		} else {
+			this.root.setCenter(vbox);
+		}
 	}
 
-	private void onGenerateRequest() {
-		//System.out.println("onGenerateRequest Query: " + this.recipeQuery.getText());
+	/**
+	 * This method is responsible for displaying different pages based on the provided page type.
+	 * It calls the displayPage() method with different parameters depending on the page type.
+	 *
+	 * @param pageType The type of the page to be displayed. This can be one of the following:
+	 *                 "home", "recipeDetails", "recordMealType", "recordIngredients", 
+	 *                 "newlyGeneratedRecipeDisplay", "editPage".
+	 *                 If the pageType is not one of these, an "Invalid page type" message is printed to the console.
+	 */
+	private void displaySelector(String pageType) {
+		switch (pageType) {
+			case "home":
+				displayPage(this.homePageVbox, "Displaying Home Page", DONT_ADD_BACK_BUTTON);
+				break;
+			case "recipeDetails":
+				displayPage(this.savedRecipeDetailVbox, "Displaying Recipe Details", DONT_ADD_BACK_BUTTON);
+				break;
+			case "recordMealType":
+				displayPage(this.recordMealTypeVbox, "Displaying Record Meal Type Page", ADD_BACK_BUTTON);
+				break;
+			case "recordIngredients":
+				displayPage(this.recordIngredientsVbox, "Displaying Ingredients Page", ADD_BACK_BUTTON);
+				break;
+			case "newlyGeneratedRecipeDisplay":
+				displayPage(this.newlyGeneratedRecipeDisplayVbox, "Displaying Newly Generated Recipe Page", DONT_ADD_BACK_BUTTON);
+				break;
+			case "editPage":
+				displayPage(this.editRecipesVbox, "Displaying Edit Page", DONT_ADD_BACK_BUTTON);
+				break;
+			default:
+				System.out.println("Invalid page type: " + pageType);
+				break;
+		}
+	}
 
-		RequestHandler req = new RequestHandler();
-		req.performPOST("http://localhost:8100/", this.recipeQuery.getText());
-		this.recipeQuery.clear();
+	private void saveRecipe(RecipeNode recipeNode){
+		viewModel.performPutRequest(recipeNode);
 		this.updateRecipes();
-	}
-
-	private void onSaveNewlyGeneratedRecipeRequest(){
-		RequestHandler req = new RequestHandler();
-		Integer newRecipeID = req.performPUT("http://localhost:8100/", newlyGeneratedRecipe.getRecipeID(), 
-														   newlyGeneratedRecipe.getRecipeTitle(), 
-														   newlyGeneratedRecipe.getRecipeText());
-		displayHomePage();
-		this.updateRecipes();
-	}
-
-	private void onSaveEditedRecipe(RecipeNode editRecipeNode){
-		RequestHandler req = new RequestHandler();
-		req.performPUT("http://localhost:8100/", editRecipeNode.getRecipeID(), 
-														   editRecipeNode.getRecipeTitle(), 
-														   editRecipeNode.getRecipeText());
-		
-		this.updateRecipes();
-		displayHomePage();
+		displaySelector("home");
 	}
 
 	private void onDeleteRequest() {
-		//System.out.println("onGenerateRequest Query: " + this.recipeQuery.getText());
 		System.out.println("Client Delete Recipe: "+currentSelectedRecipeID);
-	
-		RequestHandler req = new RequestHandler();
-		req.performDELETE("http://localhost:8100/", currentSelectedRecipeID);
-		this.recipeQuery.clear();
+		viewModel.performDeleteRequest(currentSelectedRecipeID);
 		this.updateRecipes();
-		displayHomePage();
+		displaySelector("home");
 	}
-
-	private void onRecordRequest() {
-		System.out.println("Recording...");
-		this.audioRecorder.startRecording();
-	}
-
+	
 	private boolean onStopRecordRequest(String requestType) {
 		//Stop Recording
-		this.audioRecorder.stopRecording();
-		System.out.println("Stopped recording.");
+		this.viewModel.stopRecording();
 		//Send Request
 		if(requestType.equals("mealType")){
 			return viewModel.requestMealTypeCheck();
 		}else if(requestType.equals("ingredients")){
 			newlyGeneratedRecipe = viewModel.requestNewRecipe();
+			if (newlyGeneratedRecipe == null) {
+				return false;
+			}
 			return true;
 		}
 		//If valid request, move on, else dont
 		return false;
 	}
+
 	private void updateSelectedRecipeDetails(String recipeText, Integer curID){
 		savedRecipeDescription.setText(recipeText);
 		currentSelectedRecipeID = curID;
 	}
-	
+
+	private void setupEventHandlers() {
+        this.deleteSavedRecipeButton.setOnAction(e -> this.onDeleteRequest());
+        this.startRecording.setOnAction(e -> this.viewModel.startRecording());
+        this.backToHome.setOnAction(e -> displaySelector("home"));
+        this.generateNewRecipe.setOnAction(e -> this.buildRecordMealType());
+        this.editSavedRecipeButton.setOnAction(e -> this.buildEditPage(currentlyEditingRecipe));
+        this.stopRecordingMealType.setOnAction(e -> {
+            if (this.onStopRecordRequest("mealType")){
+                buildRecordIngredients();
+            }else{
+                this.recordMealTypeText.setText(this.recordMealTypeText.getText() + "\nInvalid meal type, please try again.");
+            }
+        });
+        this.stopRecordingIngredients.setOnAction(e -> {
+            if(this.onStopRecordRequest("ingredients")){
+                buildNewlyGeneratedRecipeDisplay();
+            }else{
+                this.recordIngredientsText.setText(this.recordIngredientsText.getText() + "\nInvalid ingredients, please try again.");
+            }
+        });
+        this.newlyGeneratedRecipeSaveButton.setOnAction(e -> {
+            saveRecipe(newlyGeneratedRecipe);
+        });
+        this.editedRecipeSaveButton.setOnAction(e -> {
+            String newRecipeTitle = recipeEditArea.getText().trim().substring(0, recipeEditArea.getText().trim().indexOf("\n"));
+            currentlyEditingRecipe.setRecipeText(recipeEditArea.getText());
+            currentlyEditingRecipe.setRecipeTitle(newRecipeTitle);
+            saveRecipe(currentlyEditingRecipe);
+        });
+		this.filterDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            this.updateRecipes();
+        });
+
+    }
+
+	private void setupSelectionListener(ListView<HBox> sidebar) {
+		sidebar.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue != null) {
+				RecipeNode selected = (RecipeNode)sidebar.getSelectionModel().getSelectedItem();
+				String recipeText = selected.getRecipeText();
+				updateSelectedRecipeDetails(recipeText, selected.getRecipeID());
+				currentlyEditingRecipe = selected;
+				System.out.println("Selected: " + selected.getRecipeTitle());
+			}
+			buildDetailPage();
+		});
+	}
+
+	public BorderPane getRoot() {
+		return this.root;
+	}
 }
