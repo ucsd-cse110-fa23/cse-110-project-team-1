@@ -86,14 +86,13 @@ public class View {
 		this.root = new BorderPane();
         this.root.setPadding(new Insets(SPACING));
 		
+        filterHBox = createFilters();
         setupEventHandlers();
         setupUI();
 		
         currentSelectedRecipeID = -1;
         savedRecipeDescription = new Label("Recipe Description: ...");
 		savedRecipeDescription.setWrapText(true);
-
-        filterHBox = createFilters();
 
         this.updateRecipes();
 	}
@@ -363,12 +362,16 @@ public class View {
             currentlyEditingRecipe.setRecipeTitle(newRecipeTitle);
             saveRecipe(currentlyEditingRecipe);
         });
+		this.filterDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            this.updateRecipes();
+        });
+
     }
 
-	private void setupSelectionListener(ListView<HBox> recipeListView) {
-		recipeListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+	private void setupSelectionListener(ListView<HBox> sidebar) {
+		sidebar.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue != null) {
-				RecipeNode selected = (RecipeNode)recipeListView.getSelectionModel().getSelectedItem();
+				RecipeNode selected = (RecipeNode)sidebar.getSelectionModel().getSelectedItem();
 				String recipeText = selected.getRecipeText();
 				updateSelectedRecipeDetails(recipeText, selected.getRecipeID());
 				currentlyEditingRecipe = selected;
@@ -376,9 +379,6 @@ public class View {
 			}
 			buildDetailPage();
 		});
-        this.filterDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            this.updateRecipes();
-        });
 	}
 
 	public BorderPane getRoot() {
