@@ -25,7 +25,7 @@ public class App extends Application {
 	@Override
 	public void start(Stage primaryStage) throws IOException {
 
-		//GenerateDemoLists.generateAndSaveDemoList(); // enable this to make demo recipe.list
+		//GenerateDemoLists.generateAndSaveDemoList(); enable this to make demo recipe.list
 		server = new RecipeServer();
 		server.startServer();
 

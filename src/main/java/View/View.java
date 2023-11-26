@@ -71,6 +71,7 @@ public class View {
 	private int currentSelectedRecipeID;
 	private RecipeNode newlyGeneratedRecipe;
 	private RecipeNode currentlyEditingRecipe;
+	private User user;
 
 	private static final boolean ADD_BACK_BUTTON = true;
 	private static final boolean DONT_ADD_BACK_BUTTON = false;
@@ -104,7 +105,7 @@ public class View {
 	public void updateRecipes() {
 		System.out.println("Updating Recipes");
         ListView<HBox> sidebar = new ListView<HBox>();
-        ListView<HBox> allRecipes = viewModel.pullRecipes();
+        ListView<HBox> allRecipes = viewModel.pullRecipes(user);
         String filter = filterDropdown.getValue();
         for(HBox h : allRecipes.getItems()) {
             // If recipe's meal type is the same as the filter,
@@ -299,14 +300,14 @@ public class View {
 	}
 
 	private void saveRecipe(RecipeNode recipeNode){
-		viewModel.performPutRequest(recipeNode);
+		viewModel.performPutRequest(recipeNode,user);
 		this.updateRecipes();
 		displaySelector("home");
 	}
 
 	private void onDeleteRequest() {
 		System.out.println("Client Delete Recipe: "+currentSelectedRecipeID);
-		viewModel.performDeleteRequest(currentSelectedRecipeID);
+		viewModel.performDeleteRequest(currentSelectedRecipeID,user);
 		this.updateRecipes();
 		displaySelector("home");
 	}
@@ -316,9 +317,9 @@ public class View {
 		this.viewModel.stopRecording();
 		//Send Request
 		if(requestType.equals("mealType")){
-			return viewModel.requestMealTypeCheck();
+			return viewModel.requestMealTypeCheck(user);
 		}else if(requestType.equals("ingredients")){
-			newlyGeneratedRecipe = viewModel.requestNewRecipe();
+			newlyGeneratedRecipe = viewModel.requestNewRecipe(user);
 			if (newlyGeneratedRecipe == null) {
 				return false;
 			}

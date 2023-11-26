@@ -35,10 +35,10 @@ public class ViewModel {
 		newlyValidatedMealType = "";
 	}
 	
-	public ListView<HBox> pullRecipes(){
+	public ListView<HBox> pullRecipes(User user){
 		try {
 			String allRecipes;
-			allRecipes = req.performGET(server_url+"?all");
+			allRecipes = req.performGET(server_url+"?all", user);
 			JSONArray allRec = new JSONArray(allRecipes);
 			return createRecipeListView(allRec);
 		} catch (IOException e) {
@@ -60,10 +60,10 @@ public class ViewModel {
 		return false;
 	}
 
-	public RecipeNode requestNewRecipe() {
+	public RecipeNode requestNewRecipe(User user) {
 		String response = "";
 		try {
-			response = req.performPOST(server_url, new File("recording.wav"), "ingredients", newlyValidatedMealType);
+			response = req.performPOST(server_url, new File("recording.wav"), "ingredients", newlyValidatedMealType, user);
 		} catch (IOException e) {
 			ErrorAlert.showError("Unable to contact server to generate new recipe");
 			e.printStackTrace();
@@ -83,10 +83,10 @@ public class ViewModel {
 	}
 	
 	
-	public boolean requestMealTypeCheck() {
+	public boolean requestMealTypeCheck(User user) {
 		String response = "";
         try {
-			response = req.performPOST(server_url, new File("recording.wav"), "mealType", "none");
+			response = req.performPOST(server_url, new File("recording.wav"), "mealType", "none", user);
 			if(validateMealType(response)){
 				newlyValidatedMealType = getMealTypeFromResponse(response);
 				return true;
@@ -99,18 +99,18 @@ public class ViewModel {
         return false;
     }
 
-	public void performPutRequest(RecipeNode recipe){
+	public void performPutRequest(RecipeNode recipe, User user){
         try {
-			req.performPUT(server_url, recipe.getRecipeID(), recipe.getRecipeTitle(), recipe.getRecipeText(), recipe.getMealType());
+			req.performPUT(server_url, recipe.getRecipeID(), recipe.getRecipeTitle(), recipe.getRecipeText(), recipe.getMealType(), user);
 		} catch (IOException e) {
 			ErrorAlert.showError("Unable to contact server to save recipe");
 			e.printStackTrace();
 		}
     }
 
-    public void performDeleteRequest(int recipeId){
+    public void performDeleteRequest(int recipeId, User user){
         try {
-			req.performDELETE(server_url, recipeId);
+			req.performDELETE(server_url, recipeId, user);
 		} catch (IOException e) {
 			ErrorAlert.showError("Unable to contact server to delete recipe");
 			e.printStackTrace();
@@ -146,4 +146,5 @@ public class ViewModel {
 		this.audioRecorder.stopRecording();
 		System.out.println("Stopped recording.");
 	}
+
 }
