@@ -137,6 +137,9 @@ public class View {
 	public void updateRecipes() {
 		System.out.println("Updating Recipes");
 		ListView<HBox> daStuff = viewModel.pullRecipes();
+        
+        // Implement filtering here. Should simply remove filtered Recipes from list.
+
         // for(HBox h : daStuff.getItems()) {
         //     // If recipe's meal type is not what the filter is set as,
         //     // do not show it / remove it from the sidebar.
@@ -145,6 +148,8 @@ public class View {
         //     }
         // }
 		this.recipeTitleListleftVbox = new VBox(10, daStuff);
+        HBox filterContainer = new HBox(10, this.filterDropdown, this.filterButton);
+        this.recipeTitleListleftVbox.getChildren().add(0, filterContainer);
 		VBox.setVgrow(daStuff, Priority.ALWAYS);
 		this.root.setLeft(this.recipeTitleListleftVbox);
 		//Update detail view
