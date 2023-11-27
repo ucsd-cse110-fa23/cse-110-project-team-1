@@ -42,7 +42,11 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
           response = handlePut(httpExchange);
         }else if(method.equals("DELETE")){
           response = handleDelete(httpExchange);
-        }else{
+        }else if(method.equals("CREATE")){
+		  response = handleCreate(httpExchange);
+		}else if(method.equals("LOGIN")){
+		  response = handleLogin(httpExchange);
+		}else{
             throw new Exception("Not Valid Request Method");
         }
       } catch (Exception e) {
@@ -214,6 +218,31 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
 	  }
 	  return response;
   }
+
+  private String handleCreate(HttpExchange httpExchange) {
+	  Headers headers = httpExchange.getRequestHeaders();
+	  String username = headers.getFirst("Username");
+	  String password = headers.getFirst("Password");
+  
+	  int userID = accountManager.addUser(username, password);
+	  if (userID == -1) {
+		  return "Username already exists. Please choose a different username.";
+	  } else {
+		  return "Account created successfully. Your user ID is " + userID;
+	  }
+  }
+
+  private String handleLogin(HttpExchange httpExchange) {
+    Headers headers = httpExchange.getRequestHeaders();
+    String username = headers.getFirst("Username");
+    String password = headers.getFirst("Password");
+
+    if (accountManager.verifyAccount(username, password)) {
+        return "Login successful";
+    } else {
+        return "Invalid username or password";
+    }
+}
 
   private Integer verifyUserAndGetID(HttpExchange httpExchange) {
       Headers headers = httpExchange.getRequestHeaders();
