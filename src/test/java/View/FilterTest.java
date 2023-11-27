@@ -34,7 +34,7 @@ public class FilterTest{
 
     @Test
     void testBreakfast(){
-        Platform.startup(() -> {});
+        // Platform.startup(() -> {});
         RecipeServerInterface server = new MockRecipeServer();
         try {
             server.startServer();
