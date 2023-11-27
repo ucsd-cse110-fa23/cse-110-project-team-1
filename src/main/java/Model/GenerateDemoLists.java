@@ -43,18 +43,18 @@ public class GenerateDemoLists {
         String recipe12Title = "BBQ Chicken with Rice";
         String recipe12Text = "BBQ Chicken with Rice\n\nIngredients:\nCanned Chicken\nRice\nBBQ Sauce\n\nInstructions:\nStep 1: Heat the canned chicken in a pan with BBQ sauce.\nStep 2: Serve the BBQ chicken over cooked rice.\n";
     
-        recipeList.addRecipe(recipe1Title, recipe1Text, "lunch");
+        recipeList.addRecipe(recipe1Title, recipe1Text, "breakfast");
         recipeList.addRecipe(recipe2Title, recipe2Text, "lunch");
-        recipeList.addRecipe(recipe3Title, recipe3Text, "lunch");
+        recipeList.addRecipe(recipe3Title, recipe3Text, "dinner");
         recipeList.addRecipe(recipe4Title, recipe4Text, "lunch");
-        recipeList.addRecipe(recipe5Title, recipe5Text, "lunch");
-        recipeList.addRecipe(recipe6Title, recipe6Text, "lunch");
-        recipeList.addRecipe(recipe7Title, recipe7Text, "lunch");
+        recipeList.addRecipe(recipe5Title, recipe5Text, "dinner");
+        recipeList.addRecipe(recipe6Title, recipe6Text, "dinner");
+        recipeList.addRecipe(recipe7Title, recipe7Text, "breakfast");
         recipeList.addRecipe(recipe8Title, recipe8Text, "lunch");
-        recipeList.addRecipe(recipe9Title, recipe9Text, "lunch");
+        recipeList.addRecipe(recipe9Title, recipe9Text, "breakfast");
         recipeList.addRecipe(recipe10Title, recipe10Text, "lunch");
-        recipeList.addRecipe(recipe11Title, recipe11Text, "lunch");
-        recipeList.addRecipe(recipe12Title, recipe12Text, "lunch");
+        recipeList.addRecipe(recipe11Title, recipe11Text, "breakfast");
+        recipeList.addRecipe(recipe12Title, recipe12Text, "dinner");
 
         recipeList.saveToDisk();
 
