@@ -126,6 +126,34 @@ public class RequestHandler {
         return content;
     }
 
+    /**
+     * Attempts to log in a user.
+     *
+     * @param url The URL of the server
+     * @param user The user to log in.
+     * @return true if login is successful, false otherwise.
+     * @throws IOException If an I/O error occurs with the connection.
+     */
+    public boolean performLogin(String urlString,User user) throws IOException {
+        HttpURLConnection conn = setupConnection(urlString, "LOGIN", user);
+        String response = getResponse(conn);
+        return response.equals("Login successful");
+    }
+
+    /**
+     * Attempts to create a new user account.
+     *     
+     * @param url The URL of the server
+     * @param user The user to create an account for.
+     * @return true if account creation is successful, false otherwise.
+     * @throws IOException If an I/O error occurs with the connection.
+     */    
+    public boolean performAccountCreation(String urlString,User user) throws IOException {
+        HttpURLConnection conn = setupConnection(urlString, "CREATE", user);
+        String response = getResponse(conn);
+        return response.startsWith("Account created successfully");
+    }
+
     private HttpURLConnection setupConnection(String urlString, String method, User user) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
