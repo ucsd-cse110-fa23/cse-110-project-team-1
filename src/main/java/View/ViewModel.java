@@ -12,6 +12,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 
+import java.io.BufferedReader;
+import java.io.*;
+import java.io.IOException;
+
 
 public class ViewModel {
 	private static final String DINNER = "dinner";
@@ -22,23 +26,29 @@ public class ViewModel {
 	private String server_url;
 	private RequestHandler req;
 	private AudioRecorder audioRecorder;
+	private String savedLoginFileName;
 
 
 	/*
 	* Pulls recipies from server url passed in
 	* Returns a Listview of Recipes in order from newest to oldest
 	*/
-	public ViewModel(RequestHandler req, String server_url, AudioRecorder audioRecorder){
+	public ViewModel(RequestHandler req, String server_url, AudioRecorder audioRecorder, String savedLoginFileName){
 		this.req = req;
 		this.server_url = server_url;
 		this.audioRecorder = audioRecorder;
 		newlyValidatedMealType = "";
+		this.savedLoginFileName = savedLoginFileName;
 	}
 	
-	public ListView<HBox> pullRecipes(User user){
+	public ListView<HBox> pullRecipes(User user) throws Exception{
 		try {
 			String allRecipes;
 			allRecipes = req.performGET(server_url+"?all", user);
+			if(allRecipes.contains("Invalid username")){
+				ErrorAlert.showError("Invalid username or password");
+				throw new Exception("Invalid username or password");
+			}
 			JSONArray allRec = new JSONArray(allRecipes);
 			return createRecipeListView(allRec);
 		} catch (IOException e) {
@@ -146,5 +156,92 @@ public class ViewModel {
 		this.audioRecorder.stopRecording();
 		System.out.println("Stopped recording.");
 	}
+	
+	public User getSavedUser() {
+		String csvFile = savedLoginFileName;
+		File file = new File(csvFile);
+		if (!file.exists()) {
+			return null;
+		}
+	
+		String line = "";
+		String cvsSplitBy = ",";
+	
+		try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+			while ((line = br.readLine()) != null) {
+				// Check if line is not empty and contains a comma
+				if (!line.isEmpty() && line.contains(cvsSplitBy)) {
+					// use comma as separator
+					String[] userInfo = line.split(cvsSplitBy);
+	
+					String username = userInfo[0];
+					String password = userInfo[1];
+	
+					return new User(username, password);
+				}
+			}
+		} catch (IOException e) {
+			if (!file.exists()) {
+				file.delete();
+			}
+		}
+	
+		return null;
+	}
+
+	public void saveUserLogin(String username, String password) {
+		if (!isValidUserInfo(username, password)) {
+			return;
+		}
+		String csvFile = savedLoginFileName;
+		try {
+			FileWriter writer = new FileWriter(csvFile);
+			writer.append(username);
+			writer.append(",");
+			writer.append(password);
+			writer.append("\n");
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			System.out.println("Error writing to file: " + e.getMessage());
+		}
+	}
+
+	public boolean handleLogin(String username, String password) {
+		if (!isValidUserInfo(username, password)) {
+			return false;
+		}
+		User user = new User(username, password);
+		try {
+			return req.performLogin(server_url, user);
+		} catch (IOException e) {
+			return false;
+		}
+	}
+	
+	public boolean createAccount(String username, String password) {
+		if (!isValidUserInfo(username, password)) {
+			return false;
+		}
+		User newUser = new User(username, password);
+		try {
+			return req.performAccountCreation(server_url, newUser);
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
+	public void handleLogout() {
+		String csvFile = savedLoginFileName;
+		File file = new File(csvFile);
+		if (file.exists()) {
+			file.delete();
+		}
+	}
+
+	private boolean isValidUserInfo(String username, String password) {
+		return !(username.isEmpty() || password.isEmpty());
+	}
+
 
 }

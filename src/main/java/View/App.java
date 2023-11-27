@@ -30,7 +30,7 @@ public class App extends Application {
 		server.startServer();
 
 		AudioRecorder audioRecorder = new AudioRecorder();
-		ViewModel viewModel = new ViewModel(new RequestHandler(), "http://localhost:8100/", audioRecorder);
+		ViewModel viewModel = new ViewModel(new RequestHandler(), "http://localhost:8100/", audioRecorder,"savedLogin.csv");
 		View view = new View(viewModel);
 
 		//Just a test for sending files
