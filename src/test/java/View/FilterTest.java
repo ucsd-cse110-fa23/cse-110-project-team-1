@@ -22,12 +22,12 @@ public class FilterTest {
     
     @BeforeEach
     void setUp(){
-        Platform.startup(() -> {});
         GenerateDemoLists.generateAndSaveDemoList();
     }
-
+    
     @Test 
     void testBreakfast(){
+        Platform.startup(() -> {});
         RecipeServerInterface server = new MockRecipeServer();
         try {
             server.startServer();
@@ -53,9 +53,10 @@ public class FilterTest {
             e.printStackTrace();
         }
     }
-
+    
     @Test 
     void testAll(){
+        Platform.startup(() -> {});
         RecipeServerInterface server = new MockRecipeServer();
         try {
             server.startServer();
