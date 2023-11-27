@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +24,12 @@ public class FilterTest{
     @BeforeEach
     void setUp(){
         GenerateDemoLists.generateAndSaveDemoList();
+    }
+
+    @AfterEach
+    void cleanUp(){
+        File demoFile = new File("demo1.list");
+        demoFile.delete();
     }
 
     @Test
@@ -47,16 +54,15 @@ public class FilterTest{
                 assertTrue(((RecipeNode)h).toJson().getString("mealType").equalsIgnoreCase(filter));
             }
             server.stopServer();
-            File demoFile = new File("demo1.list");
-            demoFile.delete();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Platform.exit();
     }
     
     @Test 
     void testAll(){
-        // Platform.startup(() -> {});
+        Platform.startup(() -> {});
         RecipeServerInterface server = new MockRecipeServer();
         try {
             server.startServer();
@@ -78,11 +84,10 @@ public class FilterTest{
             }
             assertEquals(12, recipeCounter);
             server.stopServer();
-            File demoFile = new File("demo1.list");
-            demoFile.delete();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Platform.exit();
     }
 
 }
