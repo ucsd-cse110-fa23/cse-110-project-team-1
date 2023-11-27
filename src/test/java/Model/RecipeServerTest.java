@@ -25,7 +25,7 @@ public class RecipeServerTest{
             server.renameServer("src/test/lists/testServerReadsExistingList");
             server.loadServer();
             RequestHandler req = new RequestHandler();
-            String content = req.performGET("http://localhost:8100/?all", new User(1, "username", "password"));
+            String content = req.performGET("http://localhost:8100/?all", new User("username", "password"));
             assertEquals("[{\"recipeTitle\":\"Recipe1\",\"recipeText\":\"RecipeText1\",\"mealType\":\"lunch\",\"ownerID\":1,\"recipeID\":1}]",content);
             server.stopServer();
         } catch (IOException e) {
@@ -54,7 +54,7 @@ public class RecipeServerTest{
             server.renameServer("src/test/lists/empty");
             server.loadServer();
             RequestHandler req = new RequestHandler();
-            String content = req.performGET("http://localhost:8100/?all", new User(1, "username", "password"));
+            String content = req.performGET("http://localhost:8100/?all", new User("username", "password"));
     
             assertEquals("[]",content);
             server.stopServer();
