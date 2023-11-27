@@ -115,7 +115,13 @@ public class View {
 	}
 
 	private void setupUI() {
-        this.buildLoginPage();
+		User loggedInUser = viewModel.getSavedUser();
+		if(loggedInUser != null){
+			this.user = loggedInUser;
+			buildHomePage();
+		}else{
+			buildLoginPage();
+		}
     }
 
 	public void updateRecipes() {
