@@ -119,6 +119,7 @@ public class View {
 		if(loggedInUser != null){
 			this.user = loggedInUser;
 			buildHomePage();
+			updateRecipes();
 		}else{
 			buildLoginPage();
 		}
@@ -262,16 +263,21 @@ public class View {
 	}
 
 	private void buildLoginPage() {
+		Label welcomeMessage = new Label("Welcome to Pantry Pal");
+		welcomeMessage.setWrapText(true);
+
 		usernameField = new TextField();
 		usernameField.setPromptText("Username");
+		usernameField.setMaxWidth(400);
 	
 		passwordField = new TextField();
 		passwordField.setPromptText("Password");
+		passwordField.setMaxWidth(400);
 
-		CheckBox autoLoginCheckbox = new CheckBox("Remember me");
+		autoLoginCheckbox = new CheckBox("Remember me");
 
 	
-		this.loginVbox = buildPage(null, 0, NO_TEXT, NO_MIN_HEIGHT, Pos.CENTER, usernameField, passwordField, autoLoginCheckbox, login, createAccount);
+		this.loginVbox = buildPage(null, 0, NO_TEXT, NO_MIN_HEIGHT, Pos.CENTER, welcomeMessage, usernameField, passwordField, autoLoginCheckbox, login, createAccount);
 		displaySelector("login");
 	}	
 
@@ -336,6 +342,7 @@ public class View {
 				break;
 			case "login":
 				displayPage(this.loginVbox, "Displaying Login Page", DONT_ADD_BACK_BUTTON);
+				this.root.setLeft(null);
 				break;
 			default:
 				System.out.println("Invalid page type: " + pageType);
@@ -381,7 +388,10 @@ public class View {
 	private void setupEventHandlers() {
         this.deleteSavedRecipeButton.setOnAction(e -> this.onDeleteRequest());
         this.startRecording.setOnAction(e -> this.viewModel.startRecording());
-        this.backToHome.setOnAction(e -> displaySelector("home"));
+        this.backToHome.setOnAction(e -> {
+			((ListView<HBox>)this.recipeTitleListleftVbox.getChildren().get(1)).getSelectionModel().clearSelection();
+			displaySelector("home");}
+			);
         this.generateNewRecipe.setOnAction(e -> this.buildRecordMealType());
         this.editSavedRecipeButton.setOnAction(e -> this.buildEditPage(currentlyEditingRecipe));
         this.stopRecordingMealType.setOnAction(e -> {
@@ -420,6 +430,8 @@ public class View {
 				}
 				this.user = new User(username,password);
 				buildHomePage();
+				updateRecipes();
+
 			} else {
 				ErrorAlert.showError("Invalid username or password");
 			}
@@ -427,15 +439,18 @@ public class View {
 		this.createAccount.setOnAction(e -> {
 			String username = usernameField.getText();
 			String password = passwordField.getText();
+			System.out.println("Create Account Button Pushed");
 			boolean accountCreated = viewModel.createAccount(username, password);
+			System.out.println("Account Created: " + accountCreated);
 			if (accountCreated) {
 				if (autoLoginCheckbox.isSelected()) {
 					viewModel.saveUserLogin(username, password);
 				}
 				this.user = new User(username,password);
 				buildHomePage();
+				updateRecipes();
 			} else {
-				ErrorAlert.showError("Invalid username or password");
+				ErrorAlert.showError("Invalid username or password when creating account");
 			}
 		});
 		this.logout.setOnAction(e -> {
