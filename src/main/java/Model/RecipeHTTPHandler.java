@@ -32,6 +32,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
  public void handle(HttpExchange httpExchange) throws IOException {
     String response = "Request Received";
     String method = httpExchange.getRequestMethod();
+	//System.out.println("Request recieved " + method);
     
     try {
         if (method.equals("GET")) {
@@ -42,11 +43,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
           response = handlePut(httpExchange);
         }else if(method.equals("DELETE")){
           response = handleDelete(httpExchange);
-        }else if(method.equals("CREATE")){
-		  response = handleCreate(httpExchange);
-		}else if(method.equals("LOGIN")){
-		  response = handleLogin(httpExchange);
-		}else{
+        }else{
             throw new Exception("Not Valid Request Method");
         }
       } catch (Exception e) {
@@ -54,7 +51,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
         response = e.toString();
         e.printStackTrace();
       }
-
+	  //System.out.println("Server Sending: " + response);
     //Sending back response to the client
     httpExchange.sendResponseHeaders(200, response.length());
     OutputStream outStream = httpExchange.getResponseBody();
@@ -111,6 +108,17 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
 		String saveDirectory = "src/main/RecievedMedia/";
 		String response = "Invalid POST request";
 
+		// Check for login/ account handling request
+		if(headers.containsKey("UserHandling")){
+			String handleType = headers.get("UserHandling").get(0);		
+			if(handleType.equals("CREATE")){
+				response = handleCreate(httpExchange);
+			}else if(handleType.equals("LOGIN")){
+				response = handleLogin(httpExchange);
+			}
+			return response;
+		}
+
 		try (InputStream in = httpExchange.getRequestBody();
 				OutputStream out = new FileOutputStream(saveDirectory + audioType + ".wav")) {
 			// this is a fix for reading single bytes at a time
@@ -160,7 +168,9 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
 		} else {
 			response = "Invalid username or password";
 		}
-		return response;
+		//this replace makes sure no wierd control characters in the json
+		//https://stackoverflow.com/questions/14028716/how-to-remove-control-characters-from-java-string
+		return response.replaceAll("\\p{Cntrl}", ""); 
 	}
 
 	/*
@@ -223,7 +233,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
 	  Headers headers = httpExchange.getRequestHeaders();
 	  String username = headers.getFirst("Username");
 	  String password = headers.getFirst("Password");
-  
+		System.out.println("Handling Create");
 	  int userID = accountManager.addUser(username, password);
 	  if (userID == -1) {
 		  return "Username already exists. Please choose a different username.";

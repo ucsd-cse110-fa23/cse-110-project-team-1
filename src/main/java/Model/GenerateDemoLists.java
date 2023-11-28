@@ -58,5 +58,12 @@ public class GenerateDemoLists {
 
         recipeList.saveToDisk();
 
+        RecipeList recipeList2 = new RecipeList("demo2");
+
+        recipeList2.addRecipe(recipe1Title, recipe1Text, "breakfast",4);
+        recipeList2.addRecipe(recipe2Title, recipe2Text, "lunch",4);
+        recipeList2.addRecipe(recipe3Title, recipe3Text, "dinner",4);
+        
+        recipeList2.saveToDisk();
     }
 }

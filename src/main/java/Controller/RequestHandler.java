@@ -135,8 +135,11 @@ public class RequestHandler {
      * @throws IOException If an I/O error occurs with the connection.
      */
     public boolean performLogin(String urlString,User user) throws IOException {
-        HttpURLConnection conn = setupConnection(urlString, "LOGIN", user);
+        HttpURLConnection conn = setupConnection(urlString, "POST", user);
+        conn.setRequestProperty("UserHandling", "LOGIN");
         String response = getResponse(conn);
+        System.out.println("Performing Login");
+        System.out.println("Server Response Recieved: " + response);
         return response.equals("Login successful");
     }
 
@@ -149,8 +152,12 @@ public class RequestHandler {
      * @throws IOException If an I/O error occurs with the connection.
      */    
     public boolean performAccountCreation(String urlString,User user) throws IOException {
-        HttpURLConnection conn = setupConnection(urlString, "CREATE", user);
+        HttpURLConnection conn = setupConnection(urlString, "POST", user);
+        conn.setRequestProperty("UserHandling", "CREATE");
+
         String response = getResponse(conn);
+        System.out.println("Performing Account Create");
+        //System.out.println("Server Response Recieved: " + response);
         return response.startsWith("Account created successfully");
     }
 
@@ -173,8 +180,8 @@ public class RequestHandler {
     
     private String getResponse(HttpURLConnection conn) throws IOException {
         BufferedReader in;
-        System.out.println("Response Code: " + conn.getResponseCode());
-        System.out.println("Response Message: " + conn.getResponseMessage());
+        //System.out.println("Response Code: " + conn.getResponseCode());
+        //System.out.println("Response Message: " + conn.getResponseMessage());
         if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
             in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
         } else {

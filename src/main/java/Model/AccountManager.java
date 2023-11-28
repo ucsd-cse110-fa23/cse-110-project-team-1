@@ -18,6 +18,7 @@ public class AccountManager {
     public synchronized int addUser(String username, String password) {
         for (UserAccount user : userAccounts.values()) {
             if (user.getUsername().equals(username)) {
+                System.out.println("Failed to create user " + username + ":" + password);
                 return -1;
             }
         }
@@ -55,7 +56,7 @@ public class AccountManager {
     public synchronized boolean verifyAccount(String username, String password) {
         for (UserAccount user : userAccounts.values()) {
             if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
-                System.out.println("Verified username: " + username + " password: " + password);
+                System.out.println("Verified user: " + username);
                 return true;
             }
         }
@@ -81,8 +82,9 @@ public class AccountManager {
         }
     
         try (BufferedReader br = new BufferedReader(new FileReader(csvFilePath))) {
+            System.out.println("Reading Saved Users");
             while ((line = br.readLine()) != null) {
-                System.out.println("Read:\"" + line + "\"");
+                //System.out.println("Read:\"" + line + "\"");
                 // use comma as separator
                 String[] user = line.split(csvSplitBy);
 
