@@ -226,7 +226,7 @@ public class View {
 		this.homePageTextSubheader.setWrapText(true);
 
 		StackPane centeringPane = new StackPane();
-		this.homePageVbox = buildPage(null, 0, NO_TEXT, NO_MIN_HEIGHT, Pos.CENTER, this.homePageTextHeader, this.homePageTextSubheader, this.generateNewRecipe);
+		this.homePageVbox = buildPage(null, 0, NO_TEXT, NO_MIN_HEIGHT, Pos.CENTER, this.homePageTextHeader, this.homePageTextSubheader, this.generateNewRecipe, this.logout);
 
 		VBox.setVgrow(this.homePageVbox, Priority.ALWAYS);
 		centeringPane.getChildren().add(this.homePageVbox);
@@ -271,7 +271,7 @@ public class View {
 		CheckBox autoLoginCheckbox = new CheckBox("Remember me");
 
 	
-		this.loginVbox = buildPage(null, 0, NO_TEXT, NO_MIN_HEIGHT, Pos.CENTER, usernameField, passwordField, login, createAccount);
+		this.loginVbox = buildPage(null, 0, NO_TEXT, NO_MIN_HEIGHT, Pos.CENTER, usernameField, passwordField, autoLoginCheckbox, login, createAccount);
 		displaySelector("login");
 	}	
 
