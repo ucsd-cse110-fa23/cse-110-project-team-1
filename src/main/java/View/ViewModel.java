@@ -1,8 +1,5 @@
 package View;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,9 +9,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 
-import java.io.BufferedReader;
 import java.io.*;
-import java.io.IOException;
+
+import javafx.geometry.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
+import javafx.scene.layout.CornerRadii;
 
 
 public class ViewModel {
@@ -46,7 +47,7 @@ public class ViewModel {
 			String allRecipes;
 			allRecipes = req.performGET(server_url+"?all", user);
 			if(allRecipes.contains("Invalid username")){
-				ErrorAlert.showError("Invalid username or password");
+				ErrorAlert.showError("Invalid username or password when pulling recipes");
 				throw new Exception("Invalid username or password");
 			}
 			JSONArray allRec = new JSONArray(allRecipes);
@@ -176,7 +177,10 @@ public class ViewModel {
 	
 					String username = userInfo[0];
 					String password = userInfo[1];
-	
+					if(!isValidUserInfo(username,password)){
+						return null;
+					}
+					System.out.println("Read Saved User Login");
 					return new User(username, password);
 				}
 			}
@@ -202,6 +206,7 @@ public class ViewModel {
 			writer.append("\n");
 			writer.flush();
 			writer.close();
+			System.out.println("Saved User Login");
 		} catch (IOException e) {
 			System.out.println("Error writing to file: " + e.getMessage());
 		}
@@ -213,6 +218,7 @@ public class ViewModel {
 		}
 		User user = new User(username, password);
 		try {
+			System.out.println("Sending Login Request");
 			return req.performLogin(server_url, user);
 		} catch (IOException e) {
 			return false;
@@ -225,6 +231,7 @@ public class ViewModel {
 		}
 		User newUser = new User(username, password);
 		try {
+			System.out.println("Sending Create Account Request");
 			return req.performAccountCreation(server_url, newUser);
 		} catch (IOException e) {
 			return false;
@@ -235,11 +242,13 @@ public class ViewModel {
 		String csvFile = savedLoginFileName;
 		File file = new File(csvFile);
 		if (file.exists()) {
+			System.out.println("Logged Out ");
 			file.delete();
 		}
 	}
 
 	private boolean isValidUserInfo(String username, String password) {
+		//System.out.println("Checking user info ["+ username + ":" + password + "] " + !(username.isEmpty() || password.isEmpty()));
 		return !(username.isEmpty() || password.isEmpty());
 	}
 
