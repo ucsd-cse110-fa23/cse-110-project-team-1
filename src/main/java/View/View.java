@@ -36,6 +36,7 @@ public class View {
 	private Button stopRecordingMealType = new Button("Stop Meal Type Recording");
 	private Button stopRecordingIngredients = new Button("Stop Ingredient Recording");
 	private Button generateNewRecipe = new Button("Generate New Recipe");
+	private Button refreshRecipe = new Button("Refresh Recipe");
 	private Button login = new Button("Login");
 	private Button createAccount = new Button("Create Account");
 	private Button logout = new Button("Logout");
@@ -215,7 +216,7 @@ public class View {
 
 	private void buildNewlyGeneratedRecipeDisplay(){
 		savedRecipeDescription.setText(newlyGeneratedRecipe.getRecipeText());
-		HBox buttons = new HBox(backToHome, newlyGeneratedRecipeSaveButton);
+		HBox buttons = new HBox(backToHome, newlyGeneratedRecipeSaveButton, refreshRecipe);
 		this.newlyGeneratedRecipeDisplayVbox = buildPage(savedRecipeDescription, 0, TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, buttons);
 		displaySelector("newlyGeneratedRecipeDisplay");
 		
@@ -422,6 +423,10 @@ public class View {
 		this.filterDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             this.updateRecipes();
         });
+		this.refreshRecipe.setOnAction(e -> {
+			onStopRecordRequest("ingredients");
+			buildNewlyGeneratedRecipeDisplay();
+		});
 		this.login.setOnAction(e -> {
 			String username = usernameField.getText();
 			String password = passwordField.getText();
