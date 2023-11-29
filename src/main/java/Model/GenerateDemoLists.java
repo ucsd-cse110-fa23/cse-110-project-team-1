@@ -45,7 +45,6 @@ public class GenerateDemoLists {
     
         String recipe12Title = "BBQ Chicken with Rice";
         String recipe12Text = "BBQ Chicken with Rice\n\nIngredients:\nCanned Chicken\nRice\nBBQ Sauce\n\nInstructions:\nStep 1: Heat the canned chicken in a pan with BBQ sauce.\nStep 2: Serve the BBQ chicken over cooked rice.\n";
-    
 
         recipeList.addRecipe(recipe1Title, recipe1Text, "lunch",1);
         recipeList.addRecipe(recipe2Title, recipe2Text, "lunch",1);

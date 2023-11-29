@@ -86,6 +86,7 @@ public class View {
 	//private Label newlyGeneratedRecipeLabel;
 
 	private int currentSelectedRecipeID;
+	private RecipeNode currentSelectedRecipe;
 	private RecipeNode newlyGeneratedRecipe;
 	private RecipeNode currentlyEditingRecipe;
 	private User user;
@@ -205,9 +206,10 @@ public class View {
 
 	private void buildDetailPage(){
 		HBox buttons = new HBox(backToHome, editSavedRecipeButton, deleteSavedRecipeButton);
+		Label detailMealtype = new Label("Meal Type: " + currentSelectedRecipe.getMealType());
 		ScrollPane descriptionScrollBox = new ScrollPane(savedRecipeDescription);
 		descriptionScrollBox.setStyle("-fx-background-color:transparent;");
-		this.savedRecipeDetailVbox = buildPage(descriptionScrollBox, 0, TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, buttons);
+		this.savedRecipeDetailVbox = buildPage(null, 0, NO_TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, detailMealtype ,descriptionScrollBox ,buttons);
 		displaySelector("recipeDetails");
 	}
 
@@ -465,6 +467,7 @@ public class View {
 		sidebar.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue != null) {
 				RecipeNode selected = (RecipeNode)sidebar.getSelectionModel().getSelectedItem();
+				currentSelectedRecipe = selected;
 				String recipeText = selected.getRecipeText();
 				updateSelectedRecipeDetails(recipeText, selected.getRecipeID());
 				currentlyEditingRecipe = selected;

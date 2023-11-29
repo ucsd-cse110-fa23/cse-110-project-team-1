@@ -5,9 +5,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import Controller.RequestHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 
 import java.io.*;
 
@@ -142,7 +148,20 @@ public class ViewModel {
 		for (int i = 0; i < allRec.length(); i++) {
 			JSONObject r = allRec.getJSONObject(i);
 			RecipeNode newRecipe = RecipeNode.jsonToRecipeNode(r);
-			newRecipe.getChildren().addAll(new Label(newRecipe.getRecipeTitle()));
+			
+// Setup title and mealtype labels for sidebar
+			Label recipeTitle = new Label(newRecipe.getRecipeTitle());
+			Label mealType = new Label(newRecipe.getMealType());
+			BackgroundFill background_fill = new BackgroundFill(getMealTypeColor(mealType.getText()), CornerRadii.EMPTY, Insets.EMPTY);
+			Background background = new Background(background_fill);
+			mealType.setBackground(background);
+			// Setting padding width and alignment
+			mealType.setPadding(new Insets(0,3,0,3));
+			recipeTitle.setPadding(new Insets(0,0,0,10));
+			mealType.setMinWidth(55);
+			mealType.setAlignment(Pos.CENTER);
+
+			newRecipe.getChildren().addAll(mealType, recipeTitle);
 			listView.getItems().add(0,newRecipe);
 		}
 		return listView;
@@ -156,6 +175,19 @@ public class ViewModel {
 	public void stopRecording() {
 		this.audioRecorder.stopRecording();
 		System.out.println("Stopped recording.");
+	}
+
+	private Color getMealTypeColor(String mealType) {
+		switch (mealType.toLowerCase()) {
+			case BREAKFAST:
+				return Color.rgb(230, 237, 138); // yellowish
+			case LUNCH:
+				return Color.rgb(145, 237, 138); // greenish
+			case DINNER:
+				return Color.rgb(237, 138, 146); // redish
+			default:
+				return Color.TRANSPARENT;
+		}
 	}
 	
 	public User getSavedUser() {
