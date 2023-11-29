@@ -1,8 +1,5 @@
 package View;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +8,14 @@ import Controller.RequestHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
+
+import java.io.*;
+
+import javafx.geometry.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.paint.Color;
+import javafx.scene.layout.CornerRadii;
 
 
 public class ViewModel {
@@ -22,23 +27,29 @@ public class ViewModel {
 	private String server_url;
 	private RequestHandler req;
 	private AudioRecorder audioRecorder;
+	private String savedLoginFileName;
 
 
 	/*
 	* Pulls recipies from server url passed in
 	* Returns a Listview of Recipes in order from newest to oldest
 	*/
-	public ViewModel(RequestHandler req, String server_url, AudioRecorder audioRecorder){
+	public ViewModel(RequestHandler req, String server_url, AudioRecorder audioRecorder, String savedLoginFileName){
 		this.req = req;
 		this.server_url = server_url;
 		this.audioRecorder = audioRecorder;
 		newlyValidatedMealType = "";
+		this.savedLoginFileName = savedLoginFileName;
 	}
 	
-	public ListView<HBox> pullRecipes(){
+	public ListView<HBox> pullRecipes(User user) throws Exception{
 		try {
 			String allRecipes;
-			allRecipes = req.performGET(server_url+"?all");
+			allRecipes = req.performGET(server_url+"?all", user);
+			if(allRecipes.contains("Invalid username")){
+				ErrorAlert.showError("Invalid username or password when pulling recipes");
+				throw new Exception("Invalid username or password");
+			}
 			JSONArray allRec = new JSONArray(allRecipes);
 			return createRecipeListView(allRec);
 		} catch (IOException e) {
@@ -60,10 +71,10 @@ public class ViewModel {
 		return false;
 	}
 
-	public RecipeNode requestNewRecipe() {
+	public RecipeNode requestNewRecipe(User user) {
 		String response = "";
 		try {
-			response = req.performPOST(server_url, new File("recording.wav"), "ingredients", newlyValidatedMealType);
+			response = req.performPOST(server_url, new File("recording.wav"), "ingredients", newlyValidatedMealType, user);
 		} catch (IOException e) {
 			ErrorAlert.showError("Unable to contact server to generate new recipe");
 			e.printStackTrace();
@@ -83,10 +94,10 @@ public class ViewModel {
 	}
 	
 	
-	public boolean requestMealTypeCheck() {
+	public boolean requestMealTypeCheck(User user) {
 		String response = "";
         try {
-			response = req.performPOST(server_url, new File("recording.wav"), "mealType", "none");
+			response = req.performPOST(server_url, new File("recording.wav"), "mealType", "none", user);
 			if(validateMealType(response)){
 				newlyValidatedMealType = getMealTypeFromResponse(response);
 				return true;
@@ -99,18 +110,18 @@ public class ViewModel {
         return false;
     }
 
-	public void performPutRequest(RecipeNode recipe){
+	public void performPutRequest(RecipeNode recipe, User user){
         try {
-			req.performPUT(server_url, recipe.getRecipeID(), recipe.getRecipeTitle(), recipe.getRecipeText(), recipe.getMealType());
+			req.performPUT(server_url, recipe.getRecipeID(), recipe.getRecipeTitle(), recipe.getRecipeText(), recipe.getMealType(), user);
 		} catch (IOException e) {
 			ErrorAlert.showError("Unable to contact server to save recipe");
 			e.printStackTrace();
 		}
     }
 
-    public void performDeleteRequest(int recipeId){
+    public void performDeleteRequest(int recipeId, User user){
         try {
-			req.performDELETE(server_url, recipeId);
+			req.performDELETE(server_url, recipeId, user);
 		} catch (IOException e) {
 			ErrorAlert.showError("Unable to contact server to delete recipe");
 			e.printStackTrace();
@@ -146,4 +157,100 @@ public class ViewModel {
 		this.audioRecorder.stopRecording();
 		System.out.println("Stopped recording.");
 	}
+	
+	public User getSavedUser() {
+		String csvFile = savedLoginFileName;
+		File file = new File(csvFile);
+		if (!file.exists()) {
+			return null;
+		}
+	
+		String line = "";
+		String cvsSplitBy = ",";
+	
+		try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+			while ((line = br.readLine()) != null) {
+				// Check if line is not empty and contains a comma
+				if (!line.isEmpty() && line.contains(cvsSplitBy)) {
+					// use comma as separator
+					String[] userInfo = line.split(cvsSplitBy);
+	
+					String username = userInfo[0];
+					String password = userInfo[1];
+					if(!isValidUserInfo(username,password)){
+						return null;
+					}
+					System.out.println("Read Saved User Login");
+					return new User(username, password);
+				}
+			}
+		} catch (IOException e) {
+			if (!file.exists()) {
+				file.delete();
+			}
+		}
+	
+		return null;
+	}
+
+	public void saveUserLogin(String username, String password) {
+		if (!isValidUserInfo(username, password)) {
+			return;
+		}
+		String csvFile = savedLoginFileName;
+		try {
+			FileWriter writer = new FileWriter(csvFile);
+			writer.append(username);
+			writer.append(",");
+			writer.append(password);
+			writer.append("\n");
+			writer.flush();
+			writer.close();
+			System.out.println("Saved User Login");
+		} catch (IOException e) {
+			System.out.println("Error writing to file: " + e.getMessage());
+		}
+	}
+
+	public boolean handleLogin(String username, String password) {
+		if (!isValidUserInfo(username, password)) {
+			return false;
+		}
+		User user = new User(username, password);
+		try {
+			System.out.println("Sending Login Request");
+			return req.performLogin(server_url, user);
+		} catch (IOException e) {
+			return false;
+		}
+	}
+	
+	public boolean createAccount(String username, String password) {
+		if (!isValidUserInfo(username, password)) {
+			return false;
+		}
+		User newUser = new User(username, password);
+		try {
+			System.out.println("Sending Create Account Request");
+			return req.performAccountCreation(server_url, newUser);
+		} catch (IOException e) {
+			return false;
+		}
+	}
+
+	public void handleLogout() {
+		String csvFile = savedLoginFileName;
+		File file = new File(csvFile);
+		if (file.exists()) {
+			System.out.println("Logged Out ");
+			file.delete();
+		}
+	}
+
+	private boolean isValidUserInfo(String username, String password) {
+		//System.out.println("Checking user info ["+ username + ":" + password + "] " + !(username.isEmpty() || password.isEmpty()));
+		return !(username.isEmpty() || password.isEmpty());
+	}
+
+
 }

@@ -164,9 +164,9 @@ public class RecipeList {
      *
      * @return The ID of the newly added recipe.
      */
-    public int addRecipe(String recipeTitle, String recipeText, String mealType) {
+    public int addRecipe(String recipeTitle, String recipeText, String mealType, int ownerID) {
         int recipeID = ++highestIndex; // increment highestIndex with every new recipe creataed
-        Recipe r = new Recipe(recipeID, recipeTitle, recipeText, mealType);
+        Recipe r = new Recipe(recipeID, recipeTitle, recipeText, mealType, ownerID);
         recipeList.put(recipeID, r);
         //System.out.println("Added " + recipeID);
         saveToDisk();
@@ -182,8 +182,8 @@ public class RecipeList {
      * @return Boolean - Returns true if the recipe was successfully deleted, false
      *         otherwise.
      */
-    public boolean deleteRecipe(int recipeID) {
-        if (recipeList.get(recipeID) != null) {
+    public boolean deleteRecipe(int recipeID, int ownerID) {
+        if (recipeList.get(recipeID) != null && recipeList.get(recipeID).getOwnerID() == ownerID) {
             recipeList.remove(recipeID);
             saveToDisk();
             return true;
@@ -202,10 +202,11 @@ public class RecipeList {
      * @return Boolean - Returns true if the recipe was successfully edited, false
      *         otherwise.
      */
-    public boolean editRecipe(int recipeID, String newRecipeTitle, String newRecipeText) {
-        if (recipeList.get(recipeID) != null) {
-            recipeList.get(recipeID).setRecipeText(newRecipeText);
-            recipeList.get(recipeID).setRecipeTitle(newRecipeTitle);
+    public boolean editRecipe(int recipeID, String newRecipeTitle, String newRecipeText, int ownerID) {
+        Recipe recipe = recipeList.get(recipeID);
+        if (recipe != null && recipe.getOwnerID() == ownerID) {
+            recipe.setRecipeText(newRecipeText);
+            recipe.setRecipeTitle(newRecipeTitle);
             saveToDisk();
             return true;
         }
@@ -252,14 +253,25 @@ public class RecipeList {
             Map.Entry<Integer, Recipe> entry = iterator.next();
             Recipe r = ((Recipe) entry.getValue());
             //System.out.println(r.getRecipeID());
-            JSONObject recipe = new JSONObject();
-                recipe.put("recipeText", r.getRecipeText());
-                recipe.put("recipeTitle", r.getRecipeTitle());
-                recipe.put("recipeID", r.getRecipeID());
-                recipe.put("mealType", r.getMealType());
-            allRecipes.put(recipeIndex++, recipe);
+            allRecipes.put(recipeIndex++, r.toJson());
         }
         return allRecipes;
+    }
+
+    public JSONArray getUserRecipes(Integer userID) {
+        JSONArray userRecipes = new JSONArray();
+        Set<Entry<Integer, Recipe>> set = recipeList.entrySet();
+        Iterator<Entry<Integer, Recipe>> iterator = set.iterator();
+    
+        int recipeIndex = 0;
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, Recipe> entry = iterator.next();
+            Recipe r = ((Recipe) entry.getValue());
+            if (r.getOwnerID() == userID) {
+                userRecipes.put(recipeIndex++,r.toJson());
+            }
+        }
+        return userRecipes;
     }
 
     /**

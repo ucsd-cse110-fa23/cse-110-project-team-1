@@ -41,7 +41,7 @@ public class MockRecipeServer implements RecipeServerInterface{
         new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT),
         0);
     
-    RecipeHTTPHandlerInterface requestHandler = new MockRecipeHTTPHandler(list);
+    RecipeHTTPHandlerInterface requestHandler = new MockRecipeHTTPHandler(list, new AccountManager("test.csv"));
     //MyHandler myHandler = new MyHandler(data);
     // Create the context
     server.createContext("/", requestHandler);

@@ -25,12 +25,12 @@ public class App extends Application {
 	@Override
 	public void start(Stage primaryStage) throws IOException {
 
-		//GenerateDemoLists.generateAndSaveDemoList(); // enable this to make demo recipe.list
+		//GenerateDemoLists.generateAndSaveDemoList(); enable this to make demo recipe.list
 		server = new RecipeServer();
 		server.startServer();
 
 		AudioRecorder audioRecorder = new AudioRecorder();
-		ViewModel viewModel = new ViewModel(new RequestHandler(), "http://localhost:8100/", audioRecorder);
+		ViewModel viewModel = new ViewModel(new RequestHandler(), "http://localhost:8100/", audioRecorder,"savedLogin.csv");
 		View view = new View(viewModel);
 
 		//Just a test for sending files
