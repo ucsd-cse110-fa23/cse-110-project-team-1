@@ -13,6 +13,7 @@ public class Recipe implements Serializable{
     private String recipeText;
     private String mealType;
     private int ownerID; // The ID of the user who owns the recipe
+    private boolean shared;
     private static final long serialVersionUID = -3203943774493510754L;
 
     public Recipe(int recipeID, String recipeTitle, String recipeText, String mealType, int ownerID){
@@ -21,6 +22,7 @@ public class Recipe implements Serializable{
         this.recipeText = recipeText;
         this.mealType = mealType;
         this.ownerID = ownerID;
+        this.shared = false;
         generateHTML();
     }
 
@@ -71,7 +73,28 @@ public class Recipe implements Serializable{
     //https://www.baeldung.com/java-write-to-file
     public void generateHTML(){
         try{
-            String str = "Yellow";
+            String str = "<html>\r\n" + //
+                    "    <style>\r\n" + //
+                    "        body {\r\n" + //
+                    "            background-color: rgb(192, 192, 192);\r\n" + //
+                    "        }\r\n" + //
+                    "    </style>\r\n" + //
+                    "\r\n" + //
+                    "    <head>\r\n" + //
+                    "        <meta charset=\"UTF-8\" />\r\n" + //
+                    "    </head>\r\n" + //
+                    "    <h2>\r\n" + //
+                    "        "+ this.recipeTitle +"\r\n" + //
+                    "    </h2>\r\n" + //
+                    "\r\n" + //
+                    "    <body>\r\n" + //
+                    "        <title>\r\n" + //
+                    "            "+ this.recipeTitle +"\r\n" + //
+                    "        </title>\r\n" + //
+                    "        "+ this.recipeText +"\r\n" + //
+                    "    </body>\r\n" + //
+                    "\r\n" + //
+                    "</html>";
             FileOutputStream outputStream = new FileOutputStream("shared/recipe"+recipeID+".html");
             byte[] strToBytes = str.getBytes();
             outputStream.write(strToBytes);
