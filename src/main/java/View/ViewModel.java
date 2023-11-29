@@ -189,7 +189,6 @@ public class ViewModel {
 				return Color.TRANSPARENT;
 		}
 	}
-}
 	
 	public User getSavedUser() {
 		String csvFile = savedLoginFileName;
