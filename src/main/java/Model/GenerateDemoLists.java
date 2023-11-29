@@ -2,6 +2,9 @@ package Model;
 
 public class GenerateDemoLists {
 
+    public static void main(String[] args) {
+        generateAndSaveDemoList();
+    }
     public static void generateAndSaveDemoList() {
         // Generate and save the first demo list
         RecipeList recipeList = new RecipeList("demo1");
@@ -42,21 +45,28 @@ public class GenerateDemoLists {
     
         String recipe12Title = "BBQ Chicken with Rice";
         String recipe12Text = "BBQ Chicken with Rice\n\nIngredients:\nCanned Chicken\nRice\nBBQ Sauce\n\nInstructions:\nStep 1: Heat the canned chicken in a pan with BBQ sauce.\nStep 2: Serve the BBQ chicken over cooked rice.\n";
-    
-        recipeList.addRecipe(recipe1Title, recipe1Text, "breakfast");
-        recipeList.addRecipe(recipe2Title, recipe2Text, "lunch");
-        recipeList.addRecipe(recipe3Title, recipe3Text, "dinner");
-        recipeList.addRecipe(recipe4Title, recipe4Text, "lunch");
-        recipeList.addRecipe(recipe5Title, recipe5Text, "dinner");
-        recipeList.addRecipe(recipe6Title, recipe6Text, "dinner");
-        recipeList.addRecipe(recipe7Title, recipe7Text, "breakfast");
-        recipeList.addRecipe(recipe8Title, recipe8Text, "lunch");
-        recipeList.addRecipe(recipe9Title, recipe9Text, "breakfast");
-        recipeList.addRecipe(recipe10Title, recipe10Text, "lunch");
-        recipeList.addRecipe(recipe11Title, recipe11Text, "breakfast");
-        recipeList.addRecipe(recipe12Title, recipe12Text, "dinner");
+
+        recipeList.addRecipe(recipe1Title, recipe1Text, "lunch",1);
+        recipeList.addRecipe(recipe2Title, recipe2Text, "lunch",1);
+        recipeList.addRecipe(recipe3Title, recipe3Text, "breakfast",1);
+        recipeList.addRecipe(recipe4Title, recipe4Text, "breakfast",1);
+        recipeList.addRecipe(recipe5Title, recipe5Text, "breakfast",1);
+        recipeList.addRecipe(recipe6Title, recipe6Text, "breakfast",1);
+        recipeList.addRecipe(recipe7Title, recipe7Text, "lunch",1);
+        recipeList.addRecipe(recipe8Title, recipe8Text, "dinner",1);
+        recipeList.addRecipe(recipe9Title, recipe9Text, "dinner",1);
+        recipeList.addRecipe(recipe10Title, recipe10Text, "dinner",1);
+        recipeList.addRecipe(recipe11Title, recipe11Text, "dinner",1);
+        recipeList.addRecipe(recipe12Title, recipe12Text, "lunch",1);
 
         recipeList.saveToDisk();
 
+        RecipeList recipeList2 = new RecipeList("demo2");
+
+        recipeList2.addRecipe(recipe1Title, recipe1Text, "breakfast",4);
+        recipeList2.addRecipe(recipe2Title, recipe2Text, "lunch",4);
+        recipeList2.addRecipe(recipe3Title, recipe3Text, "dinner",4);
+        
+        recipeList2.saveToDisk();
     }
 }
