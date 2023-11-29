@@ -1,5 +1,7 @@
 package Model;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 
 import org.json.JSONObject;
@@ -19,6 +21,7 @@ public class Recipe implements Serializable{
         this.recipeText = recipeText;
         this.mealType = mealType;
         this.ownerID = ownerID;
+        generateHTML();
     }
 
     public int getRecipeID(){
@@ -43,10 +46,12 @@ public class Recipe implements Serializable{
 
     public void setRecipeTitle(String newTitle){
         recipeTitle = newTitle;
+        generateHTML();
     }
 
     public void setRecipeText(String newRecipe){
         recipeText = newRecipe;
+        generateHTML();
     }
 
     public String toString(){
@@ -63,5 +68,17 @@ public class Recipe implements Serializable{
         return recipe;
     }
 
+    //https://www.baeldung.com/java-write-to-file
+    public void generateHTML(){
+        try{
+            String str = "Yellow";
+            FileOutputStream outputStream = new FileOutputStream("shared/recipe"+recipeID+".html");
+            byte[] strToBytes = str.getBytes();
+            outputStream.write(strToBytes);
+            outputStream.close();
+        }catch(Exception e){
+
+        }
+    }
 }
 
