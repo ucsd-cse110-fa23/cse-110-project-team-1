@@ -9,6 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -148,9 +149,11 @@ public class ViewModel {
 		for (int i = 0; i < allRec.length(); i++) {
 			JSONObject r = allRec.getJSONObject(i);
 			RecipeNode newRecipe = RecipeNode.jsonToRecipeNode(r);
+			newRecipe.setMaxWidth(230);
 			
 // Setup title and mealtype labels for sidebar
 			Label recipeTitle = new Label(newRecipe.getRecipeTitle());
+			recipeTitle.setTextOverrun(OverrunStyle.ELLIPSIS);
 			Label mealType = new Label(newRecipe.getMealType());
 			BackgroundFill background_fill = new BackgroundFill(getMealTypeColor(mealType.getText()), CornerRadii.EMPTY, Insets.EMPTY);
 			Background background = new Background(background_fill);
