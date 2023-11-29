@@ -10,13 +10,15 @@ public class Recipe implements Serializable{
     private String recipeTitle; 
     private String recipeText;
     private String mealType;
+    private int ownerID; // The ID of the user who owns the recipe
     private static final long serialVersionUID = -3203943774493510754L;
 
-    public Recipe(int recipeID, String recipeTitle, String recipeText, String mealType){
+    public Recipe(int recipeID, String recipeTitle, String recipeText, String mealType, int ownerID){
         this.recipeID = recipeID;
         this.recipeTitle = recipeTitle;
         this.recipeText = recipeText;
         this.mealType = mealType;
+        this.ownerID = ownerID;
     }
 
     public int getRecipeID(){
@@ -33,6 +35,10 @@ public class Recipe implements Serializable{
 
     public String getMealType() {
         return mealType;
+    }
+
+    public int getOwnerID() {
+        return ownerID;
     }
 
     public void setRecipeTitle(String newTitle){
@@ -53,6 +59,7 @@ public class Recipe implements Serializable{
         recipe.put("recipeTitle", getRecipeTitle());
         recipe.put("recipeID", getRecipeID());
         recipe.put("mealType", getMealType());
+        recipe.put("ownerID", getOwnerID());
         return recipe;
     }
 

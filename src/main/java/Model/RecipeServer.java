@@ -45,7 +45,7 @@ public class RecipeServer implements RecipeServerInterface{
         new InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT),
         0);
     
-    RecipeHTTPHandlerInterface requestHandler = new RecipeHTTPHandler(list);
+    RecipeHTTPHandlerInterface requestHandler = new RecipeHTTPHandler(list, new AccountManager("accounts.csv"));
     //MyHandler myHandler = new MyHandler(data);
     // Create the context
     server.createContext("/", requestHandler);
@@ -56,7 +56,7 @@ public class RecipeServer implements RecipeServerInterface{
     // Start the server
     server.start();
 
-    System.out.println("Server started on port " + SERVER_PORT + "\n http://localhost:8100/?all");
+    System.out.println("Server started http://"+ SERVER_HOSTNAME+ ":"+SERVER_PORT+ "/");
 
   }
     public void stopServer(){
