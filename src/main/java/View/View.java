@@ -28,6 +28,7 @@ public class View {
 
 	private Button addNewRecipeButton = new Button("Generate Recipe");
 	private Button editSavedRecipeButton = new Button("Edit Recipe");
+	private Button shareSavedRecipeButton = new Button("Share Recipe");
 	private Button deleteSavedRecipeButton = new Button("Delete Recipe");
 	private Button newlyGeneratedRecipeSaveButton = new Button("Save Recipe");
 	private Button editedRecipeSaveButton = new Button("Save Recipe");
@@ -205,7 +206,7 @@ public class View {
 	}
 
 	private void buildDetailPage(){
-		HBox buttons = new HBox(backToHome, editSavedRecipeButton, deleteSavedRecipeButton);
+		HBox buttons = new HBox(backToHome, editSavedRecipeButton, deleteSavedRecipeButton, shareSavedRecipeButton);
 		Label detailMealtype = new Label("Meal Type: " + currentSelectedRecipe.getMealType());
 		ScrollPane descriptionScrollBox = new ScrollPane(savedRecipeDescription);
 		descriptionScrollBox.setStyle("-fx-background-color:transparent;");
