@@ -65,9 +65,12 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
   * http://localhost:8100/?recipeID=123 to get specific recipe
   */
  // Is expecting a get request with an ID of a recipe and returns with the recipe data
+
+ //https://www.digitalocean.com/community/tutorials/java-read-file-to-string
  private String handleGet(HttpExchange httpExchange) throws IOException {
 		String response = "Invalid recipeID";
 		URI uri = httpExchange.getRequestURI();
+		String uriString = uri.toString();
 		String query = uri.getRawQuery();
 
 		Integer ownerID = verifyUserAndGetID(httpExchange);
@@ -84,7 +87,23 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
 					response = list.getUserRecipes(ownerID).toString();
 				}
 			}
+		}else if(uriString.substring(0,8).equals("/shared/")){
+			int recipeID = Integer.parseInt(uriString.substring(14,uriString.indexOf(".")));
+			//System.out.println("recipe req: "+ recipeID);
+			FileInputStream fis = new FileInputStream("shared/recipe"+recipeID+".html");
+			byte[] buffer = new byte[10];
+			StringBuilder sb = new StringBuilder();
+			while (fis.read(buffer) != -1) {
+				sb.append(new String(buffer));
+				buffer = new byte[10];
+			}
+			fis.close();
+
+			String content = sb.toString();
+			response = sb.toString();
 		} else {
+			System.out.println("query: "+query);
+			System.out.println("uri: "+uri);
 			response = "Invalid username or password";
 		}
 		return response;
