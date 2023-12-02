@@ -23,7 +23,6 @@ public class Recipe implements Serializable{
         this.mealType = mealType;
         this.ownerID = ownerID;
         this.shared = false;
-        generateHTML();
     }
 
     public int getRecipeID(){
@@ -48,16 +47,27 @@ public class Recipe implements Serializable{
 
     public void setRecipeTitle(String newTitle){
         recipeTitle = newTitle;
-        generateHTML();
+        if(shared)
+            generateHTML();
     }
 
     public void setRecipeText(String newRecipe){
         recipeText = newRecipe;
-        generateHTML();
+        if(shared)
+            generateHTML();
     }
 
     public String toString(){
         return recipeTitle + ": "+ recipeText;
+    }
+
+    public void share(){
+        shared = true;
+        generateHTML();
+    }
+
+    public boolean getShared(){
+        return shared;
     }
 
     public JSONObject toJson(){

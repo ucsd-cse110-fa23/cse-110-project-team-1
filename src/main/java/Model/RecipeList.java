@@ -144,6 +144,20 @@ public class RecipeList {
     }
 
     /**
+     * This method shares a recipe from the recipe list based on the input ID.
+     *
+     * @param recipeID The ID of the recipe to be shared.
+     */
+    public boolean shareRecipe(int recipeID) {
+        Recipe r = recipeList.get(recipeID);
+        if(r != null){
+            r.share();
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * This method retrieves the most recently added recipe from the recipe list.
      *
      * @return The Recipe object that was most recently added to the list.
