@@ -101,7 +101,7 @@ public class Recipe implements Serializable{
                     "        <title>\r\n" + //
                     "            "+ this.recipeTitle +"\r\n" + //
                     "        </title>\r\n" + //
-                    "        "+ this.recipeText +"\r\n" + //
+                    "        "+ this.recipeText.replaceAll("\n", "<br>") +"\r\n" + //
                     "    </body>\r\n" + //
                     "\r\n" + //
                     "</html>";
