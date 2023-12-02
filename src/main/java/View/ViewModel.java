@@ -279,10 +279,20 @@ public class ViewModel {
 		}
 	}
 
+	public boolean handleShare(int recipeId, User user){
+		
+        try {
+			req.performShare(server_url, recipeId, user);
+		} catch (IOException e) {
+			ErrorAlert.showError("Unable to contact server to share recipe");
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+    }
+
 	private boolean isValidUserInfo(String username, String password) {
 		//System.out.println("Checking user info ["+ username + ":" + password + "] " + !(username.isEmpty() || password.isEmpty()));
 		return !(username.isEmpty() || password.isEmpty());
 	}
-
-
 }

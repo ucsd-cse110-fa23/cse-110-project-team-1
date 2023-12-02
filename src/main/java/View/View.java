@@ -359,6 +359,15 @@ public class View {
 		displaySelector("home");
 	}
 
+	private void shareRecipe(RecipeNode recipeNode){
+		String s = "http://localhost:8100/shared/recipe" + recipeNode.getRecipeID() + ".html";
+		ErrorAlert.showError(s);
+
+		System.out.println("Client Share Recipe: "+currentSelectedRecipeID);
+		viewModel.handleShare(currentSelectedRecipeID,user);
+		this.updateRecipes();
+	}
+
 	private void onDeleteRequest() {
 		System.out.println("Client Delete Recipe: "+currentSelectedRecipeID);
 		viewModel.performDeleteRequest(currentSelectedRecipeID,user);
@@ -397,6 +406,7 @@ public class View {
 			);
         this.generateNewRecipe.setOnAction(e -> this.buildRecordMealType());
         this.editSavedRecipeButton.setOnAction(e -> this.buildEditPage(currentlyEditingRecipe));
+		this.shareSavedRecipeButton.setOnAction(e -> this.shareRecipe(currentlyEditingRecipe));
         this.stopRecordingMealType.setOnAction(e -> {
             if (this.onStopRecordRequest("mealType")){
                 buildRecordIngredients();
