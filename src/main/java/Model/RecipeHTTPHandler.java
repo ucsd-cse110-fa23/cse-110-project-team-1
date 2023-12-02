@@ -89,6 +89,14 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
 			}
 		}else if(uriString.substring(0,8).equals("/shared/")){
 			int recipeID = Integer.parseInt(uriString.substring(14,uriString.indexOf(".")));
+			if(list.getRecipe(recipeID) == null){
+				System.out.println("invalid recipe ID " + recipeID);
+				return "Invalid recipe ID " + recipeID;
+			}
+			if(!list.getRecipe(recipeID).getShared()){
+				System.out.println("Private recipe["+list.getRecipe(recipeID).getShared()+"] ID " + recipeID);
+				return "Private recipe ID " + recipeID;
+			}
 			//System.out.println("recipe req: "+ recipeID);
 			FileInputStream fis = new FileInputStream("shared/recipe"+recipeID+".html");
 			byte[] buffer = new byte[10];
@@ -201,6 +209,20 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
 		String response = "Invalid PUT request";
 		InputStream inStream = httpExchange.getRequestBody();
 		String postData = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
+
+		if(postData.substring(0, 8).equals("shareID=")){
+			int recipeID = Integer.parseInt(postData.substring(8,postData.length()));
+
+			if(list.shareRecipe(recipeID)){
+				response = "Shared recipe " + recipeID;
+				System.out.println("Shared recipe " + recipeID);
+			}else{
+				response = "Invalid recipe ID " + recipeID;
+				System.out.println("Invalid recipe ID " + recipeID);
+			}
+			return response;
+		}
+
 		JSONObject allRec = new JSONObject(postData);
 		int recipeID = allRec.getInt("recipeID");
 	

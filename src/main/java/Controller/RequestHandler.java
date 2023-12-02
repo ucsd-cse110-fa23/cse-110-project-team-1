@@ -144,6 +144,28 @@ public class RequestHandler {
     }
 
     /**
+     * This method sends a DELETE request to the server to delete a specific recipe identified by its ID.
+     * 
+     * @param urlString The URL of the server to which the DELETE request will be sent
+     * @param recipeID The ID of the recipe to be deleted.
+     * 
+     */
+    public void performShare(String urlString, int recipeID, User user) throws IOException {
+        HttpURLConnection conn = setupConnection(urlString, "PUT", user);
+    
+        String body = "shareID=" + recipeID;
+        sendRequest(conn, body);
+    
+        int responseCode = conn.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            String response = getResponse(conn);
+            System.out.println("Share response " + response);
+        } else {
+            System.out.println("Server returned non-OK code: " + responseCode);
+        }
+    }
+
+    /**
      * Attempts to create a new user account.
      *     
      * @param url The URL of the server
