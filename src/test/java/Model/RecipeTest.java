@@ -88,6 +88,10 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         assertEquals(recipeList.getRecipe(3).getRecipeTitle(), loadedList.getRecipe(3).getRecipeTitle());
         assertEquals(recipeList.getRecipe(3).getRecipeText(), loadedList.getRecipe(3).getRecipeText());
        
+        assertTrue(recipeList.getRecipe(1).equals(loadedList.getRecipe(1)));
+        assertTrue(recipeList.getRecipe(2).equals(loadedList.getRecipe(2)));
+        assertTrue(recipeList.getRecipe(3).equals(loadedList.getRecipe(3)));
+
         File file = new File("src/test/testSaveAndLoadRecipeList.list");
         file.delete(); // remove test list
     }
@@ -154,6 +158,7 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         File file = new File("src/test/testEditNonExistingRecipe.list");
         file.delete(); // remove test list
     }
+
     /*public static void main(String[] args){
         Recipe L = new Recipe(0, "ball", "two eggs");
         Recipe G = new Recipe(1, "souffle", "three eggs");

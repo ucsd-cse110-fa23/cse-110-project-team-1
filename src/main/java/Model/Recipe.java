@@ -122,5 +122,14 @@ public class Recipe implements Serializable{
 
         }
     }
+
+    public boolean equals(Recipe rhs) {
+        return (this.recipeID == rhs.recipeID) &&
+            (this.recipeTitle == rhs.recipeTitle) &&
+            (this.recipeText == rhs.recipeText) &&
+            (this.mealType == rhs.mealType) &&
+            (this.ownerID == rhs.ownerID) &&
+            (this.shared == rhs.shared);
+    }
 }
 
