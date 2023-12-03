@@ -17,9 +17,10 @@ public class RecipeServerTest{
         try {
             AccountManager AccountManager = new AccountManager("test.csv");
             int userID = AccountManager.addUser("username", "password");
+            String base64Placeholder = "data:image/jpeg;base64,..."; // Replace with actual Base64 string
 
             RecipeList recipeList = new RecipeList("src/test/lists/testServerReadsExistingList");
-            recipeList.addRecipe("Recipe1", "RecipeText1", "lunch", 1);
+            recipeList.addRecipe("Recipe1", "RecipeText1", "lunch", 1, base64Placeholder);
 
             server.startServer();
             server.renameServer("src/test/lists/testServerReadsExistingList");
