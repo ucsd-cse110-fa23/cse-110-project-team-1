@@ -49,12 +49,11 @@ public class RequestHandler {
             response = getResponse(conn);
             System.out.println("Server Response: " + response);
             if(response.contains("Incorrect API key provided")){
-                ErrorAlert.showError("Incorrect API key provided \n You can find your API key at https://platform.openai.com/account/api-keys.");
+                //ErrorAlert.showError("Incorrect API key provided \n You can find your API key at https://platform.openai.com/account/api-keys.");
             }
             return response;
         } catch (IOException e) {
-            serverOfflineMessage();
-            throw e;
+            throw new ServerOfflineException("Server is offline");
         }
     }
 
@@ -96,8 +95,7 @@ public class RequestHandler {
             }
             return toReturn;
         } catch (IOException e) {
-           serverOfflineMessage();
-            throw e;
+           throw new ServerOfflineException("Server is offline");
         }
     
     }
@@ -128,8 +126,7 @@ public class RequestHandler {
             }
             return true;
         } catch (IOException e) {
-            serverOfflineMessage();
-            throw e;        
+            throw new ServerOfflineException("Server is offline");
         }
     }
 
@@ -153,8 +150,7 @@ public class RequestHandler {
             content = getResponse(conn);
             return content;
         } catch (IOException e) {
-            serverOfflineMessage();
-            throw e;        
+            throw new ServerOfflineException("Server is offline");
         }
     }
 
@@ -167,7 +163,6 @@ public class RequestHandler {
      * @throws IOException If an I/O error occurs with the connection.
      */
     public boolean performLogin(String urlString, User user) throws IOException {
-
         HttpURLConnection conn;
         try {
             conn = setupConnection(urlString, "POST", user);
@@ -180,12 +175,10 @@ public class RequestHandler {
             if (response.equals("Login successful")) {
                 return true;
             } else if (response.equals("Invalid username or password")) {
-                ErrorAlert.showError("Invalid username or password");
-                return false;
+                throw new IOException("Invalid username or password");
             }
         } catch (IOException e) {
-            serverOfflineMessage();
-            throw e;        
+            throw new ServerOfflineException("Server is offline");        
         }
         return false;
     }
@@ -208,8 +201,7 @@ public class RequestHandler {
             System.out.println("Performing Account Create");
             return response.startsWith("Account created successfully");
         } catch (IOException e) {
-            serverOfflineMessage();
-            throw e;        
+            throw new ServerOfflineException("Server is offline");
         }
         //System.out.println("Server Response Recieved: " + response);
     }
@@ -260,10 +252,6 @@ public class RequestHandler {
             throw e;
         }
         return response.toString();
-    }
-
-    private void serverOfflineMessage(){
-        ErrorAlert.showError("Server offline. Please try again later.");
     }
 
 }

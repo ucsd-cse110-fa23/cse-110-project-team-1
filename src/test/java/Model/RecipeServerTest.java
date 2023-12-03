@@ -35,7 +35,7 @@ public class RecipeServerTest{
         if (csvFile.exists()) {
             csvFile.delete();
         }
-        File recipes = new File("src/test/lists/testServerReadsExistingList");
+        File recipes = new File("src/test/lists/testServerReadsExistingList.list");
         if (recipes.exists()) {
             recipes.delete();
         }

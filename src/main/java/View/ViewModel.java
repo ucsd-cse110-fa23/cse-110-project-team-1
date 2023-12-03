@@ -60,7 +60,7 @@ public class ViewModel {
 			JSONArray allRec = new JSONArray(allRecipes);
 			return createRecipeListView(allRec);
 		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to get recipes");
+			ErrorAlert.showError("Server Offline: Unable to contact server to get recipes.");
 			throw e;		
 		}
     }
@@ -82,7 +82,7 @@ public class ViewModel {
 		try {
 			response = req.performPOST(server_url, new File("recording.wav"), "ingredients", newlyValidatedMealType, user);
 		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to generate new recipe");
+			ErrorAlert.showError("Server Offline: Unable to contact server to generate new recipe");
 			throw e;		
 		}
 		try {
@@ -109,7 +109,7 @@ public class ViewModel {
 				return true;
 			}
         } catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to validate meal type");
+			ErrorAlert.showError("Server Offline: Unable to contact server to validate meal type");
             throw e;
         }
             		
@@ -121,13 +121,19 @@ public class ViewModel {
         try {
 			req.performPUT(server_url, recipe.getRecipeID(), recipe.getRecipeTitle(), recipe.getRecipeText(), recipe.getMealType(), user);
 		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to save recipe");
+			ErrorAlert.showError("Server Offline: Unable to contact server to save recipe");
 			throw e;		
 		}
     }
 
     public boolean performDeleteRequest(int recipeId, User user) throws IOException{
-		return req.performDELETE(server_url, recipeId, user);
+		try {
+            boolean deleted = req.performDELETE(server_url, recipeId, user);
+			return deleted;
+        } catch (IOException e) {
+			ErrorAlert.showError("Server Offline: Unable to contact server to save recipe");
+			throw e;		
+        }
     }
 	
 	private String getMealTypeFromResponse(String response) {
@@ -242,14 +248,21 @@ public class ViewModel {
 		}
 	}
 
-	public boolean handleLogin(String username, String password) throws IOException {
+	public boolean handleLogin(String username, String password) throws IOException  {
 		if (!isValidUserInfo(username, password)) {
 			ErrorAlert.showError("Invalid username or password");
 			return false;
 		}
 		User user = new User(username, password);
 		System.out.println("Sending Login Request");
-		return req.performLogin(server_url, user);		
+		boolean loggedIn;
+		try {
+			loggedIn = req.performLogin(server_url, user);
+			return loggedIn;	
+		} catch (IOException e) {
+			ErrorAlert.showError("Server Offline: Unable to contact server to log in");
+			throw e;
+		}	
 	}
 	
 	public boolean createAccount(String username, String password) throws IOException {
@@ -260,7 +273,12 @@ public class ViewModel {
 		User newUser = new User(username, password);
 
 		System.out.println("Sending Create Account Request");
-		return req.performAccountCreation(server_url, newUser);
+		try {
+            return req.performAccountCreation(server_url, newUser);
+        } catch (IOException e) {
+			ErrorAlert.showError("Server Offline: Unable to contact server to create account");
+			throw e;
+		}
 
 	}
 
