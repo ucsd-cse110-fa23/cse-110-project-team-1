@@ -205,13 +205,13 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 				existingRecipe.setRecipeText(newRecipeText);
 				//existingRecipe.setMealType(mealType);
 				list.saveToDisk(); // Save the updated list
-				response = "Recipe updated successfully";
+				response = "" + recipeID;
 			} else {
 				// Generate an image and add the recipe if it's new
 				try {
 					String base64Image = dalle.generateImageBase64(newRecipeTitle);
 					recipeID = list.addRecipe(newRecipeTitle, newRecipeText, mealType, ownerID, base64Image);
-					response = "Recipe added successfully with ID: " + recipeID;
+					response = "" + recipeID;
 				} catch (Exception e) {
 					response = "Error generating image: " + e.getMessage();
 					e.printStackTrace();
