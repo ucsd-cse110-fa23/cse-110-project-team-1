@@ -9,6 +9,9 @@ public class GenerateDemoLists {
         // Generate and save the first demo list
         RecipeList recipeList = new RecipeList("demo1");
 
+        // Placeholder Base64 string for demo images
+        String placeholderBase64Image = "data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wcAAtMB9VMJ+ysAAAAASUVORK5CYII=";
+
         // Add demo recipes to the list
         String recipe1Title = "Beans";
         String recipe1Text = "Beans\n Ingredients:\n1 Can of Beans\n\nInstructions:\nStep 1: Put beans on plate\n";
@@ -46,26 +49,26 @@ public class GenerateDemoLists {
         String recipe12Title = "BBQ Chicken with Rice";
         String recipe12Text = "BBQ Chicken with Rice\n\nIngredients:\nCanned Chicken\nRice\nBBQ Sauce\n\nInstructions:\nStep 1: Heat the canned chicken in a pan with BBQ sauce.\nStep 2: Serve the BBQ chicken over cooked rice.\n";
 
-        recipeList.addRecipe(recipe1Title, recipe1Text, "lunch",1);
-        recipeList.addRecipe(recipe2Title, recipe2Text, "lunch",1);
-        recipeList.addRecipe(recipe3Title, recipe3Text, "breakfast",1);
-        recipeList.addRecipe(recipe4Title, recipe4Text, "breakfast",1);
-        recipeList.addRecipe(recipe5Title, recipe5Text, "breakfast",1);
-        recipeList.addRecipe(recipe6Title, recipe6Text, "breakfast",1);
-        recipeList.addRecipe(recipe7Title, recipe7Text, "lunch",1);
-        recipeList.addRecipe(recipe8Title, recipe8Text, "dinner",1);
-        recipeList.addRecipe(recipe9Title, recipe9Text, "dinner",1);
-        recipeList.addRecipe(recipe10Title, recipe10Text, "dinner",1);
-        recipeList.addRecipe(recipe11Title, recipe11Text, "dinner",1);
-        recipeList.addRecipe(recipe12Title, recipe12Text, "lunch",1);
+        recipeList.addRecipe(recipe1Title, recipe1Text, "lunch",1, placeholderBase64Image);
+        recipeList.addRecipe(recipe2Title, recipe2Text, "lunch",1, placeholderBase64Image);
+        recipeList.addRecipe(recipe3Title, recipe3Text, "breakfast",1, placeholderBase64Image);
+        recipeList.addRecipe(recipe4Title, recipe4Text, "breakfast",1, placeholderBase64Image);
+        recipeList.addRecipe(recipe5Title, recipe5Text, "breakfast",1, placeholderBase64Image);
+        recipeList.addRecipe(recipe6Title, recipe6Text, "breakfast",1, placeholderBase64Image);
+        recipeList.addRecipe(recipe7Title, recipe7Text, "lunch",1, placeholderBase64Image);
+        recipeList.addRecipe(recipe8Title, recipe8Text, "dinner",1, placeholderBase64Image);
+        recipeList.addRecipe(recipe9Title, recipe9Text, "dinner",1, placeholderBase64Image);
+        recipeList.addRecipe(recipe10Title, recipe10Text, "dinner",1, placeholderBase64Image);
+        recipeList.addRecipe(recipe11Title, recipe11Text, "dinner",1, placeholderBase64Image);
+        recipeList.addRecipe(recipe12Title, recipe12Text, "lunch",1, placeholderBase64Image);
 
         recipeList.saveToDisk();
 
         RecipeList recipeList2 = new RecipeList("demo2");
 
-        recipeList2.addRecipe(recipe1Title, recipe1Text, "breakfast",4);
-        recipeList2.addRecipe(recipe2Title, recipe2Text, "lunch",4);
-        recipeList2.addRecipe(recipe3Title, recipe3Text, "dinner",4);
+        recipeList2.addRecipe(recipe1Title, recipe1Text, "breakfast",4, placeholderBase64Image);
+        recipeList2.addRecipe(recipe2Title, recipe2Text, "lunch",4, placeholderBase64Image);
+        recipeList2.addRecipe(recipe3Title, recipe3Text, "dinner",4, placeholderBase64Image);
         
         recipeList2.saveToDisk();
     }
