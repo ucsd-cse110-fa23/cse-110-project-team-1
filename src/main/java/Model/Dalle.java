@@ -60,7 +60,7 @@ public class Dalle implements ImageModel {
         String responseBody = response.body();
         System.out.println("Response Body: \n" + responseBody);
         JSONObject responseJson = new JSONObject(responseBody);
-        String imageURL = responseJson.getJSONArray("data").getJSONObject(0).getString("image_path");
+        String imageURL = responseJson.getJSONArray("data").getJSONObject(0).getString("url");
         
         // Convert the image URL to Base64
         String base64Image = convertToBase64(imageURL);
