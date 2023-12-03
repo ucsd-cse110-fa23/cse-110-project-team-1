@@ -1,5 +1,6 @@
 package Model;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -105,6 +106,14 @@ public class Recipe implements Serializable{
                     "    </body>\r\n" + //
                     "\r\n" + //
                     "</html>";
+            
+            
+            // create shared directory if we don't have one
+            File sharedDir = new File("shared/");
+            if (!sharedDir.exists()){
+                sharedDir.mkdirs();
+            }
+
             FileOutputStream outputStream = new FileOutputStream("shared/recipe"+recipeID+".html");
             byte[] strToBytes = str.getBytes();
             outputStream.write(strToBytes);

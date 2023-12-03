@@ -16,4 +16,4 @@ key.txt
 
 accounts.csv
 savedLogin.csv
-src/test/lists/testServerReadsExistingList.list
+*.html
