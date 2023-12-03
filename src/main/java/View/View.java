@@ -18,6 +18,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Base64;
+import javafx.scene.layout.FlowPane;
+
 
 public class View {
 
@@ -50,6 +57,8 @@ public class View {
     private ComboBox<String> filterDropdown;
 
 	private CheckBox autoLoginCheckbox;
+
+	private ImageView recipeImageView;
 
 	private VBox recipeTitleListleftVbox;
 
@@ -105,6 +114,10 @@ public class View {
 
 		this.root = new BorderPane();
         this.root.setPadding(new Insets(SPACING));
+
+		recipeImageView = new ImageView();
+		recipeImageView.setFitHeight(100);
+		recipeImageView.setFitWidth(100);
 		
         filterHBox = createFilters();
         setupEventHandlers();
@@ -210,17 +223,40 @@ public class View {
 		Label detailMealtype = new Label("Meal Type: " + currentSelectedRecipe.getMealType());
 		ScrollPane descriptionScrollBox = new ScrollPane(savedRecipeDescription);
 		descriptionScrollBox.setStyle("-fx-background-color:transparent;");
-		this.savedRecipeDetailVbox = buildPage(null, 0, NO_TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, detailMealtype ,descriptionScrollBox ,buttons);
+		updateRecipeImage(currentSelectedRecipe.getBase64Image());
+		FlowPane imagePane = new FlowPane(recipeImageView);
+		this.savedRecipeDetailVbox = buildPage(null, 0, NO_TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, detailMealtype ,descriptionScrollBox, imagePane ,buttons);
 		displaySelector("recipeDetails");
 	}
 
 	private void buildNewlyGeneratedRecipeDisplay(){
 		savedRecipeDescription.setText(newlyGeneratedRecipe.getRecipeText());
 		HBox buttons = new HBox(backToHome, newlyGeneratedRecipeSaveButton, refreshRecipe);
-		this.newlyGeneratedRecipeDisplayVbox = buildPage(savedRecipeDescription, 0, TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, buttons);
+		FlowPane imagePane = new FlowPane(recipeImageView);
+		this.newlyGeneratedRecipeDisplayVbox = buildPage(savedRecipeDescription, 0, TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, imagePane, buttons);
 		displaySelector("newlyGeneratedRecipeDisplay");
 		
 	}
+
+	private void updateRecipeImage(String base64Image) {
+    if (base64Image != null && !base64Image.isEmpty()) {
+        try {
+            // Decode the base64 string to bytes
+            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
+            ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
+            Image image = new Image(bis);
+            recipeImageView.setImage(image);
+            bis.close(); // Close the ByteArrayInputStream
+        } catch (IllegalArgumentException | IOException e) {
+            // Handle decoding errors or image loading failures
+            recipeImageView.setImage(null); // Set to null or a default image
+            e.printStackTrace();
+        }
+    } else {
+        // Handle cases where there is no image
+        recipeImageView.setImage(null); // Or set a default image
+    }
+}
 
 	private void buildHomePage() {
 		this.homePageTextHeader = new Label("Welcome to Pantry Pal");
