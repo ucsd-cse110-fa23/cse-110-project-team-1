@@ -175,7 +175,7 @@ public class RequestHandler {
             if (response.equals("Login successful")) {
                 return true;
             } else if (response.equals("Invalid username or password")) {
-                throw new IOException("Invalid username or password");
+                return false;
             }
         } catch (IOException e) {
             throw new ServerOfflineException("Server is offline");        

@@ -258,7 +258,11 @@ public class ViewModel {
 		boolean loggedIn;
 		try {
 			loggedIn = req.performLogin(server_url, user);
-			return loggedIn;	
+			if(loggedIn){
+				return true;
+			}
+			ErrorAlert.showError("Invalid username or password");
+			return false;	
 		} catch (IOException e) {
 			ErrorAlert.showError("Server Offline: Unable to contact server to log in");
 			throw e;
@@ -274,7 +278,13 @@ public class ViewModel {
 
 		System.out.println("Sending Create Account Request");
 		try {
-            return req.performAccountCreation(server_url, newUser);
+			boolean accountCreated =  req.performAccountCreation(server_url, newUser);
+			if(accountCreated){
+				return true;
+			}
+			ErrorAlert.showError("Username Already Taken");
+            return false;
+			
         } catch (IOException e) {
 			ErrorAlert.showError("Server Offline: Unable to contact server to create account");
 			throw e;
