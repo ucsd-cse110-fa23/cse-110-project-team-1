@@ -208,7 +208,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 						base64Image = dalle.generateImageBase64(newRecipeTitle); // Image generated based on title
 						existingRecipe.setRecipeTitle(newRecipeTitle);
 						existingRecipe.setRecipeText(newRecipeText);
-						existingRecipe.setMealType(mealType);
+						//existingRecipe.setMealType(mealType);
 						existingRecipe.setBase64Image(base64Image);
 						list.saveToDisk(); // Save the updated list
 						response = "Recipe updated successfully";
@@ -219,7 +219,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 				} else {
 					// If the text has not changed, no need to regenerate the image
 					existingRecipe.setRecipeTitle(newRecipeTitle);
-					existingRecipe.setMealType(mealType);
+					//existingRecipe.setMealType(mealType);
 					list.saveToDisk();
 					response = "Recipe updated successfully";
 				}
