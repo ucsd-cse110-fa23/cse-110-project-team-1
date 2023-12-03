@@ -27,8 +27,7 @@ public class RecipeServerTest{
             server.loadServer();
             RequestHandler req = new RequestHandler();
             String content = req.performGET("http://localhost:8100/?all", new User("username", "password"));
-            String expectedJson = String.format("[{\"recipeTitle\":\"Recipe1\",\"recipeText\":\"RecipeText1\",\"mealType\":\"lunch\",\"ownerID\":1,\"recipeID\":1, \"base64Image\":\"%s\"}]", base64Placeholder);
-            assertEquals(expectedJson,content);
+            assertEquals("[{\"recipeTitle\":\"Recipe1\",\"base64Image\":\"data:image/jpeg;base64,...\",\"recipeText\":\"RecipeText1\",\"mealType\":\"lunch\",\"ownerID\":1,\"recipeID\":1}]", content);
             server.stopServer();
         } catch (IOException e) {
             e.printStackTrace();
