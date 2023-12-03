@@ -51,6 +51,8 @@ public class View {
 
     private ComboBox<String> filterDropdown;
 
+	private ComboBox<String> sortDropdown;
+
 	private CheckBox autoLoginCheckbox;
 
 	private VBox recipeTitleListleftVbox;
@@ -64,6 +66,8 @@ public class View {
 	private VBox loginVbox;
 
     private HBox filterHBox;
+
+	private HBox sortHBox;
 
 	//homepage labels
 	private Label homePageTextHeader;
@@ -79,6 +83,10 @@ public class View {
     //filter labels
 	private String[] filters;
     private Label filterLabel;
+
+	// sort labels
+	private String[] sorts;
+	private Label sortLabel;
 
 	//Login Info Fields
 	TextField usernameField;
@@ -109,6 +117,7 @@ public class View {
         this.root.setPadding(new Insets(SPACING));
 		
         filterHBox = createFilters();
+		sortHBox = createSorts();
         setupEventHandlers();
         setupUI();
 		
@@ -142,15 +151,15 @@ public class View {
         ListView<HBox> allRecipes;
 		try {
 			allRecipes = viewModel.pullRecipes(user);
-			String filter = filterDropdown.getValue();
-			for(HBox h : allRecipes.getItems()) {
-				// If recipe's meal type is the same as the filter,
-				// or filter is "all", show the recipe on the sidebar.
-				if(filter.equalsIgnoreCase("all") || ((RecipeNode)h).toJson().getString("mealType").equalsIgnoreCase(filter)) {
-					sidebar.getItems().add(h);
-				}
-			}
-	
+			String filterType = filterDropdown.getValue();
+
+			sidebar = filter(allRecipes, filterType);
+
+			String sort = sortDropdown.getValue();
+			RecipeSorter rc = new RecipeSorter(sort);
+			sidebar = rc.sort(sidebar);
+
+
 			this.recipeTitleListleftVbox = createRecipeTitleList(sidebar);
 			this.root.setLeft(this.recipeTitleListleftVbox);
 			setupSelectionListener(sidebar);
@@ -160,7 +169,7 @@ public class View {
 	}
 
 	private VBox createRecipeTitleList(ListView<HBox> recipeListView) {
-		VBox recipeTitleList = new VBox(SPACING, filterHBox, recipeListView);
+		VBox recipeTitleList = new VBox(SPACING, filterHBox, sortHBox, recipeListView);
 		VBox.setVgrow(recipeListView, Priority.ALWAYS);
 		return recipeTitleList;
 	}
@@ -172,6 +181,27 @@ public class View {
         filterLabel = new Label("Filter: ");
 
         return new HBox(SPACING, filterLabel, filterDropdown);
+    }
+
+	private ListView<HBox> filter(ListView<HBox> allRec, String filterType){
+		ListView<HBox> sidebar = new ListView<>();
+		for(HBox h : allRec.getItems()) {
+			// If recipe's meal type is the same as the filter,
+			// or filter is "all", show the recipe on the sidebar.
+			if(filterType.equalsIgnoreCase("all") || ((RecipeNode)h).toJson().getString("mealType").equalsIgnoreCase(filterType)) {
+				sidebar.getItems().add(h);			// default is add at the end, which is convenient -- if want to do reverse, add at 0
+			}
+		}
+		return sidebar;
+	}
+    
+	private HBox createSorts() {
+        sorts = new String[] {"Newest to Oldest", "Oldest to Newest", "Alphabetically", "Reverse Alphabetically"};
+        sortDropdown = new ComboBox<String>(FXCollections.observableArrayList(this.sorts));
+        sortDropdown.setValue(sorts[0]);
+        sortLabel = new Label("Sort: ");
+
+        return new HBox(SPACING, sortLabel, sortDropdown);
     }
 
 	// Variable arguments for a function 
@@ -461,6 +491,9 @@ public class View {
         });
 		this.filterDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             this.updateRecipes();
+        });
+		this.sortDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			this.updateRecipes();
         });
 		this.refreshRecipe.setOnAction(e -> {
 			if(onStopRecordRequest("ingredients")){
