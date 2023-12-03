@@ -210,24 +210,30 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface{
 		InputStream inStream = httpExchange.getRequestBody();
 		String postData = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
 
-		if(postData.substring(0, 8).equals("shareID=")){
-			int recipeID = Integer.parseInt(postData.substring(8,postData.length()));
-
-			if(list.shareRecipe(recipeID)){
-				response = "Shared recipe " + recipeID;
-				System.out.println("Shared recipe " + recipeID);
-			}else{
-				response = "Invalid recipe ID " + recipeID;
-				System.out.println("Invalid recipe ID " + recipeID);
-			}
-			return response;
-		}
-
 		JSONObject allRec = new JSONObject(postData);
-		int recipeID = allRec.getInt("recipeID");
 	
 		Integer ownerID = verifyUserAndGetID(httpExchange);
 		if (ownerID != null) {
+			if(postData.contains("shareID")){
+				int rID = allRec.getInt("shareID");
+
+				System.out.println("rUID:"+ list.getRecipe(rID).getOwnerID() +"rID:"+ rID + " uID" + ownerID);
+				if(list.getRecipe(rID).getOwnerID() != ownerID){
+					response = "Not your recipe ID" + rID;
+				  	System.out.println("Not your recipe ID" + rID);
+				}
+
+				if(list.shareRecipe(rID)){
+					response = "Shared recipe " + rID;
+					System.out.println("Shared recipe " + rID);
+				}else{
+					response = "Invalid recipe ID " + rID;
+					System.out.println("Invalid recipe ID " + rID);
+				}
+				return response;
+			}
+
+			int recipeID = allRec.getInt("recipeID");
 			if (list.editRecipe(recipeID, allRec.getString("newRecipeTitle"), allRec.getString("newRecipeText"), ownerID)) {
 				response = Integer.toString(recipeID);
 				System.out.println("Edited recipe " + recipeID);

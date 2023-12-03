@@ -152,8 +152,11 @@ public class RequestHandler {
      */
     public void performShare(String urlString, int recipeID, User user) throws IOException {
         HttpURLConnection conn = setupConnection(urlString, "PUT", user);
-    
-        String body = "shareID=" + recipeID;
+
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("shareID", recipeID);
+        String body = requestBody.toString();
+
         sendRequest(conn, body);
     
         int responseCode = conn.getResponseCode();
