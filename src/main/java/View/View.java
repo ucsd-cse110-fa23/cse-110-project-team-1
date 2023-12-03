@@ -1,5 +1,7 @@
 package View;
 
+import java.io.IOException;
+
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -43,6 +45,7 @@ public class View {
 	private Button stopRecordingMealType = new Button("Stop Meal Type Recording");
 	private Button stopRecordingIngredients = new Button("Stop Ingredient Recording");
 	private Button generateNewRecipe = new Button("Generate New Recipe");
+	private Button refreshRecipe = new Button("Refresh Recipe");
 	private Button login = new Button("Login");
 	private Button createAccount = new Button("Create Account");
 	private Button logout = new Button("Logout");
@@ -54,6 +57,8 @@ public class View {
 	private Button backToHome = new Button("Back to Home");
 
     private ComboBox<String> filterDropdown;
+
+	private ComboBox<String> sortDropdown;
 
 	private CheckBox autoLoginCheckbox;
 
@@ -69,6 +74,8 @@ public class View {
 
     private HBox filterHBox;
 
+	private HBox sortHBox;
+
 	//homepage labels
 	private Label homePageTextHeader;
 	private Label homePageTextSubheader;
@@ -83,6 +90,10 @@ public class View {
     //filter labels
 	private String[] filters;
     private Label filterLabel;
+
+	// sort labels
+	private String[] sorts;
+	private Label sortLabel;
 
 	//Login Info Fields
 	TextField usernameField;
@@ -113,52 +124,59 @@ public class View {
         this.root.setPadding(new Insets(SPACING));
 		
         filterHBox = createFilters();
+		sortHBox = createSorts();
         setupEventHandlers();
         setupUI();
 		
-        currentSelectedRecipeID = -1;
-        savedRecipeDescription = new Label("Recipe Description: ...");
-		savedRecipeDescription.setWrapText(true);
-
 	}
 
+	/**
+	 * Sets up the initial user interface of the application. 
+	 * Checks if logged in already.
+	 */
 	private void setupUI() {
+		currentSelectedRecipeID = -1;
+		savedRecipeDescription = new Label("Recipe Description: ...");
+		savedRecipeDescription.setWrapText(true);
+
 		User loggedInUser = viewModel.getSavedUser();
 		if(loggedInUser != null){
 			this.user = loggedInUser;
 			buildHomePage();
 			updateRecipes();
 		}else{
-			buildLoginPage();
+			logout();
 		}
     }
 
+	/**
+	 * Updates the list of recipes displayed in the application.
+	 */
 	public void updateRecipes() {
 		System.out.println("Updating Recipes");
         ListView<HBox> sidebar = new ListView<HBox>();
         ListView<HBox> allRecipes;
 		try {
 			allRecipes = viewModel.pullRecipes(user);
-			String filter = filterDropdown.getValue();
-			for(HBox h : allRecipes.getItems()) {
-				// If recipe's meal type is the same as the filter,
-				// or filter is "all", show the recipe on the sidebar.
-				if(filter.equalsIgnoreCase("all") || ((RecipeNode)h).toJson().getString("mealType").equalsIgnoreCase(filter)) {
-					sidebar.getItems().add(h);
-				}
-			}
-	
+			String filterType = filterDropdown.getValue();
+
+			sidebar = filter(allRecipes, filterType);
+
+			String sort = sortDropdown.getValue();
+			RecipeSorter rc = new RecipeSorter(sort);
+			sidebar = rc.sort(sidebar);
+
+
 			this.recipeTitleListleftVbox = createRecipeTitleList(sidebar);
 			this.root.setLeft(this.recipeTitleListleftVbox);
 			setupSelectionListener(sidebar);
 		} catch (Exception e) {
-			//Go back to login page
-			//Clear saved login
+			logout();
 		}
 	}
 
 	private VBox createRecipeTitleList(ListView<HBox> recipeListView) {
-		VBox recipeTitleList = new VBox(SPACING, filterHBox, recipeListView);
+		VBox recipeTitleList = new VBox(SPACING, filterHBox, sortHBox, recipeListView);
 		VBox.setVgrow(recipeListView, Priority.ALWAYS);
 		return recipeTitleList;
 	}
@@ -170,6 +188,27 @@ public class View {
         filterLabel = new Label("Filter: ");
 
         return new HBox(SPACING, filterLabel, filterDropdown);
+    }
+
+	private ListView<HBox> filter(ListView<HBox> allRec, String filterType){
+		ListView<HBox> sidebar = new ListView<>();
+		for(HBox h : allRec.getItems()) {
+			// If recipe's meal type is the same as the filter,
+			// or filter is "all", show the recipe on the sidebar.
+			if(filterType.equalsIgnoreCase("all") || ((RecipeNode)h).toJson().getString("mealType").equalsIgnoreCase(filterType)) {
+				sidebar.getItems().add(h);			// default is add at the end, which is convenient -- if want to do reverse, add at 0
+			}
+		}
+		return sidebar;
+	}
+    
+	private HBox createSorts() {
+        sorts = new String[] {"Newest to Oldest", "Oldest to Newest", "Alphabetically", "Reverse Alphabetically"};
+        sortDropdown = new ComboBox<String>(FXCollections.observableArrayList(this.sorts));
+        sortDropdown.setValue(sorts[0]);
+        sortLabel = new Label("Sort: ");
+
+        return new HBox(SPACING, sortLabel, sortDropdown);
     }
 
 	// Variable arguments for a function 
@@ -222,7 +261,7 @@ public class View {
 
 	private void buildNewlyGeneratedRecipeDisplay(){
 		savedRecipeDescription.setText(newlyGeneratedRecipe.getRecipeText());
-		HBox buttons = new HBox(backToHome, newlyGeneratedRecipeSaveButton);
+		HBox buttons = new HBox(backToHome, newlyGeneratedRecipeSaveButton, refreshRecipe);
 		this.newlyGeneratedRecipeDisplayVbox = buildPage(savedRecipeDescription, 0, TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, buttons);
 		displaySelector("newlyGeneratedRecipeDisplay");
 		
@@ -291,14 +330,11 @@ public class View {
 	}	
 
 	/**
-	 * This method is responsible for displaying a page in the application.
-	 * 
-	 * @param vbox The VBox layout that represents the page to be displayed.
-	 * @param message The message to be printed to the console for debugging purposes.
-	 * @param addBackButton A boolean flag indicating whether to add a back button to the page. If true, a back button is added to the top right corner of the page.
-	 * 
-	 * If useBackButton is true, the method creates a new BorderPane layout, sets the provided VBox as the center, and adds a back button to the top right corner. 
-	 * If useBackButton is false, the method simply sets the provided VBox as the center of the root layout.
+	 * Displays a page in the application with an optional back button.
+	 *
+	 * @param vbox The layout of the page to display.
+	 * @param message Debugging message.
+	 * @param addBackButton If true, a back button is added to the page.
 	 */
 	private void displayPage(VBox vbox, String message, boolean addBackButton) {
 		System.out.println(message);
@@ -359,10 +395,19 @@ public class View {
 		}
 	}
 
+	/**
+	 * Saves the recipe and updates the view.
+	 *
+	 * @param recipeNode The recipe to be saved.
+	 */
 	private void saveRecipe(RecipeNode recipeNode){
-		viewModel.performPutRequest(recipeNode,user);
-		this.updateRecipes();
-		displaySelector("home");
+		try {
+			viewModel.performPutRequest(recipeNode,user);
+			this.updateRecipes();
+			displaySelector("home");
+		} catch (IOException e) {
+			logout();
+		}
 	}
 
 
@@ -381,40 +426,65 @@ public class View {
 		//this.updateRecipes();
 	}
 
+	/**
+	 * Deletes the selected recipe and updates the list.
+	 */
 	private void onDeleteRequest() {
-		System.out.println("Client Delete Recipe: "+currentSelectedRecipeID);
-		viewModel.performDeleteRequest(currentSelectedRecipeID,user);
-		this.updateRecipes();
-		displaySelector("home");
+		System.out.println("Requested Delete Recipe: " + currentSelectedRecipeID);
+		try {
+			viewModel.performDeleteRequest(currentSelectedRecipeID,user);
+			this.updateRecipes();
+			displaySelector("home");
+		} catch (IOException e) {
+			logout();
+		}
 	}
-	
+
+	/**
+	 * Handles the stop recording request based on the request type.
+	 *
+	 * @param requestType The type of the request.
+	 * @return Returns true if the request was successful, false otherwise.
+	 */
 	private boolean onStopRecordRequest(String requestType) {
 		//Stop Recording
 		this.viewModel.stopRecording();
 		//Send Request
-		if(requestType.equals("mealType")){
-			return viewModel.requestMealTypeCheck(user);
-		}else if(requestType.equals("ingredients")){
-			newlyGeneratedRecipe = viewModel.requestNewRecipe(user);
-			if (newlyGeneratedRecipe == null) {
-				return false;
+		try {
+			if(requestType.equals("mealType")){
+				return viewModel.requestMealTypeCheck(user);
+			}else if(requestType.equals("ingredients")){
+				newlyGeneratedRecipe = viewModel.requestNewRecipe(user);
+				if (newlyGeneratedRecipe == null) {
+					return false;
+				}
+				return true;
 			}
-			return true;
+		} catch (IOException e) {
+			logout();
 		}
-		//If valid request, move on, else dont
 		return false;
 	}
 
+	/**
+	 * Updates the details of the selected recipe.
+	 *
+	 * @param recipeText The text of the recipe.
+	 * @param curID The ID of the recipe.
+	 */
 	private void updateSelectedRecipeDetails(String recipeText, Integer curID){
 		savedRecipeDescription.setText(recipeText);
 		currentSelectedRecipeID = curID;
 	}
 
+	/**
+	 * Sets up the event handlers for button s in the application.
+	 */
 	private void setupEventHandlers() {
         this.deleteSavedRecipeButton.setOnAction(e -> this.onDeleteRequest());
         this.startRecording.setOnAction(e -> this.viewModel.startRecording());
         this.backToHome.setOnAction(e -> {
-			((ListView<HBox>)this.recipeTitleListleftVbox.getChildren().get(1)).getSelectionModel().clearSelection();
+			((ListView<HBox>)this.recipeTitleListleftVbox.getChildren().get(2)).getSelectionModel().clearSelection();
 			displaySelector("home");}
 			);
         this.generateNewRecipe.setOnAction(e -> this.buildRecordMealType());
@@ -446,47 +516,72 @@ public class View {
 		this.filterDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             this.updateRecipes();
         });
+		this.sortDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			this.updateRecipes();
+        });
+		this.refreshRecipe.setOnAction(e -> {
+			if(onStopRecordRequest("ingredients")){
+				buildNewlyGeneratedRecipeDisplay();
+			}
+		});
 		this.login.setOnAction(e -> {
 			String username = usernameField.getText();
 			String password = passwordField.getText();
-			boolean loginSuccessful = viewModel.handleLogin(username, password);
-			if (loginSuccessful) {
-				if (autoLoginCheckbox.isSelected()) {
-					viewModel.saveUserLogin(username, password);
+			boolean loginSuccessful;
+			try {
+				loginSuccessful = viewModel.handleLogin(username, password);
+				if (loginSuccessful) {
+					if (autoLoginCheckbox.isSelected()) {
+						viewModel.saveUserLogin(username, password);
+					}
+					this.user = new User(username,password);
+					buildHomePage();
+					updateRecipes();
+	
 				}
-				this.user = new User(username,password);
-				buildHomePage();
-				updateRecipes();
-
-			} else {
-				Popup.showError("Invalid username or password");
+				else {
+					Popup.showError("Invalid username or password");
+				}
+			} 
+			catch (IOException e1) {
+				System.out.println("Login Error");
 			}
 		});
 		this.createAccount.setOnAction(e -> {
 			String username = usernameField.getText();
 			String password = passwordField.getText();
 			System.out.println("Create Account Button Pushed");
-			boolean accountCreated = viewModel.createAccount(username, password);
-			System.out.println("Account Created: " + accountCreated);
-			if (accountCreated) {
-				if (autoLoginCheckbox.isSelected()) {
-					viewModel.saveUserLogin(username, password);
+			boolean accountCreated;
+			try {
+				accountCreated = viewModel.createAccount(username, password);
+				System.out.println("Account Created: " + accountCreated);
+				if (accountCreated) {
+					if (autoLoginCheckbox.isSelected()) {
+						viewModel.saveUserLogin(username, password);
+					}
+					this.user = new User(username,password);
+					buildHomePage();
+					updateRecipes();
 				}
-				this.user = new User(username,password);
-				buildHomePage();
-				updateRecipes();
-			} else {
-				Popup.showError("Invalid username or password when creating account");
+				else {
+					Popup.showError("Invalid username or password when creating account");
+				}
+			} catch (IOException e1) {
+				System.out.println("Create Account Error");
 			}
 		});
 		this.logout.setOnAction(e -> {
-			viewModel.handleLogout();
-			this.user = null;
-			buildLoginPage();
+			logout();
 		});
 
     }
 
+	/**
+	 * Sets up a selection listener for sidebar.
+	 * When a new item is selected it updates the recipe details and builds the detail page.
+	 *
+	 * @param sidebar The ListView of items
+	 */
 	private void setupSelectionListener(ListView<HBox> sidebar) {
 		sidebar.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue != null) {
@@ -503,5 +598,14 @@ public class View {
 
 	public BorderPane getRoot() {
 		return this.root;
+	}
+
+	/**
+	 * Logs out the current user and displays the login page.
+	 */
+	private void logout() {
+		viewModel.handleLogout();
+		this.user = null;
+		buildLoginPage();
 	}
 }

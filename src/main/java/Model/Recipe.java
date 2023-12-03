@@ -15,15 +15,17 @@ public class Recipe implements Serializable{
     private String mealType;
     private int ownerID; // The ID of the user who owns the recipe
     private boolean shared;
+    private String base64Image;
     private static final long serialVersionUID = -3203943774493510754L;
 
-    public Recipe(int recipeID, String recipeTitle, String recipeText, String mealType, int ownerID){
+    public Recipe(int recipeID, String recipeTitle, String recipeText, String mealType, int ownerID, String base64Image){
         this.recipeID = recipeID;
         this.recipeTitle = recipeTitle;
         this.recipeText = recipeText;
         this.mealType = mealType;
         this.ownerID = ownerID;
         this.shared = false;
+        this.base64Image = base64Image;
     }
 
     public int getRecipeID(){
@@ -46,6 +48,10 @@ public class Recipe implements Serializable{
         return ownerID;
     }
 
+    public String getBase64Image() {
+        return base64Image;
+    }
+
     public void setRecipeTitle(String newTitle){
         recipeTitle = newTitle;
         if(shared)
@@ -56,6 +62,10 @@ public class Recipe implements Serializable{
         recipeText = newRecipe;
         if(shared)
             generateHTML();
+    }
+
+    public void setBase64Image(String base64Image) {
+        this.base64Image = base64Image;
     }
 
     public String toString(){
@@ -78,6 +88,7 @@ public class Recipe implements Serializable{
         recipe.put("recipeID", getRecipeID());
         recipe.put("mealType", getMealType());
         recipe.put("ownerID", getOwnerID());
+        recipe.put("base64Image", getBase64Image());
         return recipe;
     }
 

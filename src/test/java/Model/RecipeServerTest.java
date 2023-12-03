@@ -1,5 +1,7 @@
 package Model;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
@@ -10,23 +12,32 @@ import java.io.File;
 
 public class RecipeServerTest{
     
-
     @Test
     void testServerReadsExistingListWithItems() throws IOException {
         RecipeServerInterface server = new MockRecipeServer();
         try {
             AccountManager AccountManager = new AccountManager("test.csv");
             int userID = AccountManager.addUser("username", "password");
+            String base64Placeholder = "data:image/jpeg;base64,..."; // Replace with actual Base64 string
 
             RecipeList recipeList = new RecipeList("src/test/lists/testServerReadsExistingList");
-            recipeList.addRecipe("Recipe1", "RecipeText1", "lunch", 1);
+            recipeList.addRecipe("Recipe1", "RecipeText1", "lunch", 1, base64Placeholder);
 
             server.startServer();
             server.renameServer("src/test/lists/testServerReadsExistingList");
             server.loadServer();
             RequestHandler req = new RequestHandler();
             String content = req.performGET("http://localhost:8100/?all", new User("username", "password"));
-            assertEquals("[{\"recipeTitle\":\"Recipe1\",\"recipeText\":\"RecipeText1\",\"mealType\":\"lunch\",\"ownerID\":1,\"recipeID\":1}]",content);
+
+            JSONArray jsonArray = new JSONArray(content);
+            JSONObject jsonObject = jsonArray.getJSONObject(0);
+
+            assertEquals("Recipe1", jsonObject.getString("recipeTitle"));
+            assertEquals("RecipeText1", jsonObject.getString("recipeText"));
+            assertEquals("lunch", jsonObject.getString("mealType"));
+            assertEquals(1, jsonObject.getInt("ownerID"));
+            assertEquals(1, jsonObject.getInt("recipeID"));
+
             server.stopServer();
         } catch (IOException e) {
             e.printStackTrace();
@@ -35,7 +46,7 @@ public class RecipeServerTest{
         if (csvFile.exists()) {
             csvFile.delete();
         }
-        File recipes = new File("src/test/lists/testServerReadsExistingList");
+        File recipes = new File("src/test/lists/testServerReadsExistingList.list");
         if (recipes.exists()) {
             recipes.delete();
         }

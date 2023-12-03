@@ -178,9 +178,9 @@ public class RecipeList {
      *
      * @return The ID of the newly added recipe.
      */
-    public int addRecipe(String recipeTitle, String recipeText, String mealType, int ownerID) {
+    public int addRecipe(String recipeTitle, String recipeText, String mealType, int ownerID, String base64Image) {
         int recipeID = ++highestIndex; // increment highestIndex with every new recipe creataed
-        Recipe r = new Recipe(recipeID, recipeTitle, recipeText, mealType, ownerID);
+        Recipe r = new Recipe(recipeID, recipeTitle, recipeText, mealType, ownerID, base64Image);
         recipeList.put(recipeID, r);
         //System.out.println("Added " + recipeID);
         saveToDisk();
@@ -216,11 +216,12 @@ public class RecipeList {
      * @return Boolean - Returns true if the recipe was successfully edited, false
      *         otherwise.
      */
-    public boolean editRecipe(int recipeID, String newRecipeTitle, String newRecipeText, int ownerID) {
+    public boolean editRecipe(int recipeID, String newRecipeTitle, String newRecipeText, int ownerID, String newbase64Image) {
         Recipe recipe = recipeList.get(recipeID);
         if (recipe != null && recipe.getOwnerID() == ownerID) {
             recipe.setRecipeText(newRecipeText);
             recipe.setRecipeTitle(newRecipeTitle);
+            recipe.setBase64Image(newbase64Image);
             saveToDisk();
             return true;
         }

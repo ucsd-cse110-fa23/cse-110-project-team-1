@@ -9,6 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -60,9 +61,8 @@ public class ViewModel {
 			return createRecipeListView(allRec);
 		} catch (IOException e) {
 			Popup.showError("Unable to contact server to get recipes");
-			e.printStackTrace();
+			throw e;		
 		}
-		return new ListView<HBox>();
     }
 	
 	/*
@@ -77,13 +77,13 @@ public class ViewModel {
 		return false;
 	}
 
-	public RecipeNode requestNewRecipe(User user) {
+	public RecipeNode requestNewRecipe(User user) throws IOException {
 		String response = "";
 		try {
 			response = req.performPOST(server_url, new File("recording.wav"), "ingredients", newlyValidatedMealType, user);
 		} catch (IOException e) {
 			Popup.showError("Unable to contact server to generate new recipe");
-			e.printStackTrace();
+			throw e;		
 		}
 		try {
 			response = response.replaceAll("\r\n?", "\n");
@@ -100,7 +100,7 @@ public class ViewModel {
 	}
 	
 	
-	public boolean requestMealTypeCheck(User user) {
+	public boolean requestMealTypeCheck(User user) throws IOException {
 		String response = "";
         try {
 			response = req.performPOST(server_url, new File("recording.wav"), "mealType", "none", user);
@@ -110,28 +110,30 @@ public class ViewModel {
 			}
         } catch (IOException e) {
 			Popup.showError("Unable to contact server to validate meal type");
-            return false;
+            throw e;
         }
+            		
 		
         return false;
     }
 
-	public void performPutRequest(RecipeNode recipe, User user){
+	public void performPutRequest(RecipeNode recipe, User user) throws IOException{
         try {
 			req.performPUT(server_url, recipe.getRecipeID(), recipe.getRecipeTitle(), recipe.getRecipeText(), recipe.getMealType(), user);
 		} catch (IOException e) {
 			Popup.showError("Unable to contact server to save recipe");
-			e.printStackTrace();
+			throw e;
 		}
     }
 
-    public void performDeleteRequest(int recipeId, User user){
-        try {
-			req.performDELETE(server_url, recipeId, user);
-		} catch (IOException e) {
-			Popup.showError("Unable to contact server to delete recipe");
-			e.printStackTrace();
-		}
+    public boolean performDeleteRequest(int recipeId, User user) throws IOException{
+		try {
+            boolean deleted = req.performDELETE(server_url, recipeId, user);
+			return deleted;
+        } catch (IOException e) {
+			Popup.showError("Server Offline: Unable to contact server to delete recipe");
+			throw e;	
+        }
     }
 	
 	private String getMealTypeFromResponse(String response) {
@@ -148,9 +150,11 @@ public class ViewModel {
 		for (int i = 0; i < allRec.length(); i++) {
 			JSONObject r = allRec.getJSONObject(i);
 			RecipeNode newRecipe = RecipeNode.jsonToRecipeNode(r);
+			newRecipe.setMaxWidth(230);
 			
 // Setup title and mealtype labels for sidebar
 			Label recipeTitle = new Label(newRecipe.getRecipeTitle());
+			recipeTitle.setTextOverrun(OverrunStyle.ELLIPSIS);
 			Label mealType = new Label(newRecipe.getMealType());
 			BackgroundFill background_fill = new BackgroundFill(getMealTypeColor(mealType.getText()), CornerRadii.EMPTY, Insets.EMPTY);
 			Background background = new Background(background_fill);
@@ -244,30 +248,48 @@ public class ViewModel {
 		}
 	}
 
-	public boolean handleLogin(String username, String password) {
+	public boolean handleLogin(String username, String password) throws IOException  {
 		if (!isValidUserInfo(username, password)) {
+			Popup.showError("Invalid username or password");
 			return false;
 		}
 		User user = new User(username, password);
+		System.out.println("Sending Login Request");
+		boolean loggedIn;
 		try {
-			System.out.println("Sending Login Request");
-			return req.performLogin(server_url, user);
+			loggedIn = req.performLogin(server_url, user);
+			if(loggedIn){
+				return true;
+			}
+			Popup.showError("Invalid username or password");
+			return false;	
 		} catch (IOException e) {
-			return false;
-		}
+			Popup.showError("Server Offline: Unable to contact server to log in");
+			throw e;
+		}	
 	}
 	
-	public boolean createAccount(String username, String password) {
+	public boolean createAccount(String username, String password) throws IOException {
 		if (!isValidUserInfo(username, password)) {
+			Popup.showError("Invalid username or password");
 			return false;
 		}
 		User newUser = new User(username, password);
+
+		System.out.println("Sending Create Account Request");
 		try {
-			System.out.println("Sending Create Account Request");
-			return req.performAccountCreation(server_url, newUser);
-		} catch (IOException e) {
-			return false;
+			boolean accountCreated =  req.performAccountCreation(server_url, newUser);
+			if(accountCreated){
+				return true;
+			}
+			Popup.showError("Username Already Taken");
+            return false;
+			
+        } catch (IOException e) {
+			Popup.showError("Server Offline: Unable to contact server to create account");
+			throw e;
 		}
+
 	}
 
 	public void handleLogout() {
