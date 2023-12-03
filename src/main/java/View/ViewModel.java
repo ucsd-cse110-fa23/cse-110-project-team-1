@@ -53,13 +53,13 @@ public class ViewModel {
 			String allRecipes;
 			allRecipes = req.performGET(server_url+"?all", user);
 			if(allRecipes.contains("Invalid username")){
-				ErrorAlert.showError("Invalid username or password when pulling recipes");
+				Popup.showError("Invalid username or password when pulling recipes");
 				throw new Exception("Invalid username or password");
 			}
 			JSONArray allRec = new JSONArray(allRecipes);
 			return createRecipeListView(allRec);
 		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to get recipes");
+			Popup.showError("Unable to contact server to get recipes");
 			e.printStackTrace();
 		}
 		return new ListView<HBox>();
@@ -82,18 +82,18 @@ public class ViewModel {
 		try {
 			response = req.performPOST(server_url, new File("recording.wav"), "ingredients", newlyValidatedMealType, user);
 		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to generate new recipe");
+			Popup.showError("Unable to contact server to generate new recipe");
 			e.printStackTrace();
 		}
 		try {
 			response = response.replaceAll("\r\n?", "\n");
 			return RecipeNode.jsonToRecipeNode(new JSONObject(response));
 		} catch (JSONException e) {
-			ErrorAlert.showError("Invalid JSON response from server, try again");
+			Popup.showError("Invalid JSON response from server, try again");
 			e.printStackTrace();
 			return null;
 		} catch (NullPointerException e){
-			ErrorAlert.showError("Server response null, try again.");
+			Popup.showError("Server response null, try again.");
 			e.printStackTrace();
 			return null;
 		}
@@ -109,7 +109,7 @@ public class ViewModel {
 				return true;
 			}
         } catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to validate meal type");
+			Popup.showError("Unable to contact server to validate meal type");
             return false;
         }
 		
@@ -120,7 +120,7 @@ public class ViewModel {
         try {
 			req.performPUT(server_url, recipe.getRecipeID(), recipe.getRecipeTitle(), recipe.getRecipeText(), recipe.getMealType(), user);
 		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to save recipe");
+			Popup.showError("Unable to contact server to save recipe");
 			e.printStackTrace();
 		}
     }
@@ -129,7 +129,7 @@ public class ViewModel {
         try {
 			req.performDELETE(server_url, recipeId, user);
 		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to delete recipe");
+			Popup.showError("Unable to contact server to delete recipe");
 			e.printStackTrace();
 		}
     }
@@ -279,12 +279,13 @@ public class ViewModel {
 		}
 	}
 
+	
 	public boolean handleShare(int recipeId, User user){
 		
         try {
 			req.performShare(server_url, recipeId, user);
 		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to share recipe");
+			Popup.showError("Unable to contact server to share recipe");
 			e.printStackTrace();
 			return false;
 		}

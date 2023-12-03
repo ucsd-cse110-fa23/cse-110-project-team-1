@@ -9,6 +9,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -18,6 +20,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
+
+import java.awt.datatransfer.StringSelection;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 
 public class View {
 
@@ -359,13 +365,20 @@ public class View {
 		displaySelector("home");
 	}
 
+
+	//https://stackoverflow.com/questions/6710350/copying-text-to-the-clipboard-using-j
 	private void shareRecipe(RecipeNode recipeNode){
 		String s = "http://localhost:8100/shared/recipe" + recipeNode.getRecipeID() + ".html";
-		ErrorAlert.showError(s);
+		
+		Popup.showInformation(s+" copied to clipboard");
+
+		StringSelection stringSelection = new StringSelection(s);
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(stringSelection, null);
 
 		System.out.println("Client Share Recipe: "+currentSelectedRecipeID);
 		viewModel.handleShare(currentSelectedRecipeID,user);
-		this.updateRecipes();
+		//this.updateRecipes();
 	}
 
 	private void onDeleteRequest() {
@@ -446,7 +459,7 @@ public class View {
 				updateRecipes();
 
 			} else {
-				ErrorAlert.showError("Invalid username or password");
+				Popup.showError("Invalid username or password");
 			}
 		});
 		this.createAccount.setOnAction(e -> {
@@ -463,7 +476,7 @@ public class View {
 				buildHomePage();
 				updateRecipes();
 			} else {
-				ErrorAlert.showError("Invalid username or password when creating account");
+				Popup.showError("Invalid username or password when creating account");
 			}
 		});
 		this.logout.setOnAction(e -> {
