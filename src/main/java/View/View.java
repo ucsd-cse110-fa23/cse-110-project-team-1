@@ -461,7 +461,7 @@ public class View {
         this.deleteSavedRecipeButton.setOnAction(e -> this.onDeleteRequest());
         this.startRecording.setOnAction(e -> this.viewModel.startRecording());
         this.backToHome.setOnAction(e -> {
-			((ListView<HBox>)this.recipeTitleListleftVbox.getChildren().get(1)).getSelectionModel().clearSelection();
+			((ListView<HBox>)this.recipeTitleListleftVbox.getChildren().get(2)).getSelectionModel().clearSelection();
 			displaySelector("home");}
 			);
         this.generateNewRecipe.setOnAction(e -> this.buildRecordMealType());
