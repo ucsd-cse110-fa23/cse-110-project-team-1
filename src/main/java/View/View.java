@@ -1,5 +1,7 @@
 package View;
 
+import java.io.IOException;
+
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -110,23 +112,30 @@ public class View {
         setupEventHandlers();
         setupUI();
 		
-        currentSelectedRecipeID = -1;
-        savedRecipeDescription = new Label("Recipe Description: ...");
-		savedRecipeDescription.setWrapText(true);
-
 	}
 
+	/**
+	 * Sets up the initial user interface of the application. 
+	 * Checks if logged in already.
+	 */
 	private void setupUI() {
+		currentSelectedRecipeID = -1;
+		savedRecipeDescription = new Label("Recipe Description: ...");
+		savedRecipeDescription.setWrapText(true);
+
 		User loggedInUser = viewModel.getSavedUser();
 		if(loggedInUser != null){
 			this.user = loggedInUser;
 			buildHomePage();
 			updateRecipes();
 		}else{
-			buildLoginPage();
+			logout();
 		}
     }
 
+	/**
+	 * Updates the list of recipes displayed in the application.
+	 */
 	public void updateRecipes() {
 		System.out.println("Updating Recipes");
         ListView<HBox> sidebar = new ListView<HBox>();
@@ -146,8 +155,7 @@ public class View {
 			this.root.setLeft(this.recipeTitleListleftVbox);
 			setupSelectionListener(sidebar);
 		} catch (Exception e) {
-			//Go back to login page
-			//Clear saved login
+			logout();
 		}
 	}
 
@@ -285,14 +293,11 @@ public class View {
 	}	
 
 	/**
-	 * This method is responsible for displaying a page in the application.
-	 * 
-	 * @param vbox The VBox layout that represents the page to be displayed.
-	 * @param message The message to be printed to the console for debugging purposes.
-	 * @param addBackButton A boolean flag indicating whether to add a back button to the page. If true, a back button is added to the top right corner of the page.
-	 * 
-	 * If useBackButton is true, the method creates a new BorderPane layout, sets the provided VBox as the center, and adds a back button to the top right corner. 
-	 * If useBackButton is false, the method simply sets the provided VBox as the center of the root layout.
+	 * Displays a page in the application with an optional back button.
+	 *
+	 * @param vbox The layout of the page to display.
+	 * @param message Debugging message.
+	 * @param addBackButton If true, a back button is added to the page.
 	 */
 	private void displayPage(VBox vbox, String message, boolean addBackButton) {
 		System.out.println(message);
@@ -353,41 +358,75 @@ public class View {
 		}
 	}
 
+	/**
+	 * Saves the recipe and updates the view.
+	 *
+	 * @param recipeNode The recipe to be saved.
+	 */
 	private void saveRecipe(RecipeNode recipeNode){
-		viewModel.performPutRequest(recipeNode,user);
-		this.updateRecipes();
-		displaySelector("home");
+		try {
+			viewModel.performPutRequest(recipeNode,user);
+			this.updateRecipes();
+			displaySelector("home");
+		} catch (IOException e) {
+			logout();
+		}
 	}
 
+	/**
+	 * Deletes the selected recipe and updates the list.
+	 */
 	private void onDeleteRequest() {
-		System.out.println("Client Delete Recipe: "+currentSelectedRecipeID);
-		viewModel.performDeleteRequest(currentSelectedRecipeID,user);
-		this.updateRecipes();
-		displaySelector("home");
+		System.out.println("Requested Delete Recipe: " + currentSelectedRecipeID);
+		try {
+			viewModel.performDeleteRequest(currentSelectedRecipeID,user);
+			this.updateRecipes();
+			displaySelector("home");
+		} catch (IOException e) {
+			logout();
+		}
 	}
-	
+
+	/**
+	 * Handles the stop recording request based on the request type.
+	 *
+	 * @param requestType The type of the request.
+	 * @return Returns true if the request was successful, false otherwise.
+	 */
 	private boolean onStopRecordRequest(String requestType) {
 		//Stop Recording
 		this.viewModel.stopRecording();
 		//Send Request
-		if(requestType.equals("mealType")){
-			return viewModel.requestMealTypeCheck(user);
-		}else if(requestType.equals("ingredients")){
-			newlyGeneratedRecipe = viewModel.requestNewRecipe(user);
-			if (newlyGeneratedRecipe == null) {
-				return false;
+		try {
+			if(requestType.equals("mealType")){
+				return viewModel.requestMealTypeCheck(user);
+			}else if(requestType.equals("ingredients")){
+				newlyGeneratedRecipe = viewModel.requestNewRecipe(user);
+				if (newlyGeneratedRecipe == null) {
+					return false;
+				}
+				return true;
 			}
-			return true;
+		} catch (IOException e) {
+			logout();
 		}
-		//If valid request, move on, else dont
 		return false;
 	}
 
+	/**
+	 * Updates the details of the selected recipe.
+	 *
+	 * @param recipeText The text of the recipe.
+	 * @param curID The ID of the recipe.
+	 */
 	private void updateSelectedRecipeDetails(String recipeText, Integer curID){
 		savedRecipeDescription.setText(recipeText);
 		currentSelectedRecipeID = curID;
 	}
 
+	/**
+	 * Sets up the event handlers for button s in the application.
+	 */
 	private void setupEventHandlers() {
         this.deleteSavedRecipeButton.setOnAction(e -> this.onDeleteRequest());
         this.startRecording.setOnAction(e -> this.viewModel.startRecording());
@@ -424,50 +463,61 @@ public class View {
             this.updateRecipes();
         });
 		this.refreshRecipe.setOnAction(e -> {
-			onStopRecordRequest("ingredients");
-			buildNewlyGeneratedRecipeDisplay();
+			if(onStopRecordRequest("ingredients")){
+				buildNewlyGeneratedRecipeDisplay();
+			}
 		});
 		this.login.setOnAction(e -> {
 			String username = usernameField.getText();
 			String password = passwordField.getText();
-			boolean loginSuccessful = viewModel.handleLogin(username, password);
-			if (loginSuccessful) {
-				if (autoLoginCheckbox.isSelected()) {
-					viewModel.saveUserLogin(username, password);
+			boolean loginSuccessful;
+			try {
+				loginSuccessful = viewModel.handleLogin(username, password);
+				if (loginSuccessful) {
+					if (autoLoginCheckbox.isSelected()) {
+						viewModel.saveUserLogin(username, password);
+					}
+					this.user = new User(username,password);
+					buildHomePage();
+					updateRecipes();
+	
 				}
-				this.user = new User(username,password);
-				buildHomePage();
-				updateRecipes();
-
-			} else {
-				ErrorAlert.showError("Invalid username or password");
+			} catch (IOException e1) {
+				System.out.println("Login Error");
 			}
 		});
 		this.createAccount.setOnAction(e -> {
 			String username = usernameField.getText();
 			String password = passwordField.getText();
 			System.out.println("Create Account Button Pushed");
-			boolean accountCreated = viewModel.createAccount(username, password);
-			System.out.println("Account Created: " + accountCreated);
-			if (accountCreated) {
-				if (autoLoginCheckbox.isSelected()) {
-					viewModel.saveUserLogin(username, password);
+			boolean accountCreated;
+			try {
+				accountCreated = viewModel.createAccount(username, password);
+				System.out.println("Account Created: " + accountCreated);
+				if (accountCreated) {
+					if (autoLoginCheckbox.isSelected()) {
+						viewModel.saveUserLogin(username, password);
+					}
+					this.user = new User(username,password);
+					buildHomePage();
+					updateRecipes();
 				}
-				this.user = new User(username,password);
-				buildHomePage();
-				updateRecipes();
-			} else {
-				ErrorAlert.showError("Invalid username or password when creating account");
+			} catch (IOException e1) {
+				System.out.println("Create Account Error");
 			}
 		});
 		this.logout.setOnAction(e -> {
-			viewModel.handleLogout();
-			this.user = null;
-			buildLoginPage();
+			logout();
 		});
 
     }
 
+	/**
+	 * Sets up a selection listener for sidebar.
+	 * When a new item is selected it updates the recipe details and builds the detail page.
+	 *
+	 * @param sidebar The ListView of items
+	 */
 	private void setupSelectionListener(ListView<HBox> sidebar) {
 		sidebar.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			if (newValue != null) {
@@ -484,5 +534,14 @@ public class View {
 
 	public BorderPane getRoot() {
 		return this.root;
+	}
+
+	/**
+	 * Logs out the current user and displays the login page.
+	 */
+	private void logout() {
+		viewModel.handleLogout();
+		this.user = null;
+		buildLoginPage();
 	}
 }

@@ -61,9 +61,8 @@ public class ViewModel {
 			return createRecipeListView(allRec);
 		} catch (IOException e) {
 			ErrorAlert.showError("Unable to contact server to get recipes");
-			e.printStackTrace();
+			throw e;		
 		}
-		return new ListView<HBox>();
     }
 	
 	/*
@@ -78,13 +77,13 @@ public class ViewModel {
 		return false;
 	}
 
-	public RecipeNode requestNewRecipe(User user) {
+	public RecipeNode requestNewRecipe(User user) throws IOException {
 		String response = "";
 		try {
 			response = req.performPOST(server_url, new File("recording.wav"), "ingredients", newlyValidatedMealType, user);
 		} catch (IOException e) {
 			ErrorAlert.showError("Unable to contact server to generate new recipe");
-			e.printStackTrace();
+			throw e;		
 		}
 		try {
 			response = response.replaceAll("\r\n?", "\n");
@@ -101,7 +100,7 @@ public class ViewModel {
 	}
 	
 	
-	public boolean requestMealTypeCheck(User user) {
+	public boolean requestMealTypeCheck(User user) throws IOException {
 		String response = "";
         try {
 			response = req.performPOST(server_url, new File("recording.wav"), "mealType", "none", user);
@@ -111,28 +110,24 @@ public class ViewModel {
 			}
         } catch (IOException e) {
 			ErrorAlert.showError("Unable to contact server to validate meal type");
-            return false;
+            throw e;
         }
+            		
 		
         return false;
     }
 
-	public void performPutRequest(RecipeNode recipe, User user){
+	public void performPutRequest(RecipeNode recipe, User user) throws IOException{
         try {
 			req.performPUT(server_url, recipe.getRecipeID(), recipe.getRecipeTitle(), recipe.getRecipeText(), recipe.getMealType(), user);
 		} catch (IOException e) {
 			ErrorAlert.showError("Unable to contact server to save recipe");
-			e.printStackTrace();
+			throw e;		
 		}
     }
 
-    public void performDeleteRequest(int recipeId, User user){
-        try {
-			req.performDELETE(server_url, recipeId, user);
-		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to delete recipe");
-			e.printStackTrace();
-		}
+    public boolean performDeleteRequest(int recipeId, User user) throws IOException{
+		return req.performDELETE(server_url, recipeId, user);
     }
 	
 	private String getMealTypeFromResponse(String response) {
@@ -247,30 +242,26 @@ public class ViewModel {
 		}
 	}
 
-	public boolean handleLogin(String username, String password) {
+	public boolean handleLogin(String username, String password) throws IOException {
 		if (!isValidUserInfo(username, password)) {
+			ErrorAlert.showError("Invalid username or password");
 			return false;
 		}
 		User user = new User(username, password);
-		try {
-			System.out.println("Sending Login Request");
-			return req.performLogin(server_url, user);
-		} catch (IOException e) {
-			return false;
-		}
+		System.out.println("Sending Login Request");
+		return req.performLogin(server_url, user);		
 	}
 	
-	public boolean createAccount(String username, String password) {
+	public boolean createAccount(String username, String password) throws IOException {
 		if (!isValidUserInfo(username, password)) {
+			ErrorAlert.showError("Invalid username or password");
 			return false;
 		}
 		User newUser = new User(username, password);
-		try {
-			System.out.println("Sending Create Account Request");
-			return req.performAccountCreation(server_url, newUser);
-		} catch (IOException e) {
-			return false;
-		}
+
+		System.out.println("Sending Create Account Request");
+		return req.performAccountCreation(server_url, newUser);
+
 	}
 
 	public void handleLogout() {
@@ -286,6 +277,8 @@ public class ViewModel {
 		//System.out.println("Checking user info ["+ username + ":" + password + "] " + !(username.isEmpty() || password.isEmpty()));
 		return !(username.isEmpty() || password.isEmpty());
 	}
+
+	
 
 
 }
