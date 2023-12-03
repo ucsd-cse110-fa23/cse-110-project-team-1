@@ -196,6 +196,8 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 			String newRecipeTitle = allRec.getString("newRecipeTitle");
 			String newRecipeText = allRec.getString("newRecipeText");
 			String mealType = allRec.getString("mealType");
+			//String base64Image = allRec.getString("base64Image");
+			String base64Image = "Temp Image until UI is done.";
 	
 			// Check if the recipe exists
 			if (list.getRecipe(recipeID) != null) {
@@ -209,7 +211,6 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 			} else {
 				// Generate an image and add the recipe if it's new
 				try {
-					String base64Image = dalle.generateImageBase64(newRecipeTitle);
 					recipeID = list.addRecipe(newRecipeTitle, newRecipeText, mealType, ownerID, base64Image);
 					response = "" + recipeID;
 				} catch (Exception e) {
