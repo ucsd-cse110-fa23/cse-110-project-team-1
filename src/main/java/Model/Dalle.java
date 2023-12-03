@@ -20,7 +20,7 @@ interface ImageModel {
 public class Dalle implements ImageModel {
     private static final String API_ENDPOINT = "https://api.openai.com/v1/images/generations";
     private static String API_KEY;
-    private static final String MODEL = "dalle-mini"; // Or the specific model used for DALL-E
+    private static final String MODEL = "dall-e-2"; // Or the specific model used for DALL-E
 
     public Dalle() {
         try {
