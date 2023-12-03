@@ -11,6 +11,7 @@ lib/
 key.txt
 *.properties
 *.list
+!src/test/lists/*.list
 *.mp3
 *.wav
 
