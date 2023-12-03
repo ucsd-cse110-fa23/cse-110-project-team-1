@@ -20,7 +20,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 	protected AccountManager accountManager;
 	protected GPTModel gpt;
 	protected WhisperModel wisp;
-	protected Dalle dalle;
+	protected ImageModel dalle;
 
 	public RecipeHTTPHandler(RecipeList list, AccountManager accountManager) {
 		this.list = list;
@@ -217,11 +217,6 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 		JSONObject allRec = new JSONObject(postData);
 	
 		Integer ownerID = verifyUserAndGetID(httpExchange);
-		String newRecipeTitle = allRec.getString("newRecipeTitle");
-		String newRecipeText = allRec.getString("newRecipeText");
-		String mealType = allRec.getString("mealType");
-		//String base64Image = allRec.getString("base64Image");
-		String base64Image = "Temp Image until UI is done.";
 
 		if (ownerID != null) {
 			if(postData.contains("shareID")){
@@ -244,7 +239,11 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 			}
 
 			int recipeID = allRec.getInt("recipeID");
-	
+			String newRecipeTitle = allRec.getString("newRecipeTitle");
+			String newRecipeText = allRec.getString("newRecipeText");
+			String mealType = allRec.getString("mealType");
+			//String base64Image = allRec.getString("base64Image");
+			String base64Image = "Temp Image until UI is done.";
 			// Check if the recipe exists
 			if (list.getRecipe(recipeID) != null) {
 				// Update existing recipe without generating a new image
@@ -344,5 +343,6 @@ class MockRecipeHTTPHandler extends RecipeHTTPHandler {
 		super(list, accountManager);
 		gpt = new MockGPT();
 		wisp = new MockWhisper();
+		dalle = new MockDalle();
 	}
 }
