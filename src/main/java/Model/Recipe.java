@@ -125,9 +125,9 @@ public class Recipe implements Serializable{
 
     public boolean equals(Recipe rhs) {
         return (this.recipeID == rhs.recipeID) &&
-            (this.recipeTitle == rhs.recipeTitle) &&
-            (this.recipeText == rhs.recipeText) &&
-            (this.mealType == rhs.mealType) &&
+            (this.recipeTitle.equals(recipeTitle)) &&
+            (this.recipeText.equals(rhs.recipeText)) &&
+            (this.mealType.equals(rhs.mealType)) &&
             (this.ownerID == rhs.ownerID) &&
             (this.shared == rhs.shared);
     }
