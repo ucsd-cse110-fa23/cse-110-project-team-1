@@ -91,7 +91,11 @@ public class ChatGPT implements GPTModel {
         JSONArray choices = responseJson.getJSONArray("choices");
         String generatedText = choices.getJSONObject(0).getString("text");
 
-        return generatedText;
+        return filterNonAscii(generatedText);
+    }
+
+    String filterNonAscii(String input) {
+        return input.replaceAll("[^\\x00-\\x7F]", "");
     }
 }
 

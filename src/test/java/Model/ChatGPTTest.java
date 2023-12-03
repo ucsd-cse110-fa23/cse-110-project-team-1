@@ -54,4 +54,15 @@ public class ChatGPTTest {
             System.err.println(e);
         }
     }
+    
+    @Test
+    void testFilterNonAscii() {
+        String input = "Hello, World! 350┬░F";
+        String expected = "Hello, World! 350F";
+        
+        ChatGPT chatGPT = new ChatGPT();
+        String output = chatGPT.filterNonAscii(input);
+        
+        assertEquals(expected, output);
+    }
 }

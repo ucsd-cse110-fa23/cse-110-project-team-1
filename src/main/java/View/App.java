@@ -33,11 +33,6 @@ public class App extends Application {
 		ViewModel viewModel = new ViewModel(new RequestHandler(), "http://localhost:8100/", audioRecorder,"savedLogin.csv");
 		View view = new View(viewModel);
 
-		//Just a test for sending files
-		//RequestHandler req = new RequestHandler();
-		//req.performPOST("http://localhost:8100/",new File("Test.mp3"),"mealType");
-
-
 		primaryStage.setTitle(this.appName);
 		primaryStage.getIcons().add(new Image("file:./src/main/java/View/images/icon.png"));
 		primaryStage.setScene(new Scene(view.getRoot(), dimX, dimY));

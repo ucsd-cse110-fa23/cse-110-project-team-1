@@ -32,21 +32,29 @@ public class RequestHandler {
      * @throws IOException If an I/O error occurs with the connection.
      */
     public String performPOST(String urlString, File file, String audioType, String mealType, User user) throws IOException {
-        HttpURLConnection conn = setupConnection(urlString, "POST", user);
-        conn.setRequestProperty("Content-Type", "application/octet-stream");
-        conn.setRequestProperty("Content-Length", String.valueOf(file.length()));
-        conn.setRequestProperty("Audio-Type", audioType);
-        conn.setRequestProperty("Meal-Type", mealType);
-    
-        OutputStream out = conn.getOutputStream();
-        Files.copy(file.toPath(), out);
-    
-        out.flush();
-        out.close();
-    
-        String response = getResponse(conn);
-        System.out.println("Server Response: " + response);
-        return response;
+        
+        String response;
+        try {
+            HttpURLConnection conn = setupConnection(urlString, "POST", user);
+            conn.setRequestProperty("Content-Type", "application/octet-stream");
+            conn.setRequestProperty("Content-Length", String.valueOf(file.length()));
+            conn.setRequestProperty("Audio-Type", audioType);
+            conn.setRequestProperty("Meal-Type", mealType);
+        
+            OutputStream out = conn.getOutputStream();
+            Files.copy(file.toPath(), out);
+        
+            out.flush();
+            out.close();
+            response = getResponse(conn);
+            System.out.println("Server Response: " + response);
+            if(response.contains("Incorrect API key provided")){
+                //ErrorAlert.showError("Incorrect API key provided \n You can find your API key at https://platform.openai.com/account/api-keys.");
+            }
+            return response;
+        } catch (IOException e) {
+            throw new ServerOfflineException("Server is offline");
+        }
     }
 
 
@@ -61,29 +69,35 @@ public class RequestHandler {
      * @param mealType The meal type of the recipe to be updated or created.
      * 
      * @return 
+     * @throws IOException
      *
      */
     public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText, String mealType, User user) throws IOException {
-        HttpURLConnection conn = setupConnection(urlString, "PUT", user);
-    
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("newRecipeText", recipeText);
-        requestBody.put("newRecipeTitle", recipeTitle);
-        requestBody.put("recipeID", recipeID);
-        requestBody.put("mealType", mealType);
-        String body = requestBody.toString();
-    
-        sendRequest(conn, body);
-    
-        int responseCode = conn.getResponseCode();
-        Integer toReturn = -1;
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            String response = getResponse(conn);
-            toReturn = Integer.parseInt(response); // Get recipeID from server response
-        } else {
-            System.out.println("Server returned non-OK code: " + responseCode);
+        HttpURLConnection conn;
+        try {
+            conn = setupConnection(urlString, "PUT", user);
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("newRecipeText", recipeText);
+            requestBody.put("newRecipeTitle", recipeTitle);
+            requestBody.put("recipeID", recipeID);
+            requestBody.put("mealType", mealType);
+            String body = requestBody.toString();
+        
+            sendRequest(conn, body);
+        
+            int responseCode = conn.getResponseCode();
+            Integer toReturn = -1;
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String response = getResponse(conn);
+                toReturn = Integer.parseInt(response); // Get recipeID from server response
+            } else {
+                System.out.println("Server returned non-OK code: " + responseCode);
+            }
+            return toReturn;
+        } catch (IOException e) {
+           throw new ServerOfflineException("Server is offline");
         }
-        return toReturn;
+    
     }
 
 
@@ -92,20 +106,27 @@ public class RequestHandler {
      * 
      * @param urlString The URL of the server to which the DELETE request will be sent
      * @param recipeID The ID of the recipe to be deleted.
+     * @throws IOException
      * 
      */
-    public void performDELETE(String urlString, int recipeID, User user) throws IOException {
-        HttpURLConnection conn = setupConnection(urlString, "DELETE", user);
-    
-        String body = "recipeID=" + recipeID;
-        sendRequest(conn, body);
-    
-        int responseCode = conn.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            String response = getResponse(conn);
-            System.out.println("Delete response " + response);
-        } else {
-            System.out.println("Server returned non-OK code: " + responseCode);
+    public boolean performDELETE(String urlString, int recipeID, User user) throws IOException {
+        try {
+            HttpURLConnection conn = setupConnection(urlString, "DELETE", user);
+        
+            String body = "recipeID=" + recipeID;
+            sendRequest(conn, body);
+        
+            int responseCode;
+            responseCode = conn.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                String response = getResponse(conn);
+                System.out.println("Delete response " + response);
+            } else {
+                System.out.println("Server returned non-OK code: " + responseCode);
+            }
+            return true;
+        } catch (IOException e) {
+            throw new ServerOfflineException("Server is offline");
         }
     }
 
@@ -118,12 +139,19 @@ public class RequestHandler {
      * @param url The URL of the server from which the data will be retrieved.
      *
      * @return A JSON string containing all recipes. If an error occurs, it returns the string "Invalid".
+     * @throws IOException
      *
      */
     public String performGET(String urlString, User user) throws IOException {
-        HttpURLConnection conn = setupConnection(urlString, "GET", user);
-        String content = getResponse(conn);
-        return content;
+        try {
+            HttpURLConnection conn = setupConnection(urlString, "GET", user);
+            if(conn == null){return "";}
+            String content;
+            content = getResponse(conn);
+            return content;
+        } catch (IOException e) {
+            throw new ServerOfflineException("Server is offline");
+        }
     }
 
     /**
@@ -134,13 +162,25 @@ public class RequestHandler {
      * @return true if login is successful, false otherwise.
      * @throws IOException If an I/O error occurs with the connection.
      */
-    public boolean performLogin(String urlString,User user) throws IOException {
-        HttpURLConnection conn = setupConnection(urlString, "POST", user);
-        conn.setRequestProperty("UserHandling", "LOGIN");
-        String response = getResponse(conn);
-        System.out.println("Performing Login");
-        System.out.println("Server Response Recieved: " + response);
-        return response.equals("Login successful");
+    public boolean performLogin(String urlString, User user) throws IOException {
+        HttpURLConnection conn;
+        try {
+            conn = setupConnection(urlString, "POST", user);
+            if(conn == null){return false;}
+            conn.setRequestProperty("UserHandling", "LOGIN");
+            String response = getResponse(conn);
+            System.out.println("Performing Login");
+            System.out.println("Server Response Received: " + response);
+    
+            if (response.equals("Login successful")) {
+                return true;
+            } else if (response.equals("Invalid username or password")) {
+                throw new IOException("Invalid username or password");
+            }
+        } catch (IOException e) {
+            throw new ServerOfflineException("Server is offline");        
+        }
+        return false;
     }
 
     /**
@@ -152,48 +192,66 @@ public class RequestHandler {
      * @throws IOException If an I/O error occurs with the connection.
      */    
     public boolean performAccountCreation(String urlString,User user) throws IOException {
-        HttpURLConnection conn = setupConnection(urlString, "POST", user);
-        conn.setRequestProperty("UserHandling", "CREATE");
-
-        String response = getResponse(conn);
-        System.out.println("Performing Account Create");
+        try {
+            HttpURLConnection conn = setupConnection(urlString, "POST", user);
+            if(conn == null){return false;}
+            conn.setRequestProperty("UserHandling", "CREATE");
+    
+            String response = getResponse(conn);
+            System.out.println("Performing Account Create");
+            return response.startsWith("Account created successfully");
+        } catch (IOException e) {
+            throw new ServerOfflineException("Server is offline");
+        }
         //System.out.println("Server Response Recieved: " + response);
-        return response.startsWith("Account created successfully");
     }
 
     private HttpURLConnection setupConnection(String urlString, String method, User user) throws IOException {
-        URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod(method);
-        conn.setDoOutput(true);
-        conn.setRequestProperty("Username", user.getUsername());
-        conn.setRequestProperty("Password", user.getPassword());
-        return conn;
+        try {
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod(method);
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Username", user.getUsername());
+            conn.setRequestProperty("Password", user.getPassword());
+            return conn;
+        } catch (IOException e) {
+            System.out.println("Setup Connection Fail");
+            throw e;
+        }
     }
     
     private void sendRequest(HttpURLConnection conn, String body) throws IOException {
-        OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
-        out.write(body);
-        out.flush();
-        out.close();
+        try {
+            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            out.write(body);
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            System.out.println("Request Send Fail");
+            throw e;
+        }
     }
     
     private String getResponse(HttpURLConnection conn) throws IOException {
         BufferedReader in;
-        //System.out.println("Response Code: " + conn.getResponseCode());
-        //System.out.println("Response Message: " + conn.getResponseMessage());
-        if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
-            in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        } else {
-            in = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
-        }
         StringBuilder response = new StringBuilder();
-        String inputLine;
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+        try {
+            if (200 <= conn.getResponseCode() && conn.getResponseCode() <= 399) {
+                in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            } else {
+                in = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+            }
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+        } catch (IOException e) {
+            System.out.println("Get Response Fail");
+            throw e;
         }
-        in.close();
         return response.toString();
-     }
+    }
 
 }
