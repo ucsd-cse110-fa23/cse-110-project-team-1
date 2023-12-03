@@ -190,43 +190,26 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 		String postData = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
 		JSONObject allRec = new JSONObject(postData);
 		int recipeID = allRec.getInt("recipeID");
-
+	
 		Integer ownerID = verifyUserAndGetID(httpExchange);
 		if (ownerID != null) {
 			String newRecipeTitle = allRec.getString("newRecipeTitle");
 			String newRecipeText = allRec.getString("newRecipeText");
 			String mealType = allRec.getString("mealType");
-			String base64Image = "";
-
+	
 			// Check if the recipe exists
 			if (list.getRecipe(recipeID) != null) {
-				// Check if the title or text has changed before generating a new image
+				// Update existing recipe without generating a new image
 				Recipe existingRecipe = list.getRecipe(recipeID);
-				if (!existingRecipe.getRecipeTitle().equals(newRecipeTitle)
-						|| !existingRecipe.getRecipeText().equals(newRecipeText)) {
-					try {
-						base64Image = dalle.generateImageBase64(newRecipeTitle); // Image generated based on title
-						existingRecipe.setRecipeTitle(newRecipeTitle);
-						existingRecipe.setRecipeText(newRecipeText);
-						//existingRecipe.setMealType(mealType);
-						existingRecipe.setBase64Image(base64Image);
-						list.saveToDisk(); // Save the updated list
-						response = "Recipe updated successfully";
-					} catch (Exception e) {
-						response = "Error generating image: " + e.getMessage();
-						e.printStackTrace();
-					}
-				} else {
-					// If the text has not changed, no need to regenerate the image
-					existingRecipe.setRecipeTitle(newRecipeTitle);
-					//existingRecipe.setMealType(mealType);
-					list.saveToDisk();
-					response = "Recipe updated successfully";
-				}
+				existingRecipe.setRecipeTitle(newRecipeTitle);
+				existingRecipe.setRecipeText(newRecipeText);
+				//existingRecipe.setMealType(mealType);
+				list.saveToDisk(); // Save the updated list
+				response = "Recipe updated successfully";
 			} else {
-				// If the recipe is new, generate an image and add the recipe
+				// Generate an image and add the recipe if it's new
 				try {
-					base64Image = dalle.generateImageBase64(newRecipeTitle);
+					String base64Image = dalle.generateImageBase64(newRecipeTitle);
 					recipeID = list.addRecipe(newRecipeTitle, newRecipeText, mealType, ownerID, base64Image);
 					response = "Recipe added successfully with ID: " + recipeID;
 				} catch (Exception e) {
@@ -239,6 +222,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 		}
 		return response;
 	}
+	
 
 	/*
 	 * This will be to delete recioe
