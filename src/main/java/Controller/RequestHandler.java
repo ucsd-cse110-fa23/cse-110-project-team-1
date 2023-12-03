@@ -47,10 +47,7 @@ public class RequestHandler {
             out.flush();
             out.close();
             response = getResponse(conn);
-            System.out.println("Server Response: " + response);
-            if(response.contains("Incorrect API key provided")){
-                //ErrorAlert.showError("Incorrect API key provided \n You can find your API key at https://platform.openai.com/account/api-keys.");
-            }
+            //System.out.println("Server Response: " + response);
             return response;
         } catch (IOException e) {
             throw new ServerOfflineException("Server is offline");

@@ -81,6 +81,7 @@ public class ViewModel {
 		String response = "";
 		try {
 			response = req.performPOST(server_url, new File("recording.wav"), "ingredients", newlyValidatedMealType, user);
+			checkIfAPIError(response);
 		} catch (IOException e) {
 			Popup.showError("Unable to contact server to generate new recipe");
 			throw e;		
@@ -104,6 +105,7 @@ public class ViewModel {
 		String response = "";
         try {
 			response = req.performPOST(server_url, new File("recording.wav"), "mealType", "none", user);
+			checkIfAPIError(response);
 			if(validateMealType(response)){
 				newlyValidatedMealType = getMealTypeFromResponse(response);
 				return true;
@@ -317,5 +319,11 @@ public class ViewModel {
 	private boolean isValidUserInfo(String username, String password) {
 		//System.out.println("Checking user info ["+ username + ":" + password + "] " + !(username.isEmpty() || password.isEmpty()));
 		return !(username.isEmpty() || password.isEmpty());
+	}
+	private void checkIfAPIError(String response) throws IOException {
+		if(response.contains("Incorrect API key provided")){
+		    Popup.showError("Incorrect API key provided \n You can find your API key at https://platform.openai.com/account/api-keys.");
+		    throw new IOException("Incorrect API key provided");
+		}
 	}
 }

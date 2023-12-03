@@ -95,27 +95,39 @@ public class Recipe implements Serializable{
     //https://www.baeldung.com/java-write-to-file
     public void generateHTML(){
         try{
-            String str = "<html>\r\n" + //
-                    "    <style>\r\n" + //
-                    "        body {\r\n" + //
-                    "            background-color: rgb(192, 192, 192);\r\n" + //
-                    "        }\r\n" + //
-                    "    </style>\r\n" + //
-                    "\r\n" + //
-                    "    <head>\r\n" + //
-                    "        <meta charset=\"UTF-8\" />\r\n" + //
-                    "    </head>\r\n" + //
-                    "    <h2>\r\n" + //
-                    "        "+ this.recipeTitle +"\r\n" + //
-                    "    </h2>\r\n" + //
-                    "\r\n" + //
-                    "    <body>\r\n" + //
-                    "        <title>\r\n" + //
-                    "            "+ this.recipeTitle +"\r\n" + //
-                    "        </title>\r\n" + //
-                    "        "+ this.recipeText.replaceAll("\n", "<br>") +"\r\n" + //
-                    "    </body>\r\n" + //
-                    "\r\n" + //
+            String str = "<html>\r\n" + 
+                    "    <head>\r\n" + 
+                    "        <meta charset=\"UTF-8\" />\r\n" + 
+                    "        <title>" + this.recipeTitle + "</title>\r\n" + 
+                    "        <style>\r\n" + 
+                    "            body {\r\n" + 
+                    "                font-family: Arial, sans-serif;\r\n" + 
+                    "                margin: 0;\r\n" + 
+                    "                padding: 0;\r\n" + 
+                    "                background-color: #f4f4f4;\r\n" + 
+                    "            }\r\n" + 
+                    "            .recipe {\r\n" + 
+                    "                width: 80%;\r\n" + 
+                    "                margin: auto;\r\n" + 
+                    "                padding: 20px;\r\n" + 
+                    "                background-color: #fff;\r\n" + 
+                    "                box-shadow: 0 0 10px rgba(0,0,0,0.1);\r\n" + 
+                    "            }\r\n" + 
+                    "            .recipe h2 {\r\n" + 
+                    "                color: #333;\r\n" + 
+                    "            }\r\n" + 
+                    "            .recipe p {\r\n" + 
+                    "                font-size: 16px;\r\n" + 
+                    "                color: #666;\r\n" + 
+                    "            }\r\n" + 
+                    "        </style>\r\n" + 
+                    "    </head>\r\n" + 
+                    "    <body>\r\n" + 
+                    "        <div class=\"recipe\">\r\n" + 
+                    "            <h2>" + this.recipeTitle + "</h2>\r\n" + 
+                    "            <p>" + this.recipeText.replace(this.recipeTitle+"\n", "").replaceAll("\n", "<br>") + "</p>\r\n" + 
+                    "        </div>\r\n" + 
+                    "    </body>\r\n" + 
                     "</html>";
             
             
