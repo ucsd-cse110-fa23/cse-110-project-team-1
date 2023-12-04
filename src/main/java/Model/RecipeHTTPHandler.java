@@ -235,6 +235,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 					response = "Invalid recipe ID " + rID;
 					System.out.println("Invalid recipe ID " + rID);
 				}
+				list.saveToDisk(); // Save the updated list
 				return response;
 			}
 
