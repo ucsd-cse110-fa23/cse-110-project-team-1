@@ -11,6 +11,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -34,6 +36,10 @@ import javax.swing.UIClientPropertyKey;
 import javafx.scene.layout.FlowPane;
 
 
+import java.awt.datatransfer.StringSelection;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+
 public class View {
 
 	public BorderPane root;
@@ -43,6 +49,7 @@ public class View {
 
 	private Button addNewRecipeButton = new Button("Generate Recipe");
 	private Button editSavedRecipeButton = new Button("Edit Recipe");
+	private Button shareSavedRecipeButton = new Button("Share Recipe");
 	private Button deleteSavedRecipeButton = new Button("Delete Recipe");
 	private Button newlyGeneratedRecipeSaveButton = new Button("Save Recipe");
 	private Button editedRecipeSaveButton = new Button("Save Recipe");
@@ -269,7 +276,7 @@ public class View {
 	}
 
 	private void buildDetailPage(){
-		HBox buttons = new HBox(backToHome, editSavedRecipeButton, deleteSavedRecipeButton);
+		HBox buttons = new HBox(backToHome, editSavedRecipeButton, deleteSavedRecipeButton, shareSavedRecipeButton);
 		Label detailMealtype = new Label("Meal Type: " + currentSelectedRecipe.getMealType());
 		ScrollPane descriptionScrollBox = new ScrollPane(savedRecipeDescription);
 		descriptionScrollBox.setStyle("-fx-background-color:transparent;");
@@ -433,6 +440,22 @@ public class View {
 		}
 	}
 
+
+	//https://stackoverflow.com/questions/6710350/copying-text-to-the-clipboard-using-j
+	private void shareRecipe(RecipeNode recipeNode){
+		String s = "http://localhost:8100/shared/recipe" + recipeNode.getRecipeID() + ".html";
+		
+		Popup.showInformation(s+" copied to clipboard");
+
+		StringSelection stringSelection = new StringSelection(s);
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		clipboard.setContents(stringSelection, null);
+
+		System.out.println("Client Share Recipe: "+currentSelectedRecipeID);
+		viewModel.handleShare(currentSelectedRecipeID,user);
+		//this.updateRecipes();
+	}
+
 	/**
 	 * Deletes the selected recipe and updates the list.
 	 */
@@ -497,6 +520,7 @@ public class View {
 			);
         this.generateNewRecipe.setOnAction(e -> this.buildRecordMealType());
         this.editSavedRecipeButton.setOnAction(e -> this.buildEditPage(currentlyEditingRecipe));
+		this.shareSavedRecipeButton.setOnAction(e -> this.shareRecipe(currentlyEditingRecipe));
         this.stopRecordingMealType.setOnAction(e -> {
             if (this.onStopRecordRequest("mealType")){
                 buildRecordIngredients();
@@ -547,7 +571,11 @@ public class View {
 					this.updateRecipesList();
 	
 				}
-			} catch (IOException e1) {
+				else {
+					Popup.showError("Invalid username or password");
+				}
+			} 
+			catch (IOException e1) {
 				System.out.println("Login Error");
 			}
 		});
@@ -567,6 +595,9 @@ public class View {
 					buildHomePage();
 					this.refreshRecipes();
 					this.updateRecipesList();
+				}
+				else {
+					Popup.showError("Invalid username or password when creating account");
 				}
 			} catch (IOException e1) {
 				System.out.println("Create Account Error");

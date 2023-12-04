@@ -46,10 +46,7 @@ public class RequestHandler {
             out.flush();
             out.close();
             response = getResponse(conn);
-            System.out.println("Server Response: " + response);
-            if(response.contains("Incorrect API key provided")){
-                //ErrorAlert.showError("Incorrect API key provided \n You can find your API key at https://platform.openai.com/account/api-keys.");
-            }
+            //System.out.println("Server Response: " + response);
             return response;
         } catch (IOException e) {
             throw new ServerOfflineException("Server is offline");
@@ -181,6 +178,31 @@ public class RequestHandler {
             throw new ServerOfflineException("Server is offline");        
         }
         return false;
+    }
+
+    /**
+     * This method sends a DELETE request to the server to delete a specific recipe identified by its ID.
+     * 
+     * @param urlString The URL of the server to which the DELETE request will be sent
+     * @param recipeID The ID of the recipe to be deleted.
+     * 
+     */
+    public void performShare(String urlString, int recipeID, User user) throws IOException {
+        HttpURLConnection conn = setupConnection(urlString, "PUT", user);
+
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("shareID", recipeID);
+        String body = requestBody.toString();
+
+        sendRequest(conn, body);
+    
+        int responseCode = conn.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            String response = getResponse(conn);
+            System.out.println("Share response " + response);
+        } else {
+            System.out.println("Server returned non-OK code: " + responseCode);
+        }
     }
 
     /**

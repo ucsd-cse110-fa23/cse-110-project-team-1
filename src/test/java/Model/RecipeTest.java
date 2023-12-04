@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -75,6 +76,9 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         recipeList.addRecipe("Recipe2", "RecipeText2", "lunch", 1,base64Placeholder);
         recipeList.addRecipe("Recipe3", "RecipeText3", "lunch", 1,base64Placeholder);
 
+        recipeList.shareRecipe(1);
+        recipeList.shareRecipe(3);
+
         recipeList.saveToDisk();
 
         RecipeList loadedList = new RecipeList("src/test/testSaveAndLoadRecipeList");
@@ -83,13 +87,23 @@ public class RecipeTest { //temporary tests until JUnit is in place\
 
         assertEquals(recipeList.getRecipe(1).getRecipeTitle(), loadedList.getRecipe(1).getRecipeTitle());
         assertEquals(recipeList.getRecipe(1).getRecipeText(), loadedList.getRecipe(1).getRecipeText());
+        assertEquals(loadedList.getRecipe(1).getShared(), true);
     
         assertEquals(recipeList.getRecipe(2).getRecipeTitle(), loadedList.getRecipe(2).getRecipeTitle());
         assertEquals(recipeList.getRecipe(2).getRecipeText(), loadedList.getRecipe(2).getRecipeText());
+        assertEquals(loadedList.getRecipe(2).getShared(), false);
     
         assertEquals(recipeList.getRecipe(3).getRecipeTitle(), loadedList.getRecipe(3).getRecipeTitle());
         assertEquals(recipeList.getRecipe(3).getRecipeText(), loadedList.getRecipe(3).getRecipeText());
-       
+        assertEquals(loadedList.getRecipe(3).getShared(), true);
+        
+        
+        
+        assertTrue(recipeList.getRecipe(1).equals(loadedList.getRecipe(1)));
+        assertTrue(recipeList.getRecipe(2).equals(loadedList.getRecipe(2)));
+        assertTrue(recipeList.getRecipe(3).equals(loadedList.getRecipe(3)));
+        
+
         File file = new File("src/test/testSaveAndLoadRecipeList.list");
         file.delete(); // remove test list
     }
@@ -156,6 +170,28 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         File file = new File("src/test/testEditNonExistingRecipe.list");
         file.delete(); // remove test list
     }
+
+    @Test
+    void testGenerateHTML(){
+       int newRecipeID = 123;
+        String newRecipeTitle = "Beans Recipe";
+        String newRecipeText = "Beans Recipe\n Ingredients:\n1 Can of Beans\n\nInstructions:\nStep 1: Put beans on plate\n";
+
+        Recipe newRecipe = new Recipe(newRecipeID,newRecipeTitle,newRecipeText, "lunch",1,base64Placeholder);
+
+        String html = newRecipe.generateHTML();
+
+        assertTrue(html.contains(newRecipeTitle));
+        assertTrue(html.contains("Can of Beans"));
+
+        assertEquals(newRecipeID, newRecipe.getRecipeID());
+        assertEquals(newRecipeText, newRecipe.getRecipeText());
+        assertEquals(newRecipeTitle, newRecipe.getRecipeTitle());
+
+    }
+
+
+
     /*public static void main(String[] args){
         Recipe L = new Recipe(0, "ball", "two eggs");
         Recipe G = new Recipe(1, "souffle", "three eggs");

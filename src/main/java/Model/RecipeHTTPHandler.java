@@ -20,7 +20,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 	protected AccountManager accountManager;
 	protected GPTModel gpt;
 	protected WhisperModel wisp;
-	protected Dalle dalle;
+	protected ImageModel dalle;
 
 	public RecipeHTTPHandler(RecipeList list, AccountManager accountManager) {
 		this.list = list;
@@ -31,35 +31,35 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 	}
 
 	public void handle(HttpExchange httpExchange) throws IOException {
-		String response = "Request Received";
-		String method = httpExchange.getRequestMethod();
-		// System.out.println("Request recieved " + method);
+        String response = "Request Received";
+        String method = httpExchange.getRequestMethod();
+        // System.out.println("Request recieved " + method);
 
-		try {
-			if (method.equals("GET")) {
-				response = handleGet(httpExchange);
-			} else if (method.equals("POST")) {
-				response = handlePost(httpExchange);
-			} else if (method.equals("PUT")) {
-				response = handlePut(httpExchange);
-			} else if (method.equals("DELETE")) {
-				response = handleDelete(httpExchange);
-			} else {
-				throw new Exception("Not Valid Request Method");
-			}
-		} catch (Exception e) {
-			System.out.println("An erroneous request");
-			response = e.toString();
-			e.printStackTrace();
-		}
-		// System.out.println("Server Sending: " + response);
-		// Sending back response to the client
-		httpExchange.sendResponseHeaders(200, response.length());
-		OutputStream outStream = httpExchange.getResponseBody();
-		outStream.write(response.getBytes());
-		outStream.close();
+        try {
+            if (method.equals("GET")) {
+                response = handleGet(httpExchange);
+            } else if (method.equals("POST")) {
+                response = handlePost(httpExchange);
+            } else if (method.equals("PUT")) {
+                response = handlePut(httpExchange);
+            } else if (method.equals("DELETE")) {
+                response = handleDelete(httpExchange);
+            } else {
+                throw new Exception("Not Valid Request Method");
+            }
+        } catch (Exception e) {
+            System.out.println("An erroneous request");
+            response = e.toString();
+            e.printStackTrace();
+        }
+        // System.out.println("Server Sending: " + response);
+        // Sending back response to the client
+        httpExchange.sendResponseHeaders(200, response.length());
+        OutputStream outStream = httpExchange.getResponseBody();
+        outStream.write(response.getBytes());
+        outStream.close();
 
-	}
+    }
 
 	/*
 	 * get requests are to pull recipes from server can either use
@@ -71,6 +71,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 	private String handleGet(HttpExchange httpExchange) throws IOException {
 		String response = "Invalid recipeID";
 		URI uri = httpExchange.getRequestURI();
+		String uriString = uri.toString();
 		String query = uri.getRawQuery();
 
 		Integer ownerID = verifyUserAndGetID(httpExchange);
@@ -87,7 +88,31 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 					response = list.getUserRecipes(ownerID).toString();
 				}
 			}
+		}else if(uriString.substring(0,8).equals("/shared/")){
+			int recipeID = Integer.parseInt(uriString.substring(14,uriString.indexOf(".")));
+			if(list.getRecipe(recipeID) == null){
+				System.out.println("invalid recipe ID " + recipeID);
+				return "Invalid recipe ID " + recipeID;
+			}
+			if(!list.getRecipe(recipeID).getShared()){
+				System.out.println("Private recipe["+list.getRecipe(recipeID).getShared()+"] ID " + recipeID);
+				return "Private recipe ID " + recipeID;
+			}
+			//System.out.println("recipe req: "+ recipeID);
+			FileInputStream fis = new FileInputStream("shared/recipe"+recipeID+".html");
+			byte[] buffer = new byte[10];
+			StringBuilder sb = new StringBuilder();
+			while (fis.read(buffer) != -1) {
+				sb.append(new String(buffer));
+				buffer = new byte[10];
+			}
+			fis.close();
+
+			String content = sb.toString();
+			response = sb.toString();
 		} else {
+			System.out.println("query: "+query);
+			System.out.println("uri: "+uri);
 			response = "Invalid username or password";
 		}
 		return response;
@@ -188,16 +213,37 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 		String response = "Invalid PUT request";
 		InputStream inStream = httpExchange.getRequestBody();
 		String postData = new BufferedReader(new InputStreamReader(inStream)).lines().collect(Collectors.joining("\n"));
+
 		JSONObject allRec = new JSONObject(postData);
-		int recipeID = allRec.getInt("recipeID");
 	
 		Integer ownerID = verifyUserAndGetID(httpExchange);
+
 		if (ownerID != null) {
+			if(postData.contains("shareID")){
+				int rID = allRec.getInt("shareID");
+
+				System.out.println("rUID:"+ list.getRecipe(rID).getOwnerID() +"rID:"+ rID + " uID" + ownerID);
+				if(list.getRecipe(rID).getOwnerID() != ownerID){
+					response = "Not your recipe ID" + rID;
+				  	System.out.println("Not your recipe ID" + rID);
+				}
+
+				if(list.shareRecipe(rID)){
+					response = "Shared recipe " + rID;
+					System.out.println("Shared recipe " + rID);
+				}else{
+					response = "Invalid recipe ID " + rID;
+					System.out.println("Invalid recipe ID " + rID);
+				}
+				list.saveToDisk(); // Save the updated list
+				return response;
+			}
+
+			int recipeID = allRec.getInt("recipeID");
 			String newRecipeTitle = allRec.getString("newRecipeTitle");
 			String newRecipeText = allRec.getString("newRecipeText");
 			String mealType = allRec.getString("mealType");
 			String base64Image = allRec.getString("base64Image");
-	
 			// Check if the recipe exists
 			if (list.getRecipe(recipeID) != null) {
 				// Update existing recipe without generating a new image
@@ -297,5 +343,6 @@ class MockRecipeHTTPHandler extends RecipeHTTPHandler {
 		super(list, accountManager);
 		gpt = new MockGPT();
 		wisp = new MockWhisper();
+		dalle = new MockDalle();
 	}
 }

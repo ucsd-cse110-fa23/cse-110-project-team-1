@@ -54,13 +54,13 @@ public class ViewModel {
 			String allRecipes;
 			allRecipes = req.performGET(server_url+"?all", user);
 			if(allRecipes.contains("Invalid username")){
-				ErrorAlert.showError("Invalid username or password when pulling recipes");
+				Popup.showError("Invalid username or password when pulling recipes");
 				throw new Exception("Invalid username or password");
 			}
 			JSONArray allRec = new JSONArray(allRecipes);
 			return createRecipeListView(allRec);
 		} catch (IOException e) {
-			ErrorAlert.showError("Server Offline: Unable to contact server to get recipes.");
+			Popup.showError("Unable to contact server to get recipes");
 			throw e;		
 		}
     }
@@ -81,19 +81,20 @@ public class ViewModel {
 		String response = "";
 		try {
 			response = req.performPOST(server_url, new File("recording.wav"), "ingredients", newlyValidatedMealType, user);
+			checkIfAPIError(response);
 		} catch (IOException e) {
-			ErrorAlert.showError("Server Offline: Unable to contact server to generate new recipe");
+			Popup.showError("Unable to contact server to generate new recipe");
 			throw e;		
 		}
 		try {
 			response = response.replaceAll("\r\n?", "\n");
 			return RecipeNode.jsonToRecipeNode(new JSONObject(response));
 		} catch (JSONException e) {
-			ErrorAlert.showError("Invalid JSON response from server, try again");
+			Popup.showError("Invalid JSON response from server, try again");
 			e.printStackTrace();
 			return null;
 		} catch (NullPointerException e){
-			ErrorAlert.showError("Server response null, try again.");
+			Popup.showError("Server response null, try again.");
 			e.printStackTrace();
 			return null;
 		}
@@ -104,12 +105,13 @@ public class ViewModel {
 		String response = "";
         try {
 			response = req.performPOST(server_url, new File("recording.wav"), "mealType", "none", user);
+			checkIfAPIError(response);
 			if(validateMealType(response)){
 				newlyValidatedMealType = getMealTypeFromResponse(response);
 				return true;
 			}
         } catch (IOException e) {
-			ErrorAlert.showError("Server Offline: Unable to contact server to validate meal type");
+			Popup.showError("Unable to contact server to validate meal type");
             throw e;
         }
             		
@@ -121,8 +123,8 @@ public class ViewModel {
         try {
 			req.performPUT(server_url, recipe.getRecipeID(), recipe.getRecipeTitle(), recipe.getRecipeText(), recipe.getMealType(), recipe.getBase64Image(), user);
 		} catch (IOException e) {
-			ErrorAlert.showError("Server Offline: Unable to contact server to save recipe");
-			throw e;		
+			Popup.showError("Unable to contact server to save recipe");
+			throw e;
 		}
     }
 
@@ -131,8 +133,8 @@ public class ViewModel {
             boolean deleted = req.performDELETE(server_url, recipeId, user);
 			return deleted;
         } catch (IOException e) {
-			ErrorAlert.showError("Server Offline: Unable to contact server to save recipe");
-			throw e;		
+			Popup.showError("Server Offline: Unable to contact server to delete recipe");
+			throw e;	
         }
     }
 	
@@ -250,7 +252,7 @@ public class ViewModel {
 
 	public boolean handleLogin(String username, String password) throws IOException  {
 		if (!isValidUserInfo(username, password)) {
-			ErrorAlert.showError("Invalid username or password");
+			Popup.showError("Invalid username or password");
 			return false;
 		}
 		User user = new User(username, password);
@@ -261,17 +263,17 @@ public class ViewModel {
 			if(loggedIn){
 				return true;
 			}
-			ErrorAlert.showError("Invalid username or password");
+			Popup.showError("Invalid username or password");
 			return false;	
 		} catch (IOException e) {
-			ErrorAlert.showError("Server Offline: Unable to contact server to log in");
+			Popup.showError("Server Offline: Unable to contact server to log in");
 			throw e;
 		}	
 	}
 	
 	public boolean createAccount(String username, String password) throws IOException {
 		if (!isValidUserInfo(username, password)) {
-			ErrorAlert.showError("Invalid username or password");
+			Popup.showError("Invalid username or password");
 			return false;
 		}
 		User newUser = new User(username, password);
@@ -282,11 +284,11 @@ public class ViewModel {
 			if(accountCreated){
 				return true;
 			}
-			ErrorAlert.showError("Username Already Taken");
+			Popup.showError("Username Already Taken");
             return false;
 			
         } catch (IOException e) {
-			ErrorAlert.showError("Server Offline: Unable to contact server to create account");
+			Popup.showError("Server Offline: Unable to contact server to create account");
 			throw e;
 		}
 
@@ -301,12 +303,27 @@ public class ViewModel {
 		}
 	}
 
+	
+	public boolean handleShare(int recipeId, User user){
+		
+        try {
+			req.performShare(server_url, recipeId, user);
+		} catch (IOException e) {
+			Popup.showError("Unable to contact server to share recipe");
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+    }
+
 	private boolean isValidUserInfo(String username, String password) {
 		//System.out.println("Checking user info ["+ username + ":" + password + "] " + !(username.isEmpty() || password.isEmpty()));
 		return !(username.isEmpty() || password.isEmpty());
 	}
-
-	
-
-
+	private void checkIfAPIError(String response) throws IOException {
+		if(response.contains("Incorrect API key provided")){
+		    Popup.showError("Incorrect API key provided \n You can find your API key at https://platform.openai.com/account/api-keys.");
+		    throw new IOException("Incorrect API key provided");
+		}
+	}
 }

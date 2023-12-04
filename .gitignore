@@ -11,9 +11,10 @@ lib/
 key.txt
 *.properties
 *.list
+!src/test/lists/*.list
 *.mp3
 *.wav
 
 accounts.csv
 savedLogin.csv
-src/test/lists/testServerReadsExistingList.list
+*.html
