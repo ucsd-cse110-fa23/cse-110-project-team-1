@@ -22,6 +22,19 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Base64;
+
+import javax.swing.UIClientPropertyKey;
+
+import javafx.scene.layout.FlowPane;
+
 
 import java.awt.datatransfer.StringSelection;
 import java.awt.Toolkit;
@@ -61,6 +74,8 @@ public class View {
 	private ComboBox<String> sortDropdown;
 
 	private CheckBox autoLoginCheckbox;
+
+	private ImageView recipeImageView;
 
 	private VBox recipeTitleListleftVbox;
 
@@ -122,6 +137,10 @@ public class View {
 
 		this.root = new BorderPane();
         this.root.setPadding(new Insets(SPACING));
+
+		recipeImageView = new ImageView();
+		recipeImageView.setFitHeight(100);
+		recipeImageView.setFitWidth(100);
 		
         filterHBox = createFilters();
 		sortHBox = createSorts();
@@ -255,14 +274,18 @@ public class View {
 		Label detailMealtype = new Label("Meal Type: " + currentSelectedRecipe.getMealType());
 		ScrollPane descriptionScrollBox = new ScrollPane(savedRecipeDescription);
 		descriptionScrollBox.setStyle("-fx-background-color:transparent;");
-		this.savedRecipeDetailVbox = buildPage(null, 0, NO_TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, detailMealtype ,descriptionScrollBox ,buttons);
+		updateRecipeImage(currentSelectedRecipe.getBase64Image());
+		FlowPane imagePane = new FlowPane(recipeImageView);
+		this.savedRecipeDetailVbox = buildPage(null, 0, NO_TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, detailMealtype ,descriptionScrollBox, imagePane ,buttons);
 		displaySelector("recipeDetails");
 	}
 
 	private void buildNewlyGeneratedRecipeDisplay(){
 		savedRecipeDescription.setText(newlyGeneratedRecipe.getRecipeText());
 		HBox buttons = new HBox(backToHome, newlyGeneratedRecipeSaveButton, refreshRecipe);
-		this.newlyGeneratedRecipeDisplayVbox = buildPage(savedRecipeDescription, 0, TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, buttons);
+		updateRecipeImage(newlyGeneratedRecipe.getBase64Image());
+		FlowPane imagePane = new FlowPane(recipeImageView);
+		this.newlyGeneratedRecipeDisplayVbox = buildPage(savedRecipeDescription, 0, TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, imagePane, buttons);
 		displaySelector("newlyGeneratedRecipeDisplay");
 		
 	}
@@ -599,7 +622,18 @@ public class View {
 	public BorderPane getRoot() {
 		return this.root;
 	}
-
+	private void updateRecipeImage(String base64Image) {
+		if (base64Image != null && !base64Image.isEmpty()) {
+			recipeImageView = new ImageView(base64Image);
+			recipeImageView.setFitHeight(100);
+			recipeImageView.setFitWidth(100);
+		} else {
+			// Handle cases where there is no image
+			recipeImageView.setImage(null); // Or set a default image]
+			System.out.println("Image set null");
+		}
+    
+	}
 	/**
 	 * Logs out the current user and displays the login page.
 	 */

@@ -11,12 +11,14 @@ public class RecipeNode extends HBox{
     private Label recipeTitle; 
     private String recipeText;
     private String mealType;
+    private String base64Image;
    
-    public RecipeNode(int recipeID, String recipeTitle, String recipeText, String mealType){
+    public RecipeNode(int recipeID, String recipeTitle, String recipeText, String mealType, String base64Image){
         this.recipeID = recipeID;
         this.recipeTitle = new Label(recipeTitle);
         this.recipeText = recipeText;
         this.mealType = mealType;
+        this.base64Image = base64Image;
     }
 
     public int getRecipeID(){
@@ -35,12 +37,20 @@ public class RecipeNode extends HBox{
         return mealType;
     }
 
+    public String getBase64Image() {
+        return base64Image;
+    }
+
     public void setRecipeTitle(String newTitle){
         recipeTitle.setText(newTitle);
     }
 
     public void setRecipeText(String newRecipe){
         recipeText = newRecipe;
+    }
+
+    public void setBase64Image(String base64Image) {
+        this.base64Image = base64Image;
     }
 
     public String toString(){
@@ -53,11 +63,17 @@ public class RecipeNode extends HBox{
         recipe.put("recipeTitle", getRecipeTitle());
         recipe.put("recipeID", getRecipeID());
         recipe.put("mealType", getMealType());
+        recipe.put("base64Image", getBase64Image());
         return recipe;
     }
     public static RecipeNode jsonToRecipeNode(JSONObject json){
-        RecipeNode newRecipe = new RecipeNode(json.getInt("recipeID"), json.getString("recipeTitle").replaceAll("\\r?", ""),
-            json.getString("recipeText"), json.getString("mealType"));
+        RecipeNode newRecipe = new RecipeNode(
+            json.getInt("recipeID"), 
+            json.getString("recipeTitle").replaceAll("\\r?", ""),
+            json.getString("recipeText"), 
+            json.getString("mealType"),
+            json.optString("base64Image", "")
+            );
         return newRecipe;
     }
 

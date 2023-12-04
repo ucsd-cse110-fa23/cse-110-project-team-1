@@ -38,6 +38,7 @@ public class Dalle implements ImageModel {
         requestBody.put("model", MODEL);
         requestBody.put("prompt", recipeDescription);
         requestBody.put("n", 1); // Generate one image
+        requestBody.put("size", "256x256");
 
         // Create the HTTP Client
         HttpClient client = HttpClient.newHttpClient();
@@ -63,7 +64,7 @@ public class Dalle implements ImageModel {
         String imageURL = responseJson.getJSONArray("data").getJSONObject(0).getString("url");
         
         // Convert the image URL to Base64
-        String base64Image = convertToBase64(imageURL);
+        String base64Image = "data:image/png;base64," + convertToBase64(imageURL);
         
         return base64Image;
     }

@@ -121,7 +121,7 @@ public class ViewModel {
 
 	public void performPutRequest(RecipeNode recipe, User user) throws IOException{
         try {
-			req.performPUT(server_url, recipe.getRecipeID(), recipe.getRecipeTitle(), recipe.getRecipeText(), recipe.getMealType(), user);
+			req.performPUT(server_url, recipe.getRecipeID(), recipe.getRecipeTitle(), recipe.getRecipeText(), recipe.getMealType(), recipe.getBase64Image(), user);
 		} catch (IOException e) {
 			Popup.showError("Unable to contact server to save recipe");
 			throw e;

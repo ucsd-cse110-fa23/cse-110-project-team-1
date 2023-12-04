@@ -71,7 +71,7 @@ public class RequestHandlerTest {
     
         boolean exceptionThrown = false;
         try {
-            requestHandler.performPUT(invalidUrl, recipeID, recipeTitle, recipeText, mealType, testUser);
+            requestHandler.performPUT(invalidUrl, recipeID, recipeTitle, recipeText, mealType,null, testUser);
         } catch (IOException e) {
             exceptionThrown = true;
         }
