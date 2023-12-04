@@ -60,10 +60,9 @@ public class ViewModel {
 			JSONArray allRec = new JSONArray(allRecipes);
 			return createRecipeListView(allRec);
 		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to get recipes");
-			e.printStackTrace();
+			ErrorAlert.showError("Server Offline: Unable to contact server to get recipes.");
+			throw e;		
 		}
-		return new ListView<HBox>();
     }
 	
 	/*
@@ -78,13 +77,13 @@ public class ViewModel {
 		return false;
 	}
 
-	public RecipeNode requestNewRecipe(User user) {
+	public RecipeNode requestNewRecipe(User user) throws IOException {
 		String response = "";
 		try {
 			response = req.performPOST(server_url, new File("recording.wav"), "ingredients", newlyValidatedMealType, user);
 		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to generate new recipe");
-			e.printStackTrace();
+			ErrorAlert.showError("Server Offline: Unable to contact server to generate new recipe");
+			throw e;		
 		}
 		try {
 			response = response.replaceAll("\r\n?", "\n");
@@ -101,7 +100,7 @@ public class ViewModel {
 	}
 	
 	
-	public boolean requestMealTypeCheck(User user) {
+	public boolean requestMealTypeCheck(User user) throws IOException {
 		String response = "";
         try {
 			response = req.performPOST(server_url, new File("recording.wav"), "mealType", "none", user);
@@ -110,29 +109,31 @@ public class ViewModel {
 				return true;
 			}
         } catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to validate meal type");
-            return false;
+			ErrorAlert.showError("Server Offline: Unable to contact server to validate meal type");
+            throw e;
         }
+            		
 		
         return false;
     }
 
-	public void performPutRequest(RecipeNode recipe, User user){
+	public void performPutRequest(RecipeNode recipe, User user) throws IOException{
         try {
 			req.performPUT(server_url, recipe.getRecipeID(), recipe.getRecipeTitle(), recipe.getRecipeText(), recipe.getMealType(), recipe.getBase64Image(), user);
 		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to save recipe");
-			e.printStackTrace();
+			ErrorAlert.showError("Server Offline: Unable to contact server to save recipe");
+			throw e;		
 		}
     }
 
-    public void performDeleteRequest(int recipeId, User user){
-        try {
-			req.performDELETE(server_url, recipeId, user);
-		} catch (IOException e) {
-			ErrorAlert.showError("Unable to contact server to delete recipe");
-			e.printStackTrace();
-		}
+    public boolean performDeleteRequest(int recipeId, User user) throws IOException{
+		try {
+            boolean deleted = req.performDELETE(server_url, recipeId, user);
+			return deleted;
+        } catch (IOException e) {
+			ErrorAlert.showError("Server Offline: Unable to contact server to save recipe");
+			throw e;		
+        }
     }
 	
 	private String getMealTypeFromResponse(String response) {
@@ -247,30 +248,48 @@ public class ViewModel {
 		}
 	}
 
-	public boolean handleLogin(String username, String password) {
+	public boolean handleLogin(String username, String password) throws IOException  {
 		if (!isValidUserInfo(username, password)) {
+			ErrorAlert.showError("Invalid username or password");
 			return false;
 		}
 		User user = new User(username, password);
+		System.out.println("Sending Login Request");
+		boolean loggedIn;
 		try {
-			System.out.println("Sending Login Request");
-			return req.performLogin(server_url, user);
+			loggedIn = req.performLogin(server_url, user);
+			if(loggedIn){
+				return true;
+			}
+			ErrorAlert.showError("Invalid username or password");
+			return false;	
 		} catch (IOException e) {
-			return false;
-		}
+			ErrorAlert.showError("Server Offline: Unable to contact server to log in");
+			throw e;
+		}	
 	}
 	
-	public boolean createAccount(String username, String password) {
+	public boolean createAccount(String username, String password) throws IOException {
 		if (!isValidUserInfo(username, password)) {
+			ErrorAlert.showError("Invalid username or password");
 			return false;
 		}
 		User newUser = new User(username, password);
+
+		System.out.println("Sending Create Account Request");
 		try {
-			System.out.println("Sending Create Account Request");
-			return req.performAccountCreation(server_url, newUser);
-		} catch (IOException e) {
-			return false;
+			boolean accountCreated =  req.performAccountCreation(server_url, newUser);
+			if(accountCreated){
+				return true;
+			}
+			ErrorAlert.showError("Username Already Taken");
+            return false;
+			
+        } catch (IOException e) {
+			ErrorAlert.showError("Server Offline: Unable to contact server to create account");
+			throw e;
 		}
+
 	}
 
 	public void handleLogout() {
@@ -286,6 +305,8 @@ public class ViewModel {
 		//System.out.println("Checking user info ["+ username + ":" + password + "] " + !(username.isEmpty() || password.isEmpty()));
 		return !(username.isEmpty() || password.isEmpty());
 	}
+
+	
 
 
 }
