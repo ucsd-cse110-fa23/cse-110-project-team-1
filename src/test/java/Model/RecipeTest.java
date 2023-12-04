@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -169,6 +170,27 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         File file = new File("src/test/testEditNonExistingRecipe.list");
         file.delete(); // remove test list
     }
+
+    @Test
+    void testGenerateHTML(){
+       int newRecipeID = 123;
+        String newRecipeTitle = "Beans Recipe";
+        String newRecipeText = "Beans Recipe\n Ingredients:\n1 Can of Beans\n\nInstructions:\nStep 1: Put beans on plate\n";
+
+        Recipe newRecipe = new Recipe(newRecipeID,newRecipeTitle,newRecipeText, "lunch",1,base64Placeholder);
+
+        String html = newRecipe.generateHTML();
+
+        assertTrue(html.contains(newRecipeTitle));
+        assertTrue(html.contains("Can of Beans"));
+
+        assertEquals(newRecipeID, newRecipe.getRecipeID());
+        assertEquals(newRecipeText, newRecipe.getRecipeText());
+        assertEquals(newRecipeTitle, newRecipe.getRecipeTitle());
+
+    }
+
+
 
     /*public static void main(String[] args){
         Recipe L = new Recipe(0, "ball", "two eggs");

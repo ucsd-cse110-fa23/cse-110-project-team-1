@@ -93,7 +93,7 @@ public class Recipe implements Serializable{
     }
 
     //https://www.baeldung.com/java-write-to-file
-    public void generateHTML(){
+    public String generateHTML(){
         try{
             String str = "<html>\r\n" + 
                     "    <head>\r\n" + 
@@ -146,8 +146,9 @@ public class Recipe implements Serializable{
             byte[] strToBytes = str.getBytes();
             outputStream.write(strToBytes);
             outputStream.close();
+            return str;
         }catch(Exception e){
-
+            return "";
         }
     }
 
