@@ -120,12 +120,17 @@ public class Recipe implements Serializable{
                     "                font-size: 16px;\r\n" + 
                     "                color: #666;\r\n" + 
                     "            }\r\n" + 
+                    "            .recipe img {\r\n" + 
+                    "                width: 256px;\r\n" + 
+                    "                height: 256px;\r\n" + 
+                    "            }\r\n" + 
                     "        </style>\r\n" + 
                     "    </head>\r\n" + 
                     "    <body>\r\n" + 
                     "        <div class=\"recipe\">\r\n" + 
                     "            <h2>" + this.recipeTitle + "</h2>\r\n" + 
                     "            <p>" + this.recipeText.replace(this.recipeTitle+"\n", "").replaceAll("\n", "<br>") + "</p>\r\n" + 
+                    "            <img src=\"" + this.base64Image + "\" />\r\n" + 
                     "        </div>\r\n" + 
                     "    </body>\r\n" + 
                     "</html>";
