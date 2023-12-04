@@ -21,8 +21,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Base64;
+
+import javax.swing.UIClientPropertyKey;
+
 import javafx.scene.layout.FlowPane;
 
 
@@ -232,31 +238,12 @@ public class View {
 	private void buildNewlyGeneratedRecipeDisplay(){
 		savedRecipeDescription.setText(newlyGeneratedRecipe.getRecipeText());
 		HBox buttons = new HBox(backToHome, newlyGeneratedRecipeSaveButton, refreshRecipe);
+		updateRecipeImage(newlyGeneratedRecipe.getBase64Image());
 		FlowPane imagePane = new FlowPane(recipeImageView);
 		this.newlyGeneratedRecipeDisplayVbox = buildPage(savedRecipeDescription, 0, TEXT, NO_MIN_HEIGHT, Pos.TOP_LEFT, imagePane, buttons);
 		displaySelector("newlyGeneratedRecipeDisplay");
 		
 	}
-
-	private void updateRecipeImage(String base64Image) {
-    if (base64Image != null && !base64Image.isEmpty()) {
-        try {
-            // Decode the base64 string to bytes
-            byte[] imageBytes = Base64.getDecoder().decode(base64Image);
-            ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
-            Image image = new Image(bis);
-            recipeImageView.setImage(image);
-            bis.close(); // Close the ByteArrayInputStream
-        } catch (IllegalArgumentException | IOException e) {
-            // Handle decoding errors or image loading failures
-            recipeImageView.setImage(null); // Set to null or a default image
-            e.printStackTrace();
-        }
-    } else {
-        // Handle cases where there is no image
-        recipeImageView.setImage(null); // Or set a default image
-    }
-}
 
 	private void buildHomePage() {
 		this.homePageTextHeader = new Label("Welcome to Pantry Pal");
@@ -520,5 +507,17 @@ public class View {
 
 	public BorderPane getRoot() {
 		return this.root;
+	}
+
+	private void updateRecipeImage(String base64Image) {
+		if (base64Image != null && !base64Image.isEmpty()) {
+			recipeImageView = new ImageView(base64Image);
+			recipeImageView.setFitHeight(100);
+			recipeImageView.setFitWidth(100);
+		} else {
+			// Handle cases where there is no image
+			recipeImageView.setImage(null); // Or set a default image]
+			System.out.println("Image set null");
+		}
 	}
 }

@@ -45,7 +45,7 @@ public class RequestHandler {
         out.close();
     
         String response = getResponse(conn);
-        System.out.println("Server Response: " + response);
+        //ystem.out.println("Server Response: " + response);
         return response;
     }
 
@@ -63,7 +63,7 @@ public class RequestHandler {
      * @return 
      *
      */
-    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText, String mealType, User user) throws IOException {
+    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText, String mealType, String base64Image, User user) throws IOException {
         HttpURLConnection conn = setupConnection(urlString, "PUT", user);
     
         JSONObject requestBody = new JSONObject();
@@ -71,6 +71,7 @@ public class RequestHandler {
         requestBody.put("newRecipeTitle", recipeTitle);
         requestBody.put("recipeID", recipeID);
         requestBody.put("mealType", mealType);
+        requestBody.put("base64Image", base64Image);
         String body = requestBody.toString();
     
         sendRequest(conn, body);
