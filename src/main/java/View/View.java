@@ -56,9 +56,7 @@ public class View {
 	private Button createAccount = new Button("Create Account");
 	private Button logout = new Button("Logout");
 	
-
-
-
+	private ListView<HBox> allRecipes;
 
 	private Button backToHome = new Button("Back to Home");
 
@@ -155,23 +153,31 @@ public class View {
 		if(loggedInUser != null){
 			this.user = loggedInUser;
 			buildHomePage();
-			updateRecipes();
+			this.refreshRecipes();
+			this.updateRecipesList();
 		}else{
 			logout();
 		}
     }
 
+	public void refreshRecipes() {
+		System.out.println("Refreshing Recipes");
+		try {
+			this.allRecipes = viewModel.pullRecipes(user);
+		} catch (Exception e) {
+			//Go back to login page
+			//Clear saved login
+		}
+	}
+
 	/**
 	 * Updates the list of recipes displayed in the application.
 	 */
-	public void updateRecipes() {
+	public void updateRecipesList() {
 		System.out.println("Updating Recipes");
         ListView<HBox> sidebar = new ListView<HBox>();
-        ListView<HBox> allRecipes;
 		try {
-			allRecipes = viewModel.pullRecipes(user);
 			String filterType = filterDropdown.getValue();
-
 			sidebar = filter(allRecipes, filterType);
 
 			String sort = sortDropdown.getValue();
@@ -419,7 +425,8 @@ public class View {
 	private void saveRecipe(RecipeNode recipeNode){
 		try {
 			viewModel.performPutRequest(recipeNode,user);
-			this.updateRecipes();
+			this.refreshRecipes();
+			this.updateRecipesList();
 			displaySelector("home");
 		} catch (IOException e) {
 			logout();
@@ -433,7 +440,8 @@ public class View {
 		System.out.println("Requested Delete Recipe: " + currentSelectedRecipeID);
 		try {
 			viewModel.performDeleteRequest(currentSelectedRecipeID,user);
-			this.updateRecipes();
+			this.refreshRecipes();
+			this.updateRecipesList();
 			displaySelector("home");
 		} catch (IOException e) {
 			logout();
@@ -513,10 +521,10 @@ public class View {
             saveRecipe(currentlyEditingRecipe);
         });
 		this.filterDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            this.updateRecipes();
+            this.updateRecipesList();
         });
 		this.sortDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			this.updateRecipes();
+			this.updateRecipesList();
         });
 		this.refreshRecipe.setOnAction(e -> {
 			if(onStopRecordRequest("ingredients")){
@@ -535,7 +543,8 @@ public class View {
 					}
 					this.user = new User(username,password);
 					buildHomePage();
-					updateRecipes();
+					this.refreshRecipes();
+					this.updateRecipesList();
 	
 				}
 			} catch (IOException e1) {
@@ -556,7 +565,8 @@ public class View {
 					}
 					this.user = new User(username,password);
 					buildHomePage();
-					updateRecipes();
+					this.refreshRecipes();
+					this.updateRecipesList();
 				}
 			} catch (IOException e1) {
 				System.out.println("Create Account Error");

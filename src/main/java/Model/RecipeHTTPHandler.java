@@ -109,7 +109,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 
 		Headers headers = httpExchange.getRequestHeaders();
 		String audioType = headers.getFirst("Audio-Type");
-		String saveDirectory = "src/main/RecievedMedia/";
+		String saveDirectory = "src/main/ReceivedMedia/";
 		String response = "Invalid POST request";
 
 		// Check for login/ account handling request
