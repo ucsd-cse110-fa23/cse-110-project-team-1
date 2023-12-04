@@ -75,6 +75,9 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         recipeList.addRecipe("Recipe2", "RecipeText2", "lunch", 1,base64Placeholder);
         recipeList.addRecipe("Recipe3", "RecipeText3", "lunch", 1,base64Placeholder);
 
+        recipeList.shareRecipe(1);
+        recipeList.shareRecipe(3);
+
         recipeList.saveToDisk();
 
         RecipeList loadedList = new RecipeList("src/test/testSaveAndLoadRecipeList");
@@ -83,16 +86,22 @@ public class RecipeTest { //temporary tests until JUnit is in place\
 
         assertEquals(recipeList.getRecipe(1).getRecipeTitle(), loadedList.getRecipe(1).getRecipeTitle());
         assertEquals(recipeList.getRecipe(1).getRecipeText(), loadedList.getRecipe(1).getRecipeText());
+        assertEquals(loadedList.getRecipe(1).getShared(), true);
     
         assertEquals(recipeList.getRecipe(2).getRecipeTitle(), loadedList.getRecipe(2).getRecipeTitle());
         assertEquals(recipeList.getRecipe(2).getRecipeText(), loadedList.getRecipe(2).getRecipeText());
+        assertEquals(loadedList.getRecipe(2).getShared(), false);
     
         assertEquals(recipeList.getRecipe(3).getRecipeTitle(), loadedList.getRecipe(3).getRecipeTitle());
         assertEquals(recipeList.getRecipe(3).getRecipeText(), loadedList.getRecipe(3).getRecipeText());
-       
+        assertEquals(loadedList.getRecipe(3).getShared(), true);
+        
+        
+        
         assertTrue(recipeList.getRecipe(1).equals(loadedList.getRecipe(1)));
         assertTrue(recipeList.getRecipe(2).equals(loadedList.getRecipe(2)));
         assertTrue(recipeList.getRecipe(3).equals(loadedList.getRecipe(3)));
+        
 
         File file = new File("src/test/testSaveAndLoadRecipeList.list");
         file.delete(); // remove test list
