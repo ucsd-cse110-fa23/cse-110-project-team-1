@@ -32,7 +32,6 @@ public class RequestHandler {
      * @throws IOException If an I/O error occurs with the connection.
      */
     public String performPOST(String urlString, File file, String audioType, String mealType, User user) throws IOException {
-        
         String response;
         try {
             HttpURLConnection conn = setupConnection(urlString, "POST", user);
@@ -72,7 +71,7 @@ public class RequestHandler {
      * @throws IOException
      *
      */
-    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText, String mealType, User user) throws IOException {
+    public Integer performPUT(String urlString, int recipeID, String recipeTitle, String recipeText, String mealType, String base64Image, User user) throws IOException {
         HttpURLConnection conn;
         try {
             conn = setupConnection(urlString, "PUT", user);
@@ -81,6 +80,7 @@ public class RequestHandler {
             requestBody.put("newRecipeTitle", recipeTitle);
             requestBody.put("recipeID", recipeID);
             requestBody.put("mealType", mealType);
+            requestBody.put("base64Image", base64Image);
             String body = requestBody.toString();
         
             sendRequest(conn, body);

@@ -196,8 +196,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 			String newRecipeTitle = allRec.getString("newRecipeTitle");
 			String newRecipeText = allRec.getString("newRecipeText");
 			String mealType = allRec.getString("mealType");
-			//String base64Image = allRec.getString("base64Image");
-			String base64Image = "Temp Image until UI is done.";
+			String base64Image = allRec.getString("base64Image");
 	
 			// Check if the recipe exists
 			if (list.getRecipe(recipeID) != null) {
