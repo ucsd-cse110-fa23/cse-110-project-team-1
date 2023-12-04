@@ -602,6 +602,7 @@ public class View {
 			System.out.println("Image set null");
 		}
     
+	}
 	/**
 	 * Logs out the current user and displays the login page.
 	 */
