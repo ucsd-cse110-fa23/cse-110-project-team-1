@@ -41,9 +41,7 @@ public class View {
 	private Button createAccount = new Button("Create Account");
 	private Button logout = new Button("Logout");
 	
-
-
-
+	private ListView<HBox> allRecipes;
 
 	private Button backToHome = new Button("Back to Home");
 
@@ -130,18 +128,27 @@ public class View {
 		if(loggedInUser != null){
 			this.user = loggedInUser;
 			buildHomePage();
-			updateRecipes();
+			refreshRecipes();
+			updateRecipesList();
 		}else{
 			buildLoginPage();
 		}
     }
 
-	public void updateRecipes() {
-		System.out.println("Updating Recipes");
-        ListView<HBox> sidebar = new ListView<HBox>();
-        ListView<HBox> allRecipes;
+	public void refreshRecipes() {
+		System.out.println("Refreshing Recipes");
 		try {
 			allRecipes = viewModel.pullRecipes(user);
+		} catch (Exception e) {
+			//Go back to login page
+			//Clear saved login
+		}
+	}
+
+	public void updateRecipesList() {
+		System.out.println("Updating Recipes");
+        ListView<HBox> sidebar = new ListView<HBox>();
+		try {
 			String filterType = filterDropdown.getValue();
 
 			sidebar = filter(allRecipes, filterType);
@@ -149,7 +156,6 @@ public class View {
 			String sort = sortDropdown.getValue();
 			RecipeSorter rc = new RecipeSorter(sort);
 			sidebar = rc.sort(sidebar);
-
 
 			this.recipeTitleListleftVbox = createRecipeTitleList(sidebar);
 			this.root.setLeft(this.recipeTitleListleftVbox);
@@ -175,9 +181,9 @@ public class View {
         return new HBox(SPACING, filterLabel, filterDropdown);
     }
 
-	private ListView<HBox> filter(ListView<HBox> allRec, String filterType){
+	private ListView<HBox> filter(ListView<HBox> allR, String filterType){
 		ListView<HBox> sidebar = new ListView<>();
-		for(HBox h : allRec.getItems()) {
+		for(HBox h : allR.getItems()) {
 			// If recipe's meal type is the same as the filter,
 			// or filter is "all", show the recipe on the sidebar.
 			if(filterType.equalsIgnoreCase("all") || ((RecipeNode)h).toJson().getString("mealType").equalsIgnoreCase(filterType)) {
@@ -385,14 +391,16 @@ public class View {
 
 	private void saveRecipe(RecipeNode recipeNode){
 		viewModel.performPutRequest(recipeNode,user);
-		this.updateRecipes();
+		this.refreshRecipes();
+		this.updateRecipesList();
 		displaySelector("home");
 	}
 
 	private void onDeleteRequest() {
 		System.out.println("Client Delete Recipe: "+currentSelectedRecipeID);
 		viewModel.performDeleteRequest(currentSelectedRecipeID,user);
-		this.updateRecipes();
+		this.refreshRecipes();
+		this.updateRecipesList();
 		displaySelector("home");
 	}
 	
@@ -451,10 +459,10 @@ public class View {
             saveRecipe(currentlyEditingRecipe);
         });
 		this.filterDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            this.updateRecipes();
+            this.updateRecipesList();
         });
 		this.sortDropdown.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			this.updateRecipes();
+			this.updateRecipesList();
         });
 		this.refreshRecipe.setOnAction(e -> {
 			onStopRecordRequest("ingredients");
@@ -470,7 +478,8 @@ public class View {
 				}
 				this.user = new User(username,password);
 				buildHomePage();
-				updateRecipes();
+				refreshRecipes();
+				updateRecipesList();
 
 			} else {
 				ErrorAlert.showError("Invalid username or password");
@@ -488,7 +497,8 @@ public class View {
 				}
 				this.user = new User(username,password);
 				buildHomePage();
-				updateRecipes();
+				refreshRecipes();
+				updateRecipesList();
 			} else {
 				ErrorAlert.showError("Invalid username or password when creating account");
 			}
