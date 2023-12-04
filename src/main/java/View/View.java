@@ -146,7 +146,7 @@ public class View {
 	}
 
 	public void updateRecipesList() {
-		System.out.println("Updating Recipes");
+		System.out.println("Updating Recipe List");
         ListView<HBox> sidebar = new ListView<HBox>();
 		try {
 			String filterType = filterDropdown.getValue();
