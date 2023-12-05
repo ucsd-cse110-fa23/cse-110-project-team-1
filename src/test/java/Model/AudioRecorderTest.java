@@ -35,7 +35,7 @@ public class AudioRecorderTest {
             public void run() {
                 audioRecorder.startRecording();
                 try {
-                    Thread.sleep(1500);
+                    Thread.sleep(1000);
                 } catch (Exception e1) {
                     System.err.println(e1);
                 }
@@ -68,7 +68,7 @@ public class AudioRecorderTest {
             public void run() {
                 audioRecorder.startRecording();
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(2000);
                 } catch (Exception e1) {
                     System.err.println(e1);
                 }
@@ -86,6 +86,5 @@ public class AudioRecorderTest {
         }
         File rec = new File("recording.wav");
         assertTrue(rec.exists());
-        rec.delete();
     }
 }

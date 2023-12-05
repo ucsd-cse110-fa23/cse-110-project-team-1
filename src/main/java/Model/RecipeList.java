@@ -31,6 +31,7 @@ public class RecipeList {
     private int highestIndex;
     private String listName;
     private HashMap<Integer, Recipe> recipeList;
+    private String shareDirectory;
 
     /**
      * This is the constructor for the RecipeList class. 
@@ -43,6 +44,8 @@ public class RecipeList {
         highestIndex = 0;
         recipeList = new HashMap<Integer, Recipe>();
         this.listName = listName; // default
+        this.shareDirectory = "shared/";
+
     }
 
     /**
@@ -151,7 +154,7 @@ public class RecipeList {
     public boolean shareRecipe(int recipeID) {
         Recipe r = recipeList.get(recipeID);
         if(r != null){
-            r.share();
+            r.share(shareDirectory);
             return true;
         }
         return false;
@@ -219,8 +222,8 @@ public class RecipeList {
     public boolean editRecipe(int recipeID, String newRecipeTitle, String newRecipeText, int ownerID, String newbase64Image) {
         Recipe recipe = recipeList.get(recipeID);
         if (recipe != null && recipe.getOwnerID() == ownerID) {
-            recipe.setRecipeText(newRecipeText);
-            recipe.setRecipeTitle(newRecipeTitle);
+            recipe.setRecipeText(newRecipeText, shareDirectory);
+            recipe.setRecipeTitle(newRecipeTitle, shareDirectory);
             recipe.setBase64Image(newbase64Image);
             saveToDisk();
             return true;
@@ -305,5 +308,13 @@ public class RecipeList {
      */
     public boolean isEmpty() {
         return recipeList.isEmpty();
+    }
+
+    public String getShareDirectory(){
+        return this.shareDirectory;
+    }
+
+    public void setShareDirectory(String shareDirectory){
+        this.shareDirectory = shareDirectory;
     }
 }

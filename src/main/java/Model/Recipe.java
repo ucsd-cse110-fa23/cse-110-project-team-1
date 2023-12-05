@@ -52,16 +52,16 @@ public class Recipe implements Serializable{
         return base64Image;
     }
 
-    public void setRecipeTitle(String newTitle){
+    public void setRecipeTitle(String newTitle, String shareDirectory){
         recipeTitle = newTitle;
         if(shared)
-            generateHTML();
+            generateHTML(shareDirectory);
     }
 
-    public void setRecipeText(String newRecipe){
+    public void setRecipeText(String newRecipe, String shareDirectory){
         recipeText = newRecipe;
         if(shared)
-            generateHTML();
+            generateHTML(shareDirectory);
     }
 
     public void setBase64Image(String base64Image) {
@@ -72,9 +72,9 @@ public class Recipe implements Serializable{
         return recipeTitle + ": "+ recipeText;
     }
 
-    public void share(){
+    public void share(String shareDirectory){
         shared = true;
-        generateHTML();
+        generateHTML(shareDirectory);
     }
 
     public boolean getShared(){
@@ -93,7 +93,7 @@ public class Recipe implements Serializable{
     }
 
     //https://www.baeldung.com/java-write-to-file
-    public String generateHTML(){
+    public String generateHTML(String saveDirectory){
         try{
             String str = "<html>\r\n" + 
                     "    <head>\r\n" + 
@@ -136,13 +136,13 @@ public class Recipe implements Serializable{
                     "</html>";
             
             
-            // create shared directory if we don't have one
-            File sharedDir = new File("shared/");
+            // create shared directory if we don't have one"shared/"
+            File sharedDir = new File(saveDirectory);
             if (!sharedDir.exists()){
                 sharedDir.mkdirs();
             }
 
-            FileOutputStream outputStream = new FileOutputStream("shared/recipe"+recipeID+".html");
+            FileOutputStream outputStream = new FileOutputStream(saveDirectory + "recipe"+recipeID+".html");
             byte[] strToBytes = str.getBytes();
             outputStream.write(strToBytes);
             outputStream.close();

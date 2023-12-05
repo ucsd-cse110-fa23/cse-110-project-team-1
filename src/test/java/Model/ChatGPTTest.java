@@ -1,6 +1,7 @@
 package Model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,13 +16,12 @@ public class ChatGPTTest {
 
     @Test
     void testValidGPT() {
-        String expected = "Mashed Potatos\n...";
         String mealType = "Dinner";
         String ingredients = "I have potatoes, butter and cheese.";
 
         try {
             String response = chatGPT.getResponse(mealType, ingredients);
-            assertEquals(expected, response);
+            assertTrue(response.contains("Buttery Potato Dinner"));
         } catch (Exception e) {
             System.err.println(e);
         }

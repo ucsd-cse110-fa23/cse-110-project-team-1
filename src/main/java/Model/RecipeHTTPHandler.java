@@ -176,14 +176,15 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 
 		// Check if ownerID is not null before proceeding
 		if (ownerID != null) {
-			if (audioType.equals("mealType")) {
+			if (audioType.contains("mealType")) {
 				response = transcribedAudio;
-			} else if (audioType.equals("ingredients")) {
+			} else if (audioType.contains("ingredients")) {
 				// do gpt stuff
 				String mealType = headers.getFirst("Meal-Type");
 				System.out.println("Meal Type: " + mealType);
 				try {
 					response = gpt.getResponse(mealType, transcribedAudio);
+					System.out.println("Got GPT:" + response);
 					String recipeText = response.trim() + "\n";
 					Integer tempRecipeID = -1;
 					String recipeTitle = recipeText.substring(0, recipeText.indexOf("\n"));
@@ -248,8 +249,8 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 			if (list.getRecipe(recipeID) != null) {
 				// Update existing recipe without generating a new image
 				Recipe existingRecipe = list.getRecipe(recipeID);
-				existingRecipe.setRecipeTitle(newRecipeTitle);
-				existingRecipe.setRecipeText(newRecipeText);
+				existingRecipe.setRecipeTitle(newRecipeTitle, list.getShareDirectory());
+				existingRecipe.setRecipeText(newRecipeText, list.getShareDirectory());
 				//existingRecipe.setMealType(mealType);
 				list.saveToDisk(); // Save the updated list
 				response = "" + recipeID;

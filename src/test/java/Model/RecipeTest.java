@@ -1,6 +1,6 @@
 package Model;
 import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -71,7 +71,8 @@ public class RecipeTest { //temporary tests until JUnit is in place\
     void testSaveAndLoadRecipeList() {
 
         RecipeList recipeList = new RecipeList("src/test/testSaveAndLoadRecipeList");
-    
+        recipeList.setShareDirectory("src/test/shared/");
+
         recipeList.addRecipe("Recipe1", "RecipeText1", "lunch", 1,base64Placeholder);
         recipeList.addRecipe("Recipe2", "RecipeText2", "lunch", 1,base64Placeholder);
         recipeList.addRecipe("Recipe3", "RecipeText3", "lunch", 1,base64Placeholder);
@@ -82,6 +83,7 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         recipeList.saveToDisk();
 
         RecipeList loadedList = new RecipeList("src/test/testSaveAndLoadRecipeList");
+        loadedList.setShareDirectory("src/test/shared/");
 
         loadedList.loadFromDisk();
 
@@ -179,7 +181,7 @@ public class RecipeTest { //temporary tests until JUnit is in place\
 
         Recipe newRecipe = new Recipe(newRecipeID,newRecipeTitle,newRecipeText, "lunch",1,base64Placeholder);
 
-        String html = newRecipe.generateHTML();
+        String html = newRecipe.generateHTML("src/test/shared/");
 
         assertTrue(html.contains(newRecipeTitle));
         assertTrue(html.contains("Can of Beans"));
@@ -188,6 +190,17 @@ public class RecipeTest { //temporary tests until JUnit is in place\
         assertEquals(newRecipeText, newRecipe.getRecipeText());
         assertEquals(newRecipeTitle, newRecipe.getRecipeTitle());
 
+    }
+
+    @AfterEach
+    void cleanup() {
+        // Delete any files that were created during the tests
+        File sharedDir = new File("src/test/shared");
+        if (sharedDir.exists()) {
+            for (File file : sharedDir.listFiles()) {
+                file.delete();
+            }
+        }
     }
 
 
