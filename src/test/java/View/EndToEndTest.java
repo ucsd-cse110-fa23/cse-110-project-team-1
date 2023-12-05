@@ -48,7 +48,7 @@ public class EndToEndTest {
         req = new RequestHandler();
     
         //reused strings
-        String serverUrl = "http://localhost:8100/";
+        String serverUrl = "http://127.0.0.1:8100/";
         String username = "username";
         String password = "password";
         String wrongPassword = "wrongpassword";
@@ -127,7 +127,7 @@ public class EndToEndTest {
         req = new RequestHandler();
     
         //reused strings
-        String serverUrl = "http://localhost:8100/";
+        String serverUrl = "http://127.0.0.1:8100/";
         String username = "username";
         String password = "password";
         String recordingFile = "recording.wav";
@@ -175,7 +175,7 @@ public class EndToEndTest {
         req = new RequestHandler();
     
         //reused strings
-        String serverUrl = "http://localhost:8100/";
+        String serverUrl = "http://127.0.0.1:8100/";
         String username = "username";
         String password = "password";
         String invalidMealType = "invalidMealType";

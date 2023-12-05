@@ -14,7 +14,7 @@ public class MockRecipeServer implements RecipeServerInterface{
 
   // initialize server port and hostname
   private static final int SERVER_PORT = 8100;
-  private static final String SERVER_HOSTNAME = "localhost";
+  private static final String SERVER_HOSTNAME = "127.0.0.1";
   private RecipeList list;
   private HttpServer server;
 

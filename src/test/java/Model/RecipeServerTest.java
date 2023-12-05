@@ -29,7 +29,7 @@ public class RecipeServerTest{
             server.renameServer("src/test/lists/testServerReadsExistingList");
             server.loadServer();
             RequestHandler req = new RequestHandler();
-            String content = req.performGET("http://localhost:8100/?all", new User("username", "password"));
+            String content = req.performGET("http://127.0.0.1:8100/?all", new User("username", "password"));
 
             JSONArray jsonArray = new JSONArray(content);
             JSONObject jsonObject = jsonArray.getJSONObject(0);
