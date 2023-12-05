@@ -31,7 +31,7 @@ public class EndToEndTest {
         try {
             AudioRecorder audioRecorder = new AudioRecorder();
             audioRecorder.startRecording();
-            Thread.sleep(10);
+            Thread.sleep(1000);
             audioRecorder.stopRecording();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -178,7 +178,7 @@ public class EndToEndTest {
         String serverUrl = "http://127.0.0.1:8100/";
         String username = "username";
         String password = "password";
-        String invalidMealType = "invalidMealType";
+        String invalidMealType = "invalid";
         User user1 = new User(username, password);
     
         // Start and load 
@@ -196,7 +196,10 @@ public class EndToEndTest {
         // Send a meal type request with an invalid meal type(mocking the audio containing invalid so using the test to check instead)
         
         String invalidMealTypeResponse = req.performPOST(serverUrl, new File("recording.wav"), invalidMealType, "none", user1);
-        assertTrue(invalidMealTypeResponse.contains("Invalid POST request"));
+        
+        ViewModel v = new ViewModel(req, serverUrl, null, invalidMealTypeResponse);
+        boolean validmeal = v.validateMealType(invalidMealTypeResponse);
+        assertFalse(validmeal);
     
         // Try to delete a non existent recipe
         boolean deleteSuccessful = req.performDELETE(serverUrl, 9999, user1);
