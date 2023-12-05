@@ -27,15 +27,17 @@ public class EndToEndTest {
 
 
     @BeforeEach
-    void setup() {
-        try {
-            AudioRecorder audioRecorder = new AudioRecorder();
-            audioRecorder.startRecording();
-            Thread.sleep(1000);
-            audioRecorder.stopRecording();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    void setup() throws IOException {
+        // try {
+        //     AudioRecorder audioRecorder = new AudioRecorder();
+        //     audioRecorder.startRecording();
+        //     Thread.sleep(10);
+        //     audioRecorder.stopRecording();
+        // } catch (InterruptedException e) {
+        //     e.printStackTrace();
+        // }
+        File myObj = new File("recording.wav");
+        myObj.createNewFile();
         mockServer = new MockRecipeServer();
         req = new RequestHandler();
     }
@@ -48,7 +50,7 @@ public class EndToEndTest {
         req = new RequestHandler();
     
         //reused strings
-        String serverUrl = "http://127.0.0.1:8100/";
+        String serverUrl = "http://localhost:8100/";
         String username = "username";
         String password = "password";
         String wrongPassword = "wrongpassword";
@@ -127,7 +129,7 @@ public class EndToEndTest {
         req = new RequestHandler();
     
         //reused strings
-        String serverUrl = "http://127.0.0.1:8100/";
+        String serverUrl = "http://localhost:8100/";
         String username = "username";
         String password = "password";
         String recordingFile = "recording.wav";
@@ -175,7 +177,7 @@ public class EndToEndTest {
         req = new RequestHandler();
     
         //reused strings
-        String serverUrl = "http://127.0.0.1:8100/";
+        String serverUrl = "http://localhost:8100/";
         String username = "username";
         String password = "password";
         String invalidMealType = "invalid";
