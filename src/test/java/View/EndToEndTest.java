@@ -24,15 +24,9 @@ public class EndToEndTest {
 
     
     @BeforeEach
-    void setup() {
-        try {
-            AudioRecorder audioRecorder = new AudioRecorder();
-            audioRecorder.startRecording();
-            Thread.sleep(10);
-            audioRecorder.stopRecording();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    void setup() throws IOException {
+        File rec = new File("recording.wav");
+        rec.createNewFile();
     }
 
     
