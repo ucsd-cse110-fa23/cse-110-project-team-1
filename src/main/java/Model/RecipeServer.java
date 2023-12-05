@@ -13,7 +13,7 @@ import java.util.concurrent.*;
 public class RecipeServer implements RecipeServerInterface{
 
   // initialize server port and hostname
-  private static final int SERVER_PORT = 8100;
+  private static final int SERVER_PORT = 8080;
   private static final String SERVER_HOSTNAME = "localhost";
   private RecipeList list;
   private HttpServer server;
