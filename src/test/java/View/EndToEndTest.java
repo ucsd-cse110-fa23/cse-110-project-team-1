@@ -224,9 +224,6 @@ public class EndToEndTest {
         if (breakfastFile.exists()) {
             breakfastFile.delete();
         }
-    
-        // Repeat for any other files that were created
     }
-
 
 }

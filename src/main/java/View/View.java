@@ -443,7 +443,7 @@ public class View {
 
 	//https://stackoverflow.com/questions/6710350/copying-text-to-the-clipboard-using-j
 	private void shareRecipe(RecipeNode recipeNode){
-		String s = "http://localhost:8100/shared/recipe" + recipeNode.getRecipeID() + ".html";
+		String s = viewModel.getServerURL() + "shared/recipe" + recipeNode.getRecipeID() + ".html";
 		
 		Popup.showInformation(s+" copied to clipboard");
 

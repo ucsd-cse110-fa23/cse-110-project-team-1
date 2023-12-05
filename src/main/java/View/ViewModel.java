@@ -326,4 +326,8 @@ public class ViewModel {
 		    throw new IOException("Incorrect API key provided");
 		}
 	}
+
+	public String getServerURL(){
+		return this.server_url;
+	}
 }
