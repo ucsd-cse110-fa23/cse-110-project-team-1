@@ -3,6 +3,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.junit.jupiter.api.AfterEach;
@@ -20,6 +21,14 @@ public class RecipeServerMethodsTest {
         assertDoesNotThrow(() -> mockServer.startServer());
         assertDoesNotThrow(() -> mockServer.loadServer());
         assertDoesNotThrow(() -> mockServer.stopServer());
+    }
+
+    @AfterEach
+    void cleanup(){
+        File test = new File("test.csv");
+        if(test.exists()){
+            test.delete();
+        }
     }
 
 }

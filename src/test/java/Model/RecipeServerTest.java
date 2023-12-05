@@ -2,14 +2,16 @@ package Model;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import Controller.*;
 import View.User;
 import java.io.File;
 
-
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class RecipeServerTest{
     
     @Test
