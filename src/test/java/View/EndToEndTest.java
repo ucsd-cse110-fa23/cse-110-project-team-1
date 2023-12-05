@@ -22,7 +22,10 @@ import java.io.FileOutputStream;
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class EndToEndTest {
 
-    
+    MockRecipeServer mockServer;
+    RequestHandler req;
+
+
     @BeforeEach
     void setup() {
         try {
@@ -33,14 +36,16 @@ public class EndToEndTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        mockServer = new MockRecipeServer();
+        req = new RequestHandler();
     }
 
     
     @Test
     void testEndToEndScenario_SBST1_MS2() throws IOException {
         // Initialize mock server and request handler
-        MockRecipeServer mockServer = new MockRecipeServer();
-        RequestHandler req = new RequestHandler();
+        mockServer = new MockRecipeServer();
+        req = new RequestHandler();
     
         //reused strings
         String serverUrl = "http://localhost:8100/";
@@ -118,8 +123,8 @@ public class EndToEndTest {
     @Test
     void testEndToEndScenario_SBST2_MS2() throws IOException {
         // Initialize mock server and request handler
-        MockRecipeServer mockServer = new MockRecipeServer();
-        RequestHandler req = new RequestHandler();
+        mockServer = new MockRecipeServer();
+        req = new RequestHandler();
     
         //reused strings
         String serverUrl = "http://localhost:8100/";
@@ -166,8 +171,8 @@ public class EndToEndTest {
     @Test
     void testEndToEndScenario_InvalidScenarios() throws IOException {
         // Initialize mock server and request handler
-        MockRecipeServer mockServer = new MockRecipeServer();
-        RequestHandler req = new RequestHandler();
+        mockServer = new MockRecipeServer();
+        req = new RequestHandler();
     
         //reused strings
         String serverUrl = "http://localhost:8100/";
@@ -203,6 +208,7 @@ public class EndToEndTest {
 
     @AfterEach
     void cleanup() {
+        mockServer.stopServer();
         // Delete any files that were created during the tests
         File file = new File("test.csv");
         if (file.exists()) {
@@ -224,6 +230,7 @@ public class EndToEndTest {
         if (breakfastFile.exists()) {
             breakfastFile.delete();
         }
+        
     }
 
 }
