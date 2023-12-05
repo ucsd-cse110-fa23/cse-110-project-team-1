@@ -50,7 +50,7 @@ public class RequestHandler {
             return response;
         } catch (IOException e) {
             e.printStackTrace();
-            throw new ServerOfflineException("Server is offline" + e.getMessage());
+            throw new ServerOfflineException("Server is offline \n" + e.getStackTrace());
         }
     }
 
