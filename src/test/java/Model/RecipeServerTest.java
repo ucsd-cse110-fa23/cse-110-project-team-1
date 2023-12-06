@@ -19,7 +19,7 @@ public class RecipeServerTest{
         RecipeServerInterface server = new MockRecipeServer();
         try {
             AccountManager AccountManager = new AccountManager("test.csv");
-            int userID = AccountManager.addUser("username", "password");
+            AccountManager.addUser("username", "password");
             String base64Placeholder = "data:image/jpeg;base64,..."; // Replace with actual Base64 string
 
             RecipeList recipeList = new RecipeList("src/test/lists/testServerReadsExistingList");
@@ -61,7 +61,7 @@ public class RecipeServerTest{
             AccountManager AccountManager = new AccountManager("test.csv");
         
             // Add a user and then delete it
-            int userID = AccountManager.addUser("username", "password");
+            AccountManager.addUser("username", "password");
 
             server.startServer();
             server.renameServer("src/test/lists/empty");

@@ -151,7 +151,7 @@ class MockGPT implements GPTModel {
         }
 
         String response;
-        String prompt = "{bla:\"foo\", choices:[{text:\"Mashed Potatos\n...\", test:\"foofoo\"}], blabla:\"bar\"}";
+        //String prompt = "{bla:\"foo\", choices:[{text:\"Mashed Potatos\n...\", test:\"foofoo\"}], blabla:\"bar\"}";
         
         // Pull response string out of premade JSON prompt string
         //String responseBody = prompt;

@@ -10,14 +10,10 @@ import org.junit.jupiter.api.TestMethodOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.io.IOException;
 import Controller.*;
 import Model.*;
-import View.User;
 import java.io.File;
-import java.io.FileOutputStream;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class EndToEndTest {

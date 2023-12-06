@@ -108,7 +108,7 @@ public class RecipeHTTPHandler implements RecipeHTTPHandlerInterface {
 			}
 			fis.close();
 
-			String content = sb.toString();
+			//String content = sb.toString();
 			response = sb.toString();
 		} else {
 			System.out.println("query: "+query);

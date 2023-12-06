@@ -18,12 +18,6 @@ import javafx.scene.paint.Color;
 
 import java.io.*;
 
-import javafx.geometry.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.paint.Color;
-import javafx.scene.layout.CornerRadii;
-
 
 public class ViewModel {
 	private static final String DINNER = "dinner";
