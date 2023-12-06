@@ -46,7 +46,7 @@ public class RequestHandler {
             out.flush();
             out.close();
             response = getResponse(conn);
-            System.out.println("Server Response: " + response);
+            //System.out.println("Server Response: " + response);
             return response;
         } catch (IOException e) {
             e.printStackTrace();
