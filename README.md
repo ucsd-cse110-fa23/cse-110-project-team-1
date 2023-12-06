@@ -1,3 +1,4 @@
+https://github.com/ucsd-cse110-fa23/cse-110-project-team-1
 # Team 1 PantryPal Instructions
 
 
@@ -7,7 +8,7 @@
 
  You also need an internet connection if you do not have the dependencies installed, they will be downloaded.
 
-## How to run PantryPal Server and UI
+## How to run PantryPal Server and UI Loacally
 ### Windows
 To run the app locally, download the repository, add your `key.txt` file, and double click the `start` file.
  > If you have extensions enabled, this will be the     `start.bat` file. 
