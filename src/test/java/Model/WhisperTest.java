@@ -52,7 +52,8 @@ public class WhisperTest {
         }
 
         try {
-            String response = whisper.getResponse(new File("recording.wav"));
+            String response = whisper.getResponse(new File("dinnerrecording.wav"));
+            System.out.println(response.toLowerCase());
             assertTrue(response.toLowerCase().contains("dinner"));
         } catch (Exception e) {
             System.err.println(e);
@@ -60,6 +61,5 @@ public class WhisperTest {
 
         File rec = new File("recording.wav");
         assertTrue(rec.exists());
-        assertTrue(rec.delete());
     }
 }

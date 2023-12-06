@@ -49,6 +49,7 @@ public class RequestHandler {
             //System.out.println("Server Response: " + response);
             return response;
         } catch (IOException e) {
+            e.printStackTrace();
             throw new ServerOfflineException("Server is offline");
         }
     }
@@ -117,7 +118,11 @@ public class RequestHandler {
             responseCode = conn.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 String response = getResponse(conn);
-                System.out.println("Delete response " + response);
+                if(response.contains("Invalid recipe ID")){
+                    return false;
+                } else{
+                    System.out.println("Delete response " + response);
+                }
             } else {
                 System.out.println("Server returned non-OK code: " + responseCode);
             }
@@ -181,10 +186,10 @@ public class RequestHandler {
     }
 
     /**
-     * This method sends a DELETE request to the server to delete a specific recipe identified by its ID.
+     * This method sends a share request to the server to share a specific recipe identified by its ID.
      * 
-     * @param urlString The URL of the server to which the DELETE request will be sent
-     * @param recipeID The ID of the recipe to be deleted.
+     * @param urlString The URL of the server to which the share request will be sent
+     * @param recipeID The ID of the recipe to be shared.
      * 
      */
     public void performShare(String urlString, int recipeID, User user) throws IOException {

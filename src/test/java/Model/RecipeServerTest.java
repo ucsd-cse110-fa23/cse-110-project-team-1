@@ -2,14 +2,16 @@ package Model;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.IOException;
 import Controller.*;
 import View.User;
 import java.io.File;
 
-
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class RecipeServerTest{
     
     @Test
@@ -17,7 +19,7 @@ public class RecipeServerTest{
         RecipeServerInterface server = new MockRecipeServer();
         try {
             AccountManager AccountManager = new AccountManager("test.csv");
-            int userID = AccountManager.addUser("username", "password");
+            AccountManager.addUser("username", "password");
             String base64Placeholder = "data:image/jpeg;base64,..."; // Replace with actual Base64 string
 
             RecipeList recipeList = new RecipeList("src/test/lists/testServerReadsExistingList");
@@ -59,7 +61,7 @@ public class RecipeServerTest{
             AccountManager AccountManager = new AccountManager("test.csv");
         
             // Add a user and then delete it
-            int userID = AccountManager.addUser("username", "password");
+            AccountManager.addUser("username", "password");
 
             server.startServer();
             server.renameServer("src/test/lists/empty");

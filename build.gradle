@@ -45,6 +45,8 @@ sourceSets {
 
 test {
     useJUnitPlatform()
+    forkEvery = 1
+    maxParallelForks = 1
 }
 
 application {

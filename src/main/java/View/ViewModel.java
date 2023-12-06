@@ -18,12 +18,6 @@ import javafx.scene.paint.Color;
 
 import java.io.*;
 
-import javafx.geometry.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.paint.Color;
-import javafx.scene.layout.CornerRadii;
-
 
 public class ViewModel {
 	private static final String DINNER = "dinner";
@@ -325,5 +319,9 @@ public class ViewModel {
 		    Popup.showError("Incorrect API key provided \n You can find your API key at https://platform.openai.com/account/api-keys.");
 		    throw new IOException("Incorrect API key provided");
 		}
+	}
+
+	public String getServerURL(){
+		return this.server_url;
 	}
 }

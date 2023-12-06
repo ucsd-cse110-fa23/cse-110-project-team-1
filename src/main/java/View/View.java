@@ -11,8 +11,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -22,17 +20,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Base64;
-
-import javax.swing.UIClientPropertyKey;
-
 import javafx.scene.layout.FlowPane;
 
 
@@ -443,7 +431,7 @@ public class View {
 
 	//https://stackoverflow.com/questions/6710350/copying-text-to-the-clipboard-using-j
 	private void shareRecipe(RecipeNode recipeNode){
-		String s = "http://localhost:8100/shared/recipe" + recipeNode.getRecipeID() + ".html";
+		String s = viewModel.getServerURL() + "shared/recipe" + recipeNode.getRecipeID() + ".html";
 		
 		Popup.showInformation(s+" copied to clipboard");
 

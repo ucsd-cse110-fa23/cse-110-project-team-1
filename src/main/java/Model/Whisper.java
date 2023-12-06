@@ -188,12 +188,19 @@ class MockWhisper implements WhisperModel {
 
         // Check response code and handle response accordingly
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            response = handleSuccessResponse(connection);
+        response = handleSuccessResponse(connection);
         } else {                                                // if it actually errors out not in the intended way, return error
-            response = handleErrorResponse(connection);
+        response = handleErrorResponse(connection);
+        if (file.getName().contains("dinner")) {
             response = "dinner,potato,butter";
-            return response;
+        } else if (file.getName().contains("lunch")) {
+            response = "lunch,noodles,soy sauce";
+        } else if (file.getName().contains("breakfast")) {
+            response = "breakfast,crackers,jam";
+        } else {
+            response = "Invalid meal type";
         }
+    }
 
         // Disconnect connection
         connection.disconnect();

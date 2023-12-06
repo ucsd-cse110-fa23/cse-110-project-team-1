@@ -90,6 +90,7 @@ public class ChatGPT implements GPTModel {
         //System.out.println("Parsed Json : \n" + responseJson.toString());
         JSONArray choices = responseJson.getJSONArray("choices");
         String generatedText = choices.getJSONObject(0).getString("text");
+        //System.out.println("Parsed Json :" + generatedText);
 
         return filterNonAscii(generatedText);
     }
@@ -150,21 +151,27 @@ class MockGPT implements GPTModel {
         }
 
         String response;
-        String prompt = "{bla:\"foo\", choices:[{text:\"Mashed Potatos\\n...\", test:\"foofoo\"}], blabla:\"bar\"}";
-
+        //String prompt = "{bla:\"foo\", choices:[{text:\"Mashed Potatos\n...\", test:\"foofoo\"}], blabla:\"bar\"}";
+        
         // Pull response string out of premade JSON prompt string
-        String responseBody = prompt;
-        JSONObject responseJson = new JSONObject(responseBody);
-        JSONArray choices = responseJson.getJSONArray("choices");
-        String generatedText = choices.getJSONObject(0).getString("text");
+        //String responseBody = prompt;
+        //JSONObject responseJson = new JSONObject(responseBody);
+        //JSONArray choices = responseJson.getJSONArray("choices");
+        //String generatedText = choices.getJSONObject(0).getString("text");
 
-        if((mealType).toLowerCase().contains("dinner") &&
-            (ingredients.toLowerCase()).contains("potato") &&
-            (ingredients.toLowerCase()).contains("butter")) {
-            response = generatedText;
+
+        if(mealType.toLowerCase().contains("dinner") && ingredients.contains("potato") && ingredients.contains("butter")) {
+            response = "Buttery Potato Dinner\n\nIngredients:\nPotatoes\nButter\n\nInstructions:\nStep 1: Boil the potatoes.\nStep 2: Drain the potatoes and add butter.\nStep 3: Serve hot.\n";
+        } else if(mealType.toLowerCase().contains("lunch") && ingredients.contains("noodles") && ingredients.contains("soy sauce")) {
+            response = "Noodle Stir Fry\n\nIngredients:\nNoodles\nSoy Sauce\nAvocado oil\nOnion powder\nGarlic powder\n\nInstructions:\nStep 1: Cook the noodles.\nStep 2: Heat the avocado oil in a pan.\nStep 3: Add the cooked noodles, soy sauce, onion powder, and garlic powder.\nStep 4: Stir fry for a few minutes.\n";
+        } else if(mealType.toLowerCase().contains("breakfast") && ingredients.contains("crackers") && ingredients.contains("jam")) {
+            response = "Cracker and Jam Snack\n\nIngredients:\nCrackers\nJam\n\nInstructions:\nStep 1: Spread jam on the crackers.\n";
+        } else if(mealType.toLowerCase().contains("dinner") && ingredients.contains("noodles") && ingredients.contains("soy sauce")) {
+            response = "Soy Sauce Noodles Dinner\n\nIngredients:\nNoodles\nSoy Sauce\n\nInstructions:\nStep 1: Cook the noodles.\nStep 2: Drain the noodles and add soy sauce.\nStep 3: Serve hot.\n";
         } else {
             response = "No recipe.\n";
         }
+    
 
         return response;
     }
