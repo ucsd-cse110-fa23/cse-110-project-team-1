@@ -29,3 +29,7 @@ to
 mainClassName = "Model.StartServer"
 ```
 add your `key.txt` file, and double click the `start` file.
+
+## Application Description
+
+After running the app, new users will be prompted to create a password protected account. Returning users will have their existing data retrieved. As the name suggests, this application is your pantry pal. The user will push a button to verbally state a desired meal type from a list of options: Breakfast, Lunch, Dinner. After processing the audio input, the user will then push a button to say the ingredients they have on hand. Then, the user will be presented with a suggested recipe with two options: If the recipe is satisfactory, the user can save it for later; otherwise, the user can refresh to generate another recipe. After saving, the recipe will be saved on the server, associated with the user account. The app also offers the option to modify existing recipes manually by editing the title or steps. 
